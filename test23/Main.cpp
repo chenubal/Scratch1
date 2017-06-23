@@ -3,6 +3,8 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <numeric>
+#include <chrono>
 
 namespace Bank
 {
@@ -19,11 +21,7 @@ namespace Bank
 		const std::string nachname;
 		const std::string vorname;
 		const Gender geschlecht;
-		float kontostand;
-		Kunde(const std::string& n, const std::string& v, Gender g, float init=0) : nachname(n) , vorname(v), geschlecht(g), kontostand(init) {}
-		void einzahlen(float betrag) { if (betrag > 0) kontostand += betrag; }
-		void auszahlen(float betrag) { if (betrag > 0) kontostand -= betrag; }
-		float Kontostand() const { return kontostand; }
+		Kunde(const std::string& n, const std::string& v, Gender g, float init = 0) : nachname(n), vorname(v), geschlecht(g) {}
 	};
 
 	std::ostream& operator<<(std::ostream &o, Kunde const& k)
@@ -33,6 +31,35 @@ namespace Bank
 	}
 
 	using KundenDB = std::vector<Kunde>;
+
+	template<class T = float>
+	struct Transactions
+	{
+		Transactions(T a, std::string const& c="") : amount(a),comment(c), t(std::chrono::system_clock::now()) {}
+		const std::string comment;
+		const T amount;
+		const std::chrono::system_clock::time_point t;
+		std::string print() const { return std::to_string(amount) + ";" + comment + ";"; }
+	};
+
+	template<class T = float>
+	struct Konto
+	{
+		std::vector<Transactions<T>> transactions;
+		Konto( T init = 0)  
+		{
+			einzahlen(init);
+		}
+		void einzahlen(T betrag, std::string const& c="") { if (betrag > 0) transactions.emplace_back(betrag,c); }
+		void auszahlen(T betrag, std::string const& c="") { if (betrag > 0) transactions.emplace_back(-betrag,c); }
+		float Kontostand() const
+		{
+			T accu(0); for (auto const& x : transactions) accu += x.amount; return accu;
+			//return std::accumulate(transactions.cbegin(), transactions.cend(), 0.0f, [](float s, Transactions const& x) {return s + x.amount; });
+		}
+		std::string print() const {	std::string s; for (auto const& x : transactions) s += x.print()+"\n";	return s;}
+	};
+
 }
 
 
@@ -40,11 +67,12 @@ int main(int, char**)
 {
 
 	using namespace Bank;
-	KundenDB kunden = { {"Mueller","Klaus",Gender::male, 45000},
-	                             { "Mueller","Gaby",Gender::female, 4500 },
-								 { "Meier","Tom",Gender::male, 0 } };
-
-	for (auto const& k : kunden) std::cout << k << "\n-------\n";
+	Konto<float> k;
+	k.einzahlen(100,"T1");
+	k.einzahlen(10, "T2");
+	k.einzahlen(1);
+	k.auszahlen(33.3f, "T4");
+	std::cout << "Stand =" << k.Kontostand() << "Euro\n" << k.print() ;
 	return 0;
 
 }
