@@ -46,10 +46,7 @@ namespace Bank
 	struct Konto
 	{
 		std::vector<Transactions<T>> transactions;
-		Konto( T init = 0)  
-		{
-			einzahlen(init);
-		}
+		Konto( T init = 0)  {einzahlen(init); }
 		void einzahlen(T betrag, std::string const& c="") { if (betrag > 0) transactions.emplace_back(betrag,c); }
 		void auszahlen(T betrag, std::string const& c="") { if (betrag > 0) transactions.emplace_back(-betrag,c); }
 		float Kontostand() const
@@ -67,7 +64,7 @@ int main(int, char**)
 {
 
 	using namespace Bank;
-	Konto<float> k;
+	Konto<float> k(233.4);
 	k.einzahlen(100,"T1");
 	k.einzahlen(10, "T2");
 	k.einzahlen(1);
