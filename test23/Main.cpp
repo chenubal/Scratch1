@@ -4,69 +4,84 @@
 #include <map>
 #include <vector>
 #include <numeric>
-#include <ctime>
 #include <sstream>
 #include <iomanip>
+#include <chrono>
 
 namespace Bank
 {
-	enum class Gender { male, female};
+	using ctp_t = std::chrono::time_point<std::chrono::system_clock>;
+
+	std::string dateStr(ctp_t const& t)
+	{
+		auto tt = std::chrono::system_clock::to_time_t(t);
+		auto tm = *std::localtime(&tt);
+
+		std::ostringstream oss;
+		oss << std::put_time(&tm, "%c %Z");
+		return oss.str();
+	}
+
+	enum class Gender { male, female };
 
 	std::string genderLabel(Gender g)
 	{
-		static const std::map<Gender, std::string> GL{ {Gender::male, "maennlich"},{ Gender::female, "weiblich"} };
-		return GL.count(g)? GL.at(g) :"unknown";
+		static const std::map<Gender, std::string> GL{ {Gender::male, "male"},{ Gender::female, "female"} };
+		return GL.count(g) ? GL.at(g) : "unknown";
 	}
 
-	struct Kunde
+	struct Customer
 	{
-		const std::string nachname;
-		const std::string vorname;
+		const std::string surname;
+		const std::string forename;
 		const Gender geschlecht;
-		Kunde(const std::string& n, const std::string& v, Gender g, float init = 0) : nachname(n), vorname(v), geschlecht(g) {}
+		Customer(const std::string& n, const std::string& v, Gender g, float init = 0) : surname(n), forename(v), geschlecht(g) {}
 	};
 
-	std::ostream& operator<<(std::ostream &o, Kunde const& k)
+	std::ostream& operator<<(std::ostream &o, Customer const& k)
 	{
-		std::cout << "Name: " << k.vorname << " " << k.nachname << "\n" << "Geschlecht: " << genderLabel(k.geschlecht);
+		o << "Name: " << k.forename << " " << k.surname << "\n" << "Gender: " << genderLabel(k.geschlecht);
 		return o;
 	}
 
-	using KundenDB = std::vector<Kunde>;
+	using KundenDB = std::vector<Customer>;
 
-	std::string now()
-	{
-		auto t = std::time(nullptr);
-		auto tm = *std::localtime(&t);
 
-		std::ostringstream oss;
-		oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
-		return oss.str();
-	}
 	template<class T = float>
 	struct Transactions
 	{
-		Transactions(T a, std::string const& c = "") : amount(a), comment(c), date(now()) { }
+		Transactions(T a, std::string const& c = "") : amount(a), comment(c), date(std::chrono::system_clock::now()) { }
 		const std::string comment;
 		const T amount;
-		const std::string date;
-		std::string print() const { return std::to_string(amount) + ";" +date + ";" + comment; }
+		const ctp_t date;
 	};
 
+	template<class T>
+	std::ostream& operator<<(std::ostream &o, Transactions<T> const& t)
+	{
+		o << std::to_string(t.amount) + "\t" + dateStr(t.date) + "\t" + t.comment;
+		return o;
+	}
+
 	template<class T = float>
-	struct Konto
+	struct Account
 	{
 		std::vector<Transactions<T>> transactions;
-		Konto( T init = 0)  {einzahlen(init); }
-		void einzahlen(T betrag, std::string const& c="") { if (betrag > 0) transactions.emplace_back(betrag,c); }
-		void auszahlen(T betrag, std::string const& c="") { if (betrag > 0) transactions.emplace_back(-betrag,c); }
-		float Kontostand() const
+		Account(T init = 0) { deposit(init); }
+		void deposit(T betrag, std::string const& c = "") { if (betrag > 0) transactions.emplace_back(betrag, c); }
+		void withdraw(T betrag, std::string const& c = "") { if (betrag > 0) transactions.emplace_back(-betrag, c); }
+		float balance() const
 		{
 			T accu(0); for (auto const& x : transactions) accu += x.amount; return accu;
-			//return std::accumulate(transactions.cbegin(), transactions.cend(), 0.0f, [](float s, Transactions const& x) {return s + x.amount; });
 		}
-		std::string print() const {	std::string s; for (auto const& x : transactions) s += x.print()+"\n";	return s;}
 	};
+
+	template<class T>
+	std::ostream& operator<<(std::ostream &o, Account<T> const& a)
+	{
+		for (auto const& x : a.transactions) o << x << "\n";
+		return o;
+	}
 
 }
 
@@ -74,12 +89,12 @@ int main(int, char**)
 {
 
 	using namespace Bank;
-	Konto<float> k(233.4f);
-	k.einzahlen(100,"T1");
-	k.einzahlen(10, "T2");
-	k.einzahlen(1);
-	k.auszahlen(33.3f, "T4");
-	std::cout << "Stand =" << k.Kontostand() << "Euro\n" << k.print() ;
+	Account<float> k(233.4f);
+	k.deposit(100, "T1");
+	k.deposit(10, "T2");
+	k.deposit(1);
+	k.withdraw(33.3f, "T4");
+	std::cout << "Balance = " << k.balance() << "Euro\nTransactions:\n" << k;
 	return 0;
 
 }
