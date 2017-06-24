@@ -4,7 +4,9 @@
 #include <map>
 #include <vector>
 #include <numeric>
-#include <chrono>
+#include <ctime>
+#include <sstream>
+#include <iomanip>
 
 namespace Bank
 {
@@ -32,14 +34,23 @@ namespace Bank
 
 	using KundenDB = std::vector<Kunde>;
 
+	std::string now()
+	{
+		auto t = std::time(nullptr);
+		auto tm = *std::localtime(&t);
+
+		std::ostringstream oss;
+		oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
+		return oss.str();
+	}
 	template<class T = float>
 	struct Transactions
 	{
-		Transactions(T a, std::string const& c="") : amount(a),comment(c), t(std::chrono::system_clock::now()) {}
+		Transactions(T a, std::string const& c = "") : amount(a), comment(c), date(now()) { }
 		const std::string comment;
 		const T amount;
-		const std::chrono::system_clock::time_point t;
-		std::string print() const { return std::to_string(amount) + ";" + comment + ";"; }
+		const std::string date;
+		std::string print() const { return std::to_string(amount) + ";" +date + ";" + comment; }
 	};
 
 	template<class T = float>
@@ -59,12 +70,11 @@ namespace Bank
 
 }
 
-
 int main(int, char**)
 {
 
 	using namespace Bank;
-	Konto<float> k(233.4);
+	Konto<float> k(233.4f);
 	k.einzahlen(100,"T1");
 	k.einzahlen(10, "T2");
 	k.einzahlen(1);
