@@ -22,66 +22,58 @@ namespace Bank
 		return oss.str();
 	}
 
-	enum class Gender { male, female };
-
-	std::string genderLabel(Gender g)
-	{
-		static const std::map<Gender, std::string> GL{ {Gender::male, "male"},{ Gender::female, "female"} };
-		return GL.count(g) ? GL.at(g) : "unknown";
-	}
-
 	struct Customer
 	{
 		const std::string surname;
 		const std::string forename;
-		const Gender geschlecht;
-		Customer(const std::string& n, const std::string& v, Gender g, float init = 0) : surname(n), forename(v), geschlecht(g) {}
+		Customer(const std::string& n, const std::string& v) : surname(n), forename(v) {}
 	};
 
-	std::ostream& operator<<(std::ostream &o, Customer const& k)
+	std::ostream& operator<<(std::ostream &os, Customer const& c)
 	{
-		o << "Name: " << k.forename << " " << k.surname << "\n" << "Gender: " << genderLabel(k.geschlecht);
-		return o;
+		os << "Name: " << c.forename << " " << c.surname << "\n";
+		return os;
 	}
 
-	using KundenDB = std::vector<Customer>;
-
-
 	template<class T = float>
-	struct Transactions
+	struct Transaction
 	{
-		Transactions(T a, std::string const& c = "") : amount(a), comment(c), date(std::chrono::system_clock::now()) { }
+		Transaction(T a, std::string const& c = "") : amount(a), comment(c), date(std::chrono::system_clock::now()) { }
 		const std::string comment;
 		const T amount;
 		const ctp_t date;
+		T operator()() const { return amount; }
 	};
 
 	template<class T>
-	std::ostream& operator<<(std::ostream &o, Transactions<T> const& t)
+	std::ostream& operator<<(std::ostream &os, Transaction<T> const& t)
 	{
-		o << std::to_string(t.amount) + "\t" + dateStr(t.date) + "\t" + t.comment;
-		return o;
+		os << std::to_string(t.amount) + "\t" + dateStr(t.date) + "\t" + t.comment;
+		return os;
 	}
 
 	template<class T = float>
 	struct Account
 	{
-		std::vector<Transactions<T>> transactions;
-		Account(T init = 0) { deposit(init); }
-		void deposit(T betrag, std::string const& c = "") { if (betrag > 0) transactions.emplace_back(betrag, c); }
-		void withdraw(T betrag, std::string const& c = "") { if (betrag > 0) transactions.emplace_back(-betrag, c); }
+		std::vector<Transaction<T>> transactions;
+		Account(T start = 0) { deposit(start,"Start"); }
+		void deposit(T amount, std::string const& comment = "") { if (amount > 0) transactions.emplace_back(amount, comment); }
+		void withdraw(T amount, std::string const& comment = "") { if (amount > 0) transactions.emplace_back(-amount, comment); }
 		float balance() const
 		{
-			T accu(0); for (auto const& x : transactions) accu += x.amount; return accu;
+			T s(0); for (auto const& t : transactions) s += t(); return s;
 		}
 	};
 
 	template<class T>
-	std::ostream& operator<<(std::ostream &o, Account<T> const& a)
+	std::ostream& operator<<(std::ostream &os, Account<T> const& account)
 	{
-		for (auto const& x : a.transactions) o << x << "\n";
-		return o;
+		for (auto const& t : account.transactions) 
+			os << t << "\n";
+		return os;
 	}
+
+	using KundenDB = std::vector<Customer>;
 
 }
 
