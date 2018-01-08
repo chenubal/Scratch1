@@ -13,7 +13,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test22", "test22\test22.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UTF", "UTF\UTF.vcxproj", "{EBA16258-1ACF-4739-AEC1-B8D0041D0773}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test24", "test24\test24.vcxproj", "{FC63D288-1292-48E2-83FC-FA082C170779}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Interval", "test24\test24.vcxproj", "{FC63D288-1292-48E2-83FC-FA082C170779}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "accu_flt", "accu_flt\accu_flt.vcxproj", "{F4A87ED3-0DD8-4489-BF6F-E8D78871D7C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,14 @@ Global
 		{FC63D288-1292-48E2-83FC-FA082C170779}.Release|x64.Build.0 = Release|x64
 		{FC63D288-1292-48E2-83FC-FA082C170779}.Release|x86.ActiveCfg = Release|Win32
 		{FC63D288-1292-48E2-83FC-FA082C170779}.Release|x86.Build.0 = Release|Win32
+		{F4A87ED3-0DD8-4489-BF6F-E8D78871D7C9}.Debug|x64.ActiveCfg = Debug|x64
+		{F4A87ED3-0DD8-4489-BF6F-E8D78871D7C9}.Debug|x64.Build.0 = Debug|x64
+		{F4A87ED3-0DD8-4489-BF6F-E8D78871D7C9}.Debug|x86.ActiveCfg = Debug|Win32
+		{F4A87ED3-0DD8-4489-BF6F-E8D78871D7C9}.Debug|x86.Build.0 = Debug|Win32
+		{F4A87ED3-0DD8-4489-BF6F-E8D78871D7C9}.Release|x64.ActiveCfg = Release|x64
+		{F4A87ED3-0DD8-4489-BF6F-E8D78871D7C9}.Release|x64.Build.0 = Release|x64
+		{F4A87ED3-0DD8-4489-BF6F-E8D78871D7C9}.Release|x86.ActiveCfg = Release|Win32
+		{F4A87ED3-0DD8-4489-BF6F-E8D78871D7C9}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
