@@ -6,5 +6,6 @@
   <ItemGroup>
     <ClInclude Include="Loader.h" />
     <ClInclude Include="Buffer.h" />
+    <ClInclude Include="Image.h" />
   </ItemGroup>
 </Project>
