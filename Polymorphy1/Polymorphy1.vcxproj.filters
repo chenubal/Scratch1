@@ -3,4 +3,8 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Loader.h" />
+    <ClInclude Include="Buffer.h" />
+  </ItemGroup>
 </Project>
