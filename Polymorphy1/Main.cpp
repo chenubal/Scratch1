@@ -13,13 +13,11 @@ int main()
 	//delete g;
 
 	auto i=0U, k = 5U;
-	Image<double> Ii(k+1, k);
 
-	for (auto &x : Ii) x = 1.1*i++;
-	auto Id = Ii.clone<bool>();
+	Image<double> I(k+1, k);
+	for (auto &x : I) x = 1.1*i++;
+	std::cout << I << "\n---\n";
 
-	std::cout << Id << "\n";
-
-	auto K = Ii;
-	std::cout << K << "\n";
+	std::cout << (I * I.clone<short>()) << "\n";
+	std::cout << apply<double,int>(I, [](double x)->int {return x*x; }) << "\n";
 }
