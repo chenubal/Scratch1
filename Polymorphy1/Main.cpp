@@ -1,5 +1,8 @@
 #include "Buffer.h"
 #include "Image.h"
+#include "Geometry.h"
+
+using namespace std;
  
 int main()
 {
@@ -20,4 +23,15 @@ int main()
 
 	std::cout << (I * I.clone<short>()) << "\n";
 	std::cout << apply<double,int>(I, [](double x)->int {return x*x; }) << "\n";
+
+	geo::Point<double> P{ 1, 1 };
+	auto Q = P;
+	cout << Q.shift({2,2}) << "\n";
+	geo::Vector<double> u{0,0};
+	u += {3, 4};
+	auto u2 = u;
+
+	cout << norm2(3.0*u2) << "\n";
+
+
 }

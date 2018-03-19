@@ -7,5 +7,6 @@
     <ClInclude Include="Loader.h" />
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="Image.h" />
+    <ClInclude Include="Geometry.h" />
   </ItemGroup>
 </Project>
