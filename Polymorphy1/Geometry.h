@@ -58,39 +58,38 @@ namespace geo
 		{
 			return double(std::hypot(x - T(P.x), y - T(P.y)));
 		}
-		Point<T> move( Vector<T> const& u)	const
-		{
-			return{ x + u.x,y + u.y };
-		}
 
-		Vector<T> toVector() { return{ x,y }; }
 	};
 
 	template<class T>
-	Vector<T> shift(Point<T> const& P, Point<T> const& Q) { return{ Q.x - P.x, Q.y - P.y }; }
-		
+	Vector<T> operator-(Point<T> const& P, Point<T> const& Q) { return{ Q.x - P.x, Q.y - P.y }; }
 	template<class T>
-	std::ostream& operator<<(std::ostream& os, Point<T> const& P)
+	Point<T> operator+(Point<T> const& P, Vector<T> const& u){	return{ P.x + u.x,P.y + u.y };}
+ 	template<class T>
+	std::ostream& operator<<(std::ostream& os, Point<T> const& P) {	os << "(" << P.x << "," << P.y << ")"; return os;}
+
+	struct Line 
 	{
-		os << "(" << P.x << "," << P.y << ")";
-		return os;
-	}
+		Line() = delete;
+		Line(Point<double> const& P, Vector<double> const& u) : P(P), u(u) { if (norm2(u) == 0) throw; }
+		Line(Point<double> const& P, Point<double> const& Q) : Line(P,P-Q) {}
+		Line(Line const&) = default;
+
+		Point<double> operator() (double t) const { return P +(t * u); }
+
+		template<class T>
+		Point<T> projection(Point<T> const& X) {return operator()((u | P - X) / (u | u));}
+		template<class T>
+		double distance(Point<T> const& X) {return X.distance(projection(X));}
+
+		Point<double> P;
+		Vector<double> u;
+	};
 
 	template<class T>
-	Point<T> projection(Point<T> const& P, Vector<T> const& u, Point<T> const& X)
-	{
-		auto w = shift(P,X);
-		auto t = (u | w) / (u | u);
-		return P.move(u*t);
-
-	}
+	Point<T> projection(Point<T> const& P, Vector<T> const& u, Point<T> const& X) {	return Line(P, u).projection(X);}
 
 	template<class T>
-	double distance(Point<T> const& P, Vector<T> const& u, Point<T> const& X)
-	{
-		return X.distance(projection(P, u, X));
-
-	}
-
+	double distance(Point<T> const& P, Vector<T> const& u, Point<T> const& X) {return Line(P, u).distance(X); }
 }
 

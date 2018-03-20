@@ -30,11 +30,11 @@ int main()
 	//geo::Vector<double> u{0,0};
 	//u += {3, 4};
 	//auto u2 = u;
-	geo::Point<double> P = { 1,1 };
-	geo::Point<double> Q = { 10,10 };
-	geo::Point<double> X = { -1,-1 };
-	cout << geo::projection(P, shift(P, Q), X) << "\n";
-	cout << geo::distance(P, shift(P, Q), X) << "\n";
-
+	geo::Point<double> P{ 1,1 };
+	geo::Point<double> Q{ 10,10 };
+	geo::Line l(P, Q);
+	geo::Point<double> X = { 1,-1 };
+	cout << l.projection(X) << "\n";
+	cout << l.distance(X) << "\n";
 
 }
