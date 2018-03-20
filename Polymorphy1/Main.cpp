@@ -15,23 +15,26 @@ int main()
 	//auto g = createBuffer(m);
 	//delete g;
 
-	auto i=0U, k = 5U;
+	//auto i=0U, k = 5U;
 
-	Image<double> I(k+1, k);
-	for (auto &x : I) x = 1.1*i++;
-	std::cout << I << "\n---\n";
+	//Image<double> I(k+1, k);
+	//for (auto &x : I) x = 1.1*i++;
+	//std::cout << I << "\n---\n";
 
-	std::cout << (I * I.clone<short>()) << "\n";
-	std::cout << apply<double,int>(I, [](double x)->int {return x*x; }) << "\n";
+	//std::cout << (I * I.clone<short>()) << "\n";
+	//std::cout << apply<double,int>(I, [](double x)->int {return x*x; }) << "\n";
 
-	geo::Point<double> P{ 1, 1 };
-	auto Q = P;
-	cout << Q.shift({2,2}) << "\n";
-	geo::Vector<double> u{0,0};
-	u += {3, 4};
-	auto u2 = u;
-
-	cout << norm2(3.0*u2) << "\n";
+	//geo::Point<double> P{ 1, 1 };
+	//auto Q = P;
+	//cout << Q.move({2,2}) << "\n";
+	//geo::Vector<double> u{0,0};
+	//u += {3, 4};
+	//auto u2 = u;
+	geo::Point<double> P = { 1,1 };
+	geo::Point<double> Q = { 10,10 };
+	geo::Point<double> X = { -1,-1 };
+	cout << geo::projection(P, shift(P, Q), X) << "\n";
+	cout << geo::distance(P, shift(P, Q), X) << "\n";
 
 
 }

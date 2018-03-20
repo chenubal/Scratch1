@@ -58,12 +58,16 @@ namespace geo
 		{
 			return double(std::hypot(x - T(P.x), y - T(P.y)));
 		}
-		Point<T> shift( Vector<T> const& u)
+		Point<T> move( Vector<T> const& u)	const
 		{
 			return{ x + u.x,y + u.y };
 		}
+
+		Vector<T> toVector() { return{ x,y }; }
 	};
 
+	template<class T>
+	Vector<T> shift(Point<T> const& P, Point<T> const& Q) { return{ Q.x - P.x, Q.y - P.y }; }
 		
 	template<class T>
 	std::ostream& operator<<(std::ostream& os, Point<T> const& P)
@@ -72,6 +76,21 @@ namespace geo
 		return os;
 	}
 
+	template<class T>
+	Point<T> projection(Point<T> const& P, Vector<T> const& u, Point<T> const& X)
+	{
+		auto w = shift(P,X);
+		auto t = (u | w) / (u | u);
+		return P.move(u*t);
+
+	}
+
+	template<class T>
+	double distance(Point<T> const& P, Vector<T> const& u, Point<T> const& X)
+	{
+		return X.distance(projection(P, u, X));
+
+	}
 
 }
 
