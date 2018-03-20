@@ -61,26 +61,28 @@ namespace geo
 
 	};
 
-	template<class T>
-	Vector<T> operator-(Point<T> const& P, Point<T> const& Q) { return{ Q.x - P.x, Q.y - P.y }; }
-	template<class T>
-	Point<T> operator+(Point<T> const& P, Vector<T> const& u){	return{ P.x + u.x,P.y + u.y };}
+	template<class T, class S = T>
+	Vector<T> operator-(Point<T> const& P, Point<S> const& Q) { return{ T(Q.x) - P.x, T(Q.y) - P.y }; }
+	template<class T, class S = T>
+	Point<T> operator+(Point<T> const& P, Vector<S> const& u){	return{ P.x + T(u.x),P.y + T(u.y) };}
  	template<class T>
 	std::ostream& operator<<(std::ostream& os, Point<T> const& P) {	os << "(" << P.x << "," << P.y << ")"; return os;}
 
 	struct Line 
 	{
 		Line() = delete;
-		Line(Point<double> const& P, Vector<double> const& u) : P(P), u(u) { if (norm2(u) == 0) throw; }
-		Line(Point<double> const& P, Point<double> const& Q) : Line(P,P-Q) {}
+		template<class T = double>
+		Line(Point<T> const& P, Vector<T> const& u) : P(P), u(u) { if (norm2(u) == 0) throw; }
+		template<class T = double>
+		Line(Point<T> const& P, Point<T> const& Q) : Line(P,P-Q) {}
 		Line(Line const&) = default;
 
 		Point<double> operator() (double t) const { return P +(t * u); }
 
-		template<class T>
-		Point<T> projection(Point<T> const& X) {return operator()((u | P - X) / (u | u));}
-		template<class T>
-		double distance(Point<T> const& X) {return X.distance(projection(X));}
+		template<class T = double>
+		Point<double> projection(Point<T> const& X) {return operator()((u | P - X) / (u | u));}
+		template<class T = double>
+		double distance(Point<T> const& X) { return norm2(X - projection(X)); }
 
 		Point<double> P;
 		Vector<double> u;

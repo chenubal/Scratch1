@@ -33,7 +33,7 @@ int main()
 	geo::Point<double> P{ 1,1 };
 	geo::Point<double> Q{ 10,10 };
 	geo::Line l(P, Q);
-	geo::Point<double> X = { 1,-1 };
+	geo::Point<double> X = { 2+1,-2+1 };
 	cout << l.projection(X) << "\n";
 	cout << l.distance(X) << "\n";
 
