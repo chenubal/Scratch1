@@ -9,12 +9,9 @@ namespace geo
 		Vector(Vector<T> const&) = default;
 
 		Vector<T>& operator*=(double s) { x *= T(s); y *= T(s); return *this; }
-		Vector<T>& operator+=(double s) { x *= T(s); y += T(s); return *this; }
 
 		template<class S=T>
 		Vector<T>& operator+=(Vector<S> const& o) { x += T(o.x); y += T(o.y); return *this; }
-		template<class S=T>
-		Vector<T>& operator*=(Vector<S> const& o) { x *= T(o.x); y *= T(o.y); return *this; }
 	
 		T x, y;
 	};
@@ -45,7 +42,7 @@ namespace geo
 		os << "(" << v.x << "," << v.y << ")";
 		return os;
 	}
-
+	//-------------------------------------------------------------------------------------------------------------------------
 	template<class T = double> struct Point
 	{
 		Point() = delete;
@@ -68,7 +65,8 @@ namespace geo
  	template<class T>
 	std::ostream& operator<<(std::ostream& os, Point<T> const& P) {	os << "(" << P.x << "," << P.y << ")"; return os;}
 
-	struct Line 
+	//-------------------------------------------------------------------------------------------------------------------------
+	struct Line
 	{
 		Line() = delete;
 		template<class T = double>

@@ -6,8 +6,9 @@ using namespace std;
  
 int main()
 {
-	//std::cout << "Type n: ";
-	//unsigned n; std::cin >> n;
+	using namespace geo;
+	//cout << "Type n: ";
+	//unsigned n; cin >> n;
 	//auto f = createBuffer(n);
 	//f->store("myfile.im7");
 	//delete f;
@@ -15,25 +16,27 @@ int main()
 	//auto g = createBuffer(m);
 	//delete g;
 
-	//auto i=0U, k = 5U;
+	auto i=0U, k = 5U;
 
-	//Image<double> I(k+1, k);
-	//for (auto &x : I) x = 1.1*i++;
-	//std::cout << I << "\n---\n";
+	Image<double> I(k+1, k);
+	for (auto &x : I) x = 1.1*i++;
+	cout << I << "\n---\n";
 
-	//std::cout << (I * I.clone<short>()) << "\n";
-	//std::cout << apply<double,int>(I, [](double x)->int {return x*x; }) << "\n";
+	cout << (I * I.clone<short>()) << "\n";
+	cout << apply<double,int>(I, [](double x)->int {return x*x; }) << "\n";
 
-	//geo::Point<double> P{ 1, 1 };
-	//auto Q = P;
-	//cout << Q.move({2,2}) << "\n";
-	//geo::Vector<double> u{0,0};
-	//u += {3, 4};
-	//auto u2 = u;
-	geo::Point<double> P{ 1,1 };
-	geo::Point<double> Q{ 10,10 };
-	geo::Line l(P, Q);
-	geo::Point<double> X = { 2+1,-2+1 };
+	Point<> P1{ 1, 1 };
+	auto Q1 = P1;
+	cout << Q1 + Vector<int>{2,2} << "\n";
+	Vector<> u{0,0};
+	u += {3, 4};
+	auto u2 = u;
+
+	Point<> P{ 1,1 };
+	Point<> Q{ 10,10 };
+	Line l(P, Q);
+	cout << l(1) << "\n";
+	Point<> X = { 2+1,-2+1 };
 	cout << l.projection(X) << "\n";
 	cout << l.distance(X) << "\n";
 
