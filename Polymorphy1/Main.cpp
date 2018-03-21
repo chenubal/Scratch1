@@ -23,7 +23,7 @@ int main()
 	cout << I << "\n---\n";
 
 	cout << (I * I.clone<short>()) << "\n";
-	cout << apply<double,int>(I, [](double x)->int {return x*x; }) << "\n";
+	cout << apply<double,int>(I, [](double x) {return int(x*x); }) << "\n";
 
 	Point<> P1{ 1, 1 };
 	auto Q1 = P1;
@@ -39,5 +39,9 @@ int main()
 	Point<> X = { 2+1,-2+1 };
 	cout << l.projection(X) << "\n";
 	cout << l.distance(X) << "\n";
+
+	Vector<> vv = { 1.1,2.2 };
+	auto ww = Vector<int>(vv);
+	cout << ww << "\n";
 
 }
