@@ -24,7 +24,8 @@ namespace computer_vision
 			Image() = delete;
 			Image(size_t width, size_t height) : width(width), data(width*height, 0) { if (width*height == 0) throw; }
 			Image(Size const& s) : Image(s.width, s.height) {}
-			Image(Image const& I) : data(I.data), width(I.width) {}
+			template<class S=T>
+			Image(Image<S> const& I) : Image<T>(I.ImageSize()) {apply<S>(I, [](T, S x){return T(x);});}
 			// STL access
 			Iter begin() { return data.begin(); }
 			Iter end() { return data.end(); }
@@ -39,11 +40,12 @@ namespace computer_vision
 			T at(size_t k) const { return data[k]; }
 			// Helpers
 			Size ImageSize() const { return{ width, size() / width }; }
-			template<class S = T>
-			Image<S> clone() const {Image<S> I(ImageSize());std::transform(cbegin(), cend(), I.begin(), [](T x)->S {return static_cast<S>(x); }); return I;	}
+
 			template<typename S = T>
-			Image<T>& apply( Image<S> const& I, dfun_t<T,S> f) {	std::transform(cbegin(), cend(), I.cbegin(), begin(), f); return *this;	}
-			Image<T>& apply(mfun_t<T>f) { std::transform(cbegin(), cend(), begin(), f); return *this; }
+			Image<T>& apply( Image<S> const& I, dfun_t<T,S> f) {std::transform(cbegin(), cend(), I.cbegin(), begin(), f); return *this;	}
+
+			Image<T>& apply(mfun_t<T> f) { return apply<T>(*this, [=](T x, T){return f(x); }); }
+
 		private:
 			size_t kmap(size_t i, size_t j) { return i + j*width; }
 			size_t width;
@@ -51,9 +53,10 @@ namespace computer_vision
 		};
 
 		template<typename T, typename S = T>
-		Image<S> apply(Image<T> const& I, mfun_t<T,S> f) {return I.clone<S>().apply([=](S x) {return f(T(x)); }); }
+		Image<S> apply(Image<T> const& I, mfun_t<T,S> f) {return Image<S>(I).apply([=](S x) {return f(T(x)); }); }
 		template<typename T, typename S>
-		Image<T> apply(Image<T> const& l, Image<S> const& r, dfun_t<T, S> f) { return l.clone<T>().apply<S>(r, f);	}
+		Image<T> apply(Image<T> const& l, Image<S> const& r, dfun_t<T, S> f) { return Image<T>(l).apply<S>(r, f);	}
+
 		template<typename T, typename S>
 		Image<T> operator+(Image<T> const& l, Image<S> const& r) { return apply<T, S>(l, r, [](T x, S y)->T {return x + T(y); }); }
 		template<typename T, typename S>

@@ -22,7 +22,7 @@ int main()
 	for (auto &x : I) x = 1.1*i++;
 	cout << I << "\n---\n";
 
-	cout << (I * I.clone<short>()) << "\n";
+	cout << (I * cv2::Image<short>(I)) << "\n";
 	cout << cv2::apply<double,int>(I, [](double x) {return int(x*x); }) << "\n";
 
 	Point<> P1{ 1, 1 };
