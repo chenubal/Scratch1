@@ -18,12 +18,12 @@ int main()
 
 	auto i=0U, k = 5U;
 
-	Image<double> I(k+1, k);
+	cv2::Image<double> I(k+1, k);
 	for (auto &x : I) x = 1.1*i++;
 	cout << I << "\n---\n";
 
 	cout << (I * I.clone<short>()) << "\n";
-	cout << apply<double,int>(I, [](double x) {return int(x*x); }) << "\n";
+	cout << cv2::apply<double,int>(I, [](double x) {return int(x*x); }) << "\n";
 
 	Point<> P1{ 1, 1 };
 	auto Q1 = P1;
@@ -31,6 +31,7 @@ int main()
 	Vector<> u{0,0};
 	u += {3, 4};
 	auto u2 = u;
+	cout << (u == u2) << "\n";
 
 	Point<> P{ 1,1 };
 	Point<> Q{ 10,10 };
