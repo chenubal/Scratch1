@@ -55,7 +55,7 @@ namespace computer_vision
 		template<typename T, typename S = T>
 		Image<S> apply(Image<T> const& I, mfun_t<T,S> f) {return Image<S>(I).apply([=](S x) {return f(T(x)); }); }
 		template<typename T, typename S>
-		Image<T> apply(Image<T> const& l, Image<S> const& r, dfun_t<T, S> f) { return Image<T>(l).apply<S>(r, f);	}
+		Image<T> apply(Image<T> const& l, Image<S> const& r, dfun_t<T, S> f) { return Image<T>(l).apply(r, f);	}
 
 		template<typename T, typename S>
 		Image<T> operator+(Image<T> const& l, Image<S> const& r) { return apply<T, S>(l, r, [](T x, S y)->T {return x + T(y); }); }
