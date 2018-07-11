@@ -16,14 +16,14 @@ namespace geometry
 			Vector<T>& operator+=(Vector<S> const& u) { x += T(u.x); y += T(u.y); return *this; }
 
 			template<class S = T>
-			double operator|(Vector<S> const& u) const { return double(x*T(u.x) + y*T(u.y)); }
+			double operator*(Vector<S> const& u) const { return double(x*T(u.x) + y*T(u.y)); }
 
 			template<class S = T>
 			bool operator==(Vector<S> const& u) const { return u.x == T(x) && u.y == T(y); }
 
 			Vector<T> operator-() const { return { -x, -y }; }
 
-			operator double() const { return std::sqrt(*this | *this); }
+			operator double() const { return std::sqrt(*this *  *this); }
 			T x, y;
 		};
 
@@ -84,7 +84,7 @@ namespace geometry
 			Point<double> operator() (double t) const { return P + (t * u); }
 
 			template<class T = double>
-			Point<double> projection(Point<T> const& X) const { return operator()((u | P - X) / (u | u)); }
+			Point<double> projection(Point<T> const& X) const { return operator()((u * (P - X)) / (u * u)); }
 			template<class T = double>
 			double distance(Point<T> const& X) const { return double(X - projection(X)); }
 
@@ -112,7 +112,7 @@ namespace geometry
 		Optional<Point<double>> intersect(Line const& L, Line const& K)
 		{
 			if (L.P == K.P)	return{ L.P,true };
-			auto kl = L.u | K.u;
+			auto kl = L.u * K.u;
 			if (kl == 0.0)	return{ L.projection(K.P),true };
 			auto l = norm2(L.u), k = norm2(K.u);
 			if (std::abs(kl) == (k*l))	return{ L.projection(K.P),true };
