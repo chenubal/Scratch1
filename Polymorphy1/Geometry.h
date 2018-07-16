@@ -1,6 +1,6 @@
 #pragma once
 
-namespace geometry
+namespace Geometry
 {
 	namespace D2
 	{
@@ -10,61 +10,60 @@ namespace geometry
 			template<class S = T>
 			explicit Vector(Vector<S> const& u) : Vector(T(u.x), T(u.y)) {}
 
-			Vector<T>& operator*=(double s) { x *= T(s); y *= T(s); return *this; }
-
 			template<class S = T>
 			Vector<T>& operator+=(Vector<S> const& u) { x += T(u.x); y += T(u.y); return *this; }
 
-			template<class S = T>
+			Vector<T>& operator*=(double s) { x *= T(s); y *= T(s); return *this; }
+  
+			template<class S = T> // u+v
+			Vector<T> operator+(Vector<S> const& v) const { return{ x + v.x, y + v.y }; }
+
+			//s*u
+			Vector<T> operator*(double s) const { return{ x*s,y*s }; }
+
+			template<class S = T>// u*v
 			double operator*(Vector<S> const& u) const { return double(x*T(u.x) + y*T(u.y)); }
 
 			template<class S = T>
 			bool operator==(Vector<S> const& u) const { return u.x == T(x) && u.y == T(y); }
 
-			Vector<T> operator-() const { return { -x, -y }; }
-
-			operator double() const { return std::sqrt(*this *  *this); }
 			T x, y;
 		};
 
-		template<class T, class S = T>
+		template<class T>	// -u
+		Vector<T> operator-(Vector<T> const& u) { return{ -u.x, -u.y }; }
+		template<class T>  // norm(u)
+		double norm2(Vector<T> const& u) { return std::sqrt(u*u); }
+		template<class T, class S>	// u!=v
 		bool operator!=(Vector<T> const& u, Vector<S> const& v) { return !(u == v); }
-		template<class T, class S = T>
-		Vector<T> operator+(Vector<T> const& u, Vector<S> const& v) { auto t(u);  return t += v; }
-		template<class T, class S = T>
-		Vector<T> operator-(Vector<T> const& u, Vector<S> const& v) { auto t(u);  return t += -v; }
-		template<class T>
-		Vector<T> operator*(Vector<T> const& u, double s) { auto t(u);  return t *= s; }
-		template<class T>
+		template<class T, class S>	// u-v
+		Vector<T> operator-(Vector<T> const& u, Vector<S> const& v) { return u+(-v); }
+		template<class T>	// s*u
 		Vector<T> operator*(double s, Vector<T> const& u) { return u*s; }
-		template<class T>
-		Vector<T> operator+(Vector<T> const& u, double s) { auto t(u);  return t += s; }
-		template<class T>
-		Vector<T> operator+(double s, Vector<T> const& u) { return u + s; }
+
 		template<class T>
 		std::ostream& operator<<(std::ostream& os, const Vector<T>& v) { os << "(" << v.x << "," << v.y << ")";	return os; }
-		template<class T>
-		double norm2(Vector<T> const& u) { return double(u); }
+
 
 		//-------------------------------------------------------------------------------------------------------------------------
 		template<class T = double> struct Point
 		{
 			Point(T x = 0, T y = 0) : x(x), y(y) {}
-			template<class S = T>
+			template<class S>
 			explicit Point(Point<S> const& P) : Point(T(P.x), T(P.y)) {}
 			const T x, y;
 
-			template<class S>
+			template<class S=T>
 			bool operator==(Point<S> const& P) const { return x == P.x && y == P.y; }
+			template<class S=T>
+			Vector<T> operator-( Point<S> const& P) const { return{ T(P.x) - x, T(P.y) - y }; }
+			template<class S=T>
+			Point<T> operator+(Vector<S> const& u) const { return{ x + T(u.x), y + T(u.y) }; }
 		};
 
-		template<class T, class S = T>
+		template<class T, class S=T>
 		bool operator!=(Point<T> const& P, Point<S> const& Q) { return !(P == Q); }
- 		template<class T, class S = T>
-		Vector<T> operator-(Point<T> const& P, Point<S> const& Q) { return{ T(Q.x) - P.x, T(Q.y) - P.y }; }
-		template<class T, class S = T>
-		Point<T> operator+(Point<T> const& P, Vector<S> const& u) { return{ P.x + T(u.x),P.y + T(u.y) }; }
-		template<class T, class S = T>
+		template<class T, class S=T>
 		double operator||(Point<T> const& P, Point<S> const& Q)  { return double(P - Q); }
 		template<class T>
 		std::ostream& operator<<(std::ostream& os, Point<T> const& P) { os << "(" << P.x << "," << P.y << ")"; return os; }
@@ -81,12 +80,12 @@ namespace geometry
 
 			explicit Line(Line const&) = default;
 
-			Point<double> operator() (double t) const { return P + (t * u); }
+			Point<double> operator() (double t) const { return P + (u*t); }
 
 			template<class T = double>
 			Point<double> projection(Point<T> const& X) const { return operator()((u * (P - X)) / (u * u)); }
 			template<class T = double>
-			double distance(Point<T> const& X) const { return double(X - projection(X)); }
+			double distance(Point<T> const& X) const { return norm2(X - projection(X)); }
 
 			Point<double> P;
 			Vector<double> u;
@@ -122,5 +121,5 @@ namespace geometry
 	}
 }
 
-namespace geo = geometry::D2;
+namespace geo = Geometry::D2;
 
