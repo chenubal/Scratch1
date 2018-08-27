@@ -59,11 +59,11 @@ namespace lv
 	struct container_traits<std::set<Args...>> : public associative_container_traits<std::set<Args...>>
 	{};
 
-	template <class K, class V>
-	struct container_traits<std::map<K, V>>
+	template <class... Args>
+	struct container_traits<std::map<Args...>> 
 	{
-		using value_type = typename std::map<K, V>::value_type;// std::pair<K, V>;
-		static void add_element(std::map<K, V>& c, const value_type& t) { c.insert(t); }
+		using value_type = typename std::map<Args...>::value_type;// std::pair<K, V>;
+		static void add_element(std::map<Args...>& c, const value_type& t) { c.insert(t); }
 	};
 
 	template<class Container>
@@ -74,7 +74,7 @@ namespace lv
 	Container filter(Container const& in, FunBVT<Container>&& f)
 	{
 		Container out;
-		for (auto x : in) if (f(x)) 	container_traits<Container>::add_element(out, x);
+		for (auto x : in) if (f(x)) container_traits<Container>::add_element(out, x);
 		return out;
 	}
 }
@@ -82,8 +82,7 @@ namespace lv
 
 int main(int, char**)
 {
-
-	using ST = std::set<int>;
+  	using ST = std::set<int>;
 	ST a = { 0, 1,2,3,4,5,6,7,8,9 };
 	for (auto x : lv::filter(a, [](ST::value_type x) {return x % 3 == 0; }))
 		std::cout << x << "\n";
