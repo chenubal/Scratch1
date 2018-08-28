@@ -1,5 +1,3 @@
-#include <iostream>
-#include <string>
 #include <vector>
 #include <deque>
 #include <list>
@@ -8,9 +6,8 @@
 #include <unordered_map>
 
 #include <functional>
-#include <algorithm>
 
-namespace lv
+namespace jh
 {
 	template <class C>
 	struct container_traits
@@ -28,6 +25,7 @@ namespace lv
 		using value_type = V;
 		static void inplace_add(C<V, A>& c, const V& t) { c.push_back(t); }
 	};
+
 
 	template<class C>
 	struct associative_container_traits;
@@ -52,6 +50,7 @@ namespace lv
 		using value_type = std::pair<K, V>;
 		static void inplace_add(C<K, V, H<K>, E<K>, A>& c, const value_type& t) { c.insert(t); }
 	};
+
 
 	template<class... Args>
 	struct container_traits<std::deque<Args...>> : public sequence_container_traits<std::deque<Args...>>
@@ -93,18 +92,28 @@ namespace lv
 	Container filter(Container const& in, FunBVT<Container>&& f)
 	{
 		Container out;
-		for (auto x : in) if (f(x)) container_traits<Container>::inplace_add(out, x);
+		for (auto x : in)
+			if (f(x))
+				container_traits<Container>::inplace_add(out, x);
 		return out;
 	}
 }
 
+#include <iostream>
+
 struct MyStruct
 {
-	MyStruct(double x) : x(x), y(int(2*x)) {}
+	MyStruct(double x) : x(x), y(int(2 * x)) {}
 	double x;
 	int y;
 	operator int() { return int(x); }
 };
+
+std::ostream& operator<<(std::ostream& os, const MyStruct& s)
+{
+	os << s.x << '-' << s.y;
+	return os;
+}
 
 using VT = std::vector<MyStruct>;
 using ST = std::set<int>;
@@ -114,17 +123,17 @@ int main(int, char**)
 {
 	VT v = { 0, 1,2,3,4,5,6,7,8,9 };
 	std::cout << "\nv=";
-	for (auto x : lv::filter(v, [](VT::value_type x) {return int(x) % 2 == 0; }))
+	for (auto x : jh::filter(v, [](VT::value_type x) {return int(x) % 2 == 0; }))
 		std::cout << x << " ";
 
 	ST s = { 0, 1,2,3,4,5,6,7,8,9 };
 	std::cout << "\ns=";
-	for (auto x : lv::filter(s, [](ST::value_type x) {return int(x) % 3 == 0; }))
+	for (auto x : jh::filter(s, [](ST::value_type x) {return int(x) % 3 == 0; }))
 		std::cout << x << " ";
 
 	MT m = { { 0,11.0 },{ 1,12.0 },{ 2,13.0 },{ 3,14.0 },{ 4,15.0 },{ 5,16.0 },{ 6,17.0 },{ 7,18.0 } };
 	std::cout << "\nm=";
-	for (auto x : lv::filter(m, [](MT::value_type x) {return int(x.second) % 2 == 0; }))
+	for (auto x : jh::filter(m, [](MT::value_type x) {return int(x.second) % 2 == 0; }))
 		std::cout << x.first << "|" << x.second << " ";
 
 	std::cout << "\n";
