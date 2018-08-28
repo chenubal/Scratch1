@@ -5,6 +5,7 @@
 #include <list>
 #include <set>
 #include <map>
+#include <unordered_map>
 
 #include <functional>
 #include <algorithm>
@@ -15,17 +16,41 @@ namespace lv
 	struct container_traits
 	{
 		// Type value_type
-		// void add_element(C&,T)
+		// void inplace_add(C&,V)
 	};
 
 	template<class C>
 	struct sequence_container_traits;
 
-	template<template<class, class> class C, class T, class A>
-	struct sequence_container_traits<C<T, A>>
+	template<template<class, class> class C, class V, class A>
+	struct sequence_container_traits<C<V, A>>
 	{
-		using value_type = T;
-		static void add_element(C<T, A>& c, const T& t) { c.push_back(t); }
+		using value_type = V;
+		static void inplace_add(C<V, A>& c, const V& t) { c.push_back(t); }
+	};
+
+	template<class C>
+	struct associative_container_traits;
+
+	template<template<class, class, class> class C, class V, template<class> class L, class A>
+	struct associative_container_traits<C<V, L<V>, A>>
+	{
+		using value_type = V;
+		static void inplace_add(C<V, L<V>, A>& c, const V& t) { c.insert(t); }
+	};
+
+	template<template<class, class, class, class> class C, class K, class V, template<class> class L, class A>
+	struct associative_container_traits<C<K, V, L<K>, A>>
+	{
+		using value_type = std::pair<K, V>;
+		static void inplace_add(C<K, V, L<K>, A>& c, const value_type& t) { c.insert(t); }
+	};
+
+	template<template<class, class, class, class, class> class C, class K, class V, template<class> class H, template<class> class E, class A>
+	struct associative_container_traits<C<K, V, H<K>, E<K>, A>>
+	{
+		using value_type = std::pair<K, V>;
+		static void inplace_add(C<K, V, H<K>, E<K>, A>& c, const value_type& t) { c.insert(t); }
 	};
 
 	template<class... Args>
@@ -40,17 +65,6 @@ namespace lv
 	struct container_traits<std::vector<Args...>> : public sequence_container_traits<std::vector<Args...>>
 	{};
 
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<class C>
-	struct associative_container_traits;
-
-	template<template<class, class, class> class C, class T, template<class> class O, class A>
-	struct associative_container_traits<C<T, O<T>, A>>
-	{
-		using value_type = typename C<T, O<T>, A>::value_type;
-		static void add_element(C<T, O<T>, A>& c, const T& t) { c.insert(t); }
-	};
-
 	template<class... Args>
 	struct container_traits<std::multiset<Args...>> : public associative_container_traits<std::multiset<Args...>>
 	{};
@@ -59,46 +73,61 @@ namespace lv
 	struct container_traits<std::set<Args...>> : public associative_container_traits<std::set<Args...>>
 	{};
 
-	template<template<class, class, class, class> class C, class K, class T, template<class> class O, class A>
-	struct associative_container_traits<C<K, T, O<K>, A>>
-	{
-		using value_type = typename C<K, T, O<K>, A>::value_type;
-		static void add_element(C<K, T, O<K>, A>& c, const value_type& t) { c.insert(t); }
-	};
-
 	template<class... Args>
 	struct container_traits<std::map<Args...>> : public associative_container_traits<std::map<Args...>>
 	{};
+
 	template<class... Args>
 	struct container_traits<std::multimap<Args...>> : public associative_container_traits<std::multimap<Args...>>
 	{};
 
+	template<class... Args>
+	struct container_traits<std::unordered_map<Args...>> : public associative_container_traits<std::unordered_map<Args...>>
+	{};
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<class Container>
 	using FunBVT = std::function<bool(typename container_traits<Container>::value_type)>;
-
 
 	template<typename Container>
 	Container filter(Container const& in, FunBVT<Container>&& f)
 	{
 		Container out;
-		for (auto x : in) if (f(x)) container_traits<Container>::add_element(out, x);
+		for (auto x : in) if (f(x)) container_traits<Container>::inplace_add(out, x);
 		return out;
 	}
 }
 
+struct MyStruct
+{
+	MyStruct(double x) : x(x), y(int(2*x)) {}
+	double x;
+	int y;
+	operator int() { return int(x); }
+};
+
+using VT = std::vector<MyStruct>;
 using ST = std::set<int>;
-using MT = std::map<int, double>;
+using MT = std::unordered_map<int, double>;
 
 int main(int, char**)
 {
-	ST a = { 0, 1,2,3,4,5,6,7,8,9 };
-	for (auto x : lv::filter(a, [](ST::value_type x) {return x % 3 == 0; }))
-		std::cout << x << "\n";
+	VT v = { 0, 1,2,3,4,5,6,7,8,9 };
+	std::cout << "\nv=";
+	for (auto x : lv::filter(v, [](VT::value_type x) {return int(x) % 2 == 0; }))
+		std::cout << x << " ";
 
-	MT b = { { 0,10.0 },{ 1,11.0 },{ 2,12.0 },{ 3,13.0 },{ 4,14.0 },{ 5,15.0 },{ 6,16.0 },{ 7,17.0 } };
-	for (auto x : lv::filter(b, [](MT::value_type x)->bool {return x.first % 2 == 0; }))
-		std::cout << x.first << "|" << x.second << "\n";
+	ST s = { 0, 1,2,3,4,5,6,7,8,9 };
+	std::cout << "\ns=";
+	for (auto x : lv::filter(s, [](ST::value_type x) {return int(x) % 3 == 0; }))
+		std::cout << x << " ";
 
+	MT m = { { 0,11.0 },{ 1,12.0 },{ 2,13.0 },{ 3,14.0 },{ 4,15.0 },{ 5,16.0 },{ 6,17.0 },{ 7,18.0 } };
+	std::cout << "\nm=";
+	for (auto x : lv::filter(m, [](MT::value_type x) {return int(x.second) % 2 == 0; }))
+		std::cout << x.first << "|" << x.second << " ";
+
+	std::cout << "\n";
 	return 0;
 
 }
