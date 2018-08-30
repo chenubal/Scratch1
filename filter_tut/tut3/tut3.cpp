@@ -136,26 +136,27 @@ using MT = unordered_map<int, double>;
 int main(int, char**)
 {
 	//--------------------------------------------------------------------------------------------
-	VT v = { 0, 1,2,3,4,5,6,7,8,9 };
+	VT v{ 0, 1,2,3,4,5,6,7,8,9 };
 	cout << "\nVector = ";
-	auto predicate = [](VT::value_type x) {return int(x) % 2 == 0; };
-	for (auto x : jh::filter(v, predicate))
+	auto even = [](VT::value_type x) {return int(x) % 2 == 0; };
+	for (auto x : jh::filter(v, even))
 		cout << x << " ";
 
 	//--------------------------------------------------------------------------------------------
-	ST s = { 0, 1,2,3,4,5,6,7,8,9 };
+	ST s{ 0, 1,2,3,4,5,6,7,8,9 };
 	cout << "\nSet = ";
 	for (auto x : jh::filter(s, [](ST::value_type x) {return int(x) % 3 == 0; }))
 		cout << x << " ";
 
 	//--------------------------------------------------------------------------------------------
-	MT m = { { 0,11.0 },{ 1,12.0 },{ 2,13.0 },{ 3,14.0 },{ 4,15.0 },{ 5,16.0 },{ 6,17.0 },{ 7,18.0 } };
+	MT m{ { 0,11.0 },{ 1,12.0 },{ 2,13.0 },{ 3,14.0 },{ 4,15.0 },{ 5,16.0 },{ 6,17.0 },{ 7,18.0 } };
 	cout << "\nMap = ";
 	for (auto x : jh::filter(m, [](MT::value_type x) {return int(x.second) % 2 == 0; }))
 		cout << x.first << "|" << x.second << " ";
 
 	//--------------------------------------------------------------------------------------------
-	cout << "\nstring = " << jh::filter(string("dsf_----___das_gjfh---_gdh"), [r=string("_-g")](char c) {return r.find(c)== string::npos; });
+	auto isValidChar = [invalid = string("_-g")](char c) {return invalid.find(c) == string::npos; };
+	cout << "\nstring = " << jh::filter(string("dsf_----___das_gjfh---_gdh"), isValidChar);
 
 	cout << "\n";
 	return 0;
