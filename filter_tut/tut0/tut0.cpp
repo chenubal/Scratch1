@@ -17,7 +17,7 @@ int main(int, char**)
 {
 	std::vector<int> v = { 1,2,3,4,5,6,7,8,9 };
 	std::vector<int> w;
-	std::copy_if(v.cbegin(), v.cend(), std::back_inserter(w), [](int x) {return x % 2; });
+	std::copy_if(v.cbegin(), v.cend(), std::back_inserter(w), [](int x) {return x % 2 ==0; });
 
 	std::cout << w <<"\n";
 	return 0;
