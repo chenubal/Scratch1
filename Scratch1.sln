@@ -28,6 +28,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "filter", "filter\filter.vcxproj", "{08E3173E-B84B-4747-942D-7ABD0310259A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "filter_tut", "filter_tut", "{F5F2283E-DCAF-45B2-8368-96DB24E4CA75}"
+	ProjectSection(SolutionItems) = preProject
+		filter_tut\container_traits.h = filter_tut\container_traits.h
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tut0", "filter_tut\tut0\tut0.vcxproj", "{0EA44AE8-56A0-402B-853E-A859ABEDEF70}"
 EndProject
