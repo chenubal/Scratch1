@@ -28,7 +28,6 @@ protected:
 	const unsigned N;
 	const value_type N0;
 };
-
 /// Provides a sequence of equidistant numbers
 template<class T=int>
 struct Sequence : public SimpleNumbers
@@ -49,9 +48,7 @@ struct Sequence : public SimpleNumbers
 private:
 	const T S0;
 	T DS;
-};
-													    
-
+};					    
 /// Provides a sequence of random numbers from interval
 template <class T = double>
 struct Rands : public SimpleNumbers
