@@ -38,8 +38,7 @@ template<class T=int>
 struct Numbers 
 {
 	using Iterator = detail::LambdaIterator<T>;
-	Numbers(unsigned N, T start, T inc = 1) : N(N), S0(start), DS(inc) { if (N < 2) DS = 0; }
-	Numbers(T start, T end, unsigned N) : Numbers(N, start, (end - start) / (N - 1)) { }
+	Numbers(unsigned N, T start=0, T inc = 1) : N(N), S0(start), DS(inc) { if (N < 2) DS = 0; }
 	Iterator begin() const { return Iterator([=](unsigned n)->T { return  S0 + DS*n; }, 0); }
 	Iterator end() const { return Iterator(nullptr, N); }
 private:
@@ -85,5 +84,9 @@ int main()
 	Numbers<float> g(100u,1);
 	std::cout << "Sum2=" << std::accumulate(g.begin(), g.end(), 0.0);
 	std::cout << "\n";
+
+	Numbers<> Z(0u, 1.0, 2.0);
+	for (auto z : Z)
+		std::cout << "z=" << z << " ";
 
 }
