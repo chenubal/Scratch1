@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scratch1", "Scratch1\Scratch1.vcxproj", "{84B12321-45BF-4C29-9FC7-57F131FF02DC}"
 EndProject
@@ -195,5 +195,8 @@ Global
 		{18B34292-145C-48A2-A023-C1ADE630FFFB} = {F5F2283E-DCAF-45B2-8368-96DB24E4CA75}
 		{DBD4690C-2AB9-4291-85ED-1691AD626BA3} = {F5F2283E-DCAF-45B2-8368-96DB24E4CA75}
 		{322E5D56-6455-44CD-A783-542E1B0A192B} = {F5F2283E-DCAF-45B2-8368-96DB24E4CA75}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3D368A2A-1020-42BE-8604-C3041FC3B508}
 	EndGlobalSection
 EndGlobal
