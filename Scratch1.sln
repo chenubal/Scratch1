@@ -42,6 +42,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tut3", "filter_tut\tut3\tut
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "iota++", "iota++\iota++.vcxproj", "{0FEC6AF2-B4CB-4C88-967E-61C92A142B9A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "heap_test", "heap_test\heap_test.vcxproj", "{9D48EDBE-5304-4E6A-A811-FAC9320031BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -186,6 +188,14 @@ Global
 		{0FEC6AF2-B4CB-4C88-967E-61C92A142B9A}.Release|x64.Build.0 = Release|x64
 		{0FEC6AF2-B4CB-4C88-967E-61C92A142B9A}.Release|x86.ActiveCfg = Release|Win32
 		{0FEC6AF2-B4CB-4C88-967E-61C92A142B9A}.Release|x86.Build.0 = Release|Win32
+		{9D48EDBE-5304-4E6A-A811-FAC9320031BD}.Debug|x64.ActiveCfg = Debug|x64
+		{9D48EDBE-5304-4E6A-A811-FAC9320031BD}.Debug|x64.Build.0 = Debug|x64
+		{9D48EDBE-5304-4E6A-A811-FAC9320031BD}.Debug|x86.ActiveCfg = Debug|Win32
+		{9D48EDBE-5304-4E6A-A811-FAC9320031BD}.Debug|x86.Build.0 = Debug|Win32
+		{9D48EDBE-5304-4E6A-A811-FAC9320031BD}.Release|x64.ActiveCfg = Release|x64
+		{9D48EDBE-5304-4E6A-A811-FAC9320031BD}.Release|x64.Build.0 = Release|x64
+		{9D48EDBE-5304-4E6A-A811-FAC9320031BD}.Release|x86.ActiveCfg = Release|Win32
+		{9D48EDBE-5304-4E6A-A811-FAC9320031BD}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
