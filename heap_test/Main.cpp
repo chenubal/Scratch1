@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include <string>
 
 struct Cmd
@@ -20,7 +21,7 @@ struct PrioCmd
 
 int main()
 {
-	std::vector <PrioCmd> V = { {"A",100},{"B",-100},{"C",200},{"D",10} };
+	std::vector <PrioCmd> V = { {"A",-100},{"B",100},{"C",200},{"D",10} };
 
 	std::map<int, Cmd> M;
 	for (auto &&x : V) M.emplace(x.priority, x.cmd);
