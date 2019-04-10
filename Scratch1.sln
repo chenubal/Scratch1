@@ -64,6 +64,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UniquePtr", "UniquePtr\Uniq
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spaceshipsim", "spaceshipsim\spaceshipsim.vcxproj", "{9BAEE40E-A1EB-4D3C-977C-D39CF7D63844}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "prio4", "prio4\prio4.vcxproj", "{79B21077-0E2B-4A37-ABF4-D9933D75FDD1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -286,6 +288,14 @@ Global
 		{9BAEE40E-A1EB-4D3C-977C-D39CF7D63844}.Release|x64.Build.0 = Release|x64
 		{9BAEE40E-A1EB-4D3C-977C-D39CF7D63844}.Release|x86.ActiveCfg = Release|Win32
 		{9BAEE40E-A1EB-4D3C-977C-D39CF7D63844}.Release|x86.Build.0 = Release|Win32
+		{79B21077-0E2B-4A37-ABF4-D9933D75FDD1}.Debug|x64.ActiveCfg = Debug|x64
+		{79B21077-0E2B-4A37-ABF4-D9933D75FDD1}.Debug|x64.Build.0 = Debug|x64
+		{79B21077-0E2B-4A37-ABF4-D9933D75FDD1}.Debug|x86.ActiveCfg = Debug|Win32
+		{79B21077-0E2B-4A37-ABF4-D9933D75FDD1}.Debug|x86.Build.0 = Debug|Win32
+		{79B21077-0E2B-4A37-ABF4-D9933D75FDD1}.Release|x64.ActiveCfg = Release|x64
+		{79B21077-0E2B-4A37-ABF4-D9933D75FDD1}.Release|x64.Build.0 = Release|x64
+		{79B21077-0E2B-4A37-ABF4-D9933D75FDD1}.Release|x86.ActiveCfg = Release|Win32
+		{79B21077-0E2B-4A37-ABF4-D9933D75FDD1}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -298,6 +308,7 @@ Global
 		{FDFF491C-7808-411A-A842-3FDA5BF07A9A} = {987D4799-024A-46DF-9776-9155758ADB40}
 		{91495839-3B95-46A5-AB6E-B8D135059188} = {987D4799-024A-46DF-9776-9155758ADB40}
 		{0E771A40-7737-408F-A484-EA3FDB9C9DB3} = {987D4799-024A-46DF-9776-9155758ADB40}
+		{79B21077-0E2B-4A37-ABF4-D9933D75FDD1} = {987D4799-024A-46DF-9776-9155758ADB40}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3D368A2A-1020-42BE-8604-C3041FC3B508}
