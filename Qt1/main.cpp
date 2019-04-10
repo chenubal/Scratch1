@@ -78,6 +78,8 @@ int main(int argc, char *argv[])
 	auto i = std::atoi(ss.mid(2).toLatin1());
 	std::cout << "i=" << i << "\n";
 
-	
-	return a.exec();
+	auto zz = QString("dsgfajd dshfk\nfkds").split('\n');
+	std::cout << zz.size() << "\n";
+	  	
+	return 0;
 }
