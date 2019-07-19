@@ -19,7 +19,7 @@ private:
 	friend T;
 
 public:
-	OP_DEF( == )
+	[[nodiscard]] constexpr bool operator== (const T& o) const { return client().tie() == o.tie(); }
 	OP_DEF( != )
 	OP_DEF( <= )
 	OP_DEF( >= )
@@ -28,7 +28,7 @@ public:
 
 };
 
-struct TestClass : public TieComparable<TestClass>
+struct TestClass : public TieComparable<TestClass> // CRTP
 {
 	TestClass(int i, double d, std::string s) : i(i), d(d), s(s) {}
 	int i;
@@ -39,7 +39,7 @@ struct TestClass : public TieComparable<TestClass>
 
 
 int main()
-{
+{ 
 	TestClass s1{ 0,2.0,"test1" };
 	TestClass s2{ 0,1.0,"test1" };
 
