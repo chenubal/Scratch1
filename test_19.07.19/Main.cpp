@@ -3,7 +3,7 @@
 
 
 template<class F, class ... Args>
-void print(F&& f, Args&& ...args)
+void print(F f, Args&& ...args)
 {
 	std::cout << f(std::forward<Args>(args)...) << "\n";
 }
@@ -28,7 +28,8 @@ int main(int, char**)
 	staticTestOp sop1, sop2;
 	TestOp op(5);
 
-	print([](int i) {return i*10; },5);
+	print([]() {return 111; });
+	print([](int i) {return i * 10; }, 5);
 	print(sop1, 10);
 	print(sop2, 10);
 	print(sop1, 10);
