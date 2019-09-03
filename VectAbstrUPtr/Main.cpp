@@ -18,11 +18,11 @@ private:
 	const int i;
 };
 
-using SA = std::unique_ptr<AbstractPrinter>;
+using UPtr = std::unique_ptr<AbstractPrinter>;
 
 int main()
 {
-	std::vector<SA> printers;
+	std::vector<UPtr> printers;
 
 	printers.emplace_back(new Printer(10));
 	printers.emplace_back(new Printer(20));
