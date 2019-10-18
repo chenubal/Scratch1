@@ -14,10 +14,10 @@ std::ostream& operator<<(std::ostream& os, const V<T>& v)
 }
 
 template<class T, class S = T>
-V<T>& apply(V<T>& v, V<S> const& w, std::function<T(T,S)> l)
+V<T>& apply(V<T>& v, V<S> const& w, std::function<T(T const& ,S const&)> fun)
 {
 	auto b = v.begin();
-	std::transform(b, b + std::min(v.size(), w.size()), w.begin(),l);
+	std::transform(b, b + std::min(v.size(), w.size()), w.begin(),fun);
 	return v;
 }
 

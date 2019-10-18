@@ -244,3 +244,5 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 /CineApp/
+/CMakeProject1/buildWin/CMakeFiles
+/CMakeProject1/buildWin
