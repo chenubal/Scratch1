@@ -13,6 +13,8 @@
 
 using namespace std;
 
+using ints = vector<int>;
+
 template<typename T>
 ostream& operator<<(ostream& os, const vector<T>& vec)
 {
@@ -20,17 +22,18 @@ ostream& operator<<(ostream& os, const vector<T>& vec)
 	return os;
 }
 
-using ints = vector<int>;
-using attribute_variant = variant<int, double, string, ints>;
+
+using attribute_variant = variant<int, double, string, ints>; //new
 using attribute_t = pair<string, attribute_variant>;
 using attributes_t = unordered_map<string,attribute_variant>;
 
+
 namespace helper
 {
-	optional<attribute_variant> find(attributes_t const& attrs, string const& s)
+	optional<attribute_variant> find(attributes_t const& attrs, string const& s) //new
 	{
-		auto askKey = [&](auto const&a) {return a.first == s; };
-		if (auto it = find_if(attrs.begin(), attrs.end(), askKey); it != attrs.end())
+		auto hasKey = [&](auto const&a) {return a.first == s; };
+		if (auto it = find_if(attrs.begin(), attrs.end(), hasKey); it != attrs.end())
 			return it->second;
 		return {};
 	}
@@ -48,8 +51,7 @@ namespace helper
 
 	void print(attribute_variant const& a, ostream& os = std::cout)
 	{
-		static printer p(os);
-		visit(p, a);
+		visit(printer(os), a);
 	}
 
 	ostream& operator<<(ostream& os, const attribute_t& a)
@@ -59,14 +61,16 @@ namespace helper
 		return os;
 	}
 
-	template<class... Ts>
+	template<class... Ts> //new
 	struct overloaded : Ts...
 	{
 		using Ts::operator()...;
 	};
-	template<class... Ts>
+
+	template<class... Ts> //new
 	overloaded(Ts...)->overloaded<Ts...>;
 }
+
 int main() 
 {
 	using namespace helper;
@@ -74,59 +78,65 @@ int main()
 	attributes_t attributes = { {"one",10}, {"two",1.5}, {"three","hello"}, {"four",ints{7,8,9}} };
 	auto key = "four"s;
 
+	if (true)
 	{
 		cout << "***** simple access ************************************************\n";
-		auto isFour = [&](auto const&a) {return a.first == key; };
-		if (auto attrIt = find_if(attributes.begin(), attributes.end(), isFour); attrIt != attributes.end())
+		auto hasKey = [&](auto const&a) {return a.first == key; }; //new
+		if (auto attrIt = find_if(attributes.begin(), attributes.end(), hasKey); attrIt != attributes.end()) //new
 		{
-			if (auto pav = get_if<ints>(&(attrIt->second)))
-				cout << "1. variant<int>: value=" << *pav << '\n';
+			if (auto pav = get_if<int>(&(attrIt->second))) //new
+				cout << "1. variant<int>: value = " << *pav << '\n';
 			else
 				cout << "1. no variant<int>" << '\n';
 		}
 	}
+	if (true)
 	{
-		//cout << "***** simple access 2 **********************************************\n";
-		//if (auto attr = find(attributes, key))
-		//{
-		//	cout << "2. variant<int>: ";
-		//	if (auto pAttr = get_if<ints>(&(*attr)))
-		//		cout << "value=" << *pAttr;
-		//	else
-		//		cout << "empty";
-		//	cout << "\n";
-		//}
+		cout << "***** simple access 2 **********************************************\n";
+		if (auto attr = find(attributes, key))
+		{
+			cout << "2. variant<int>: ";
+			if (auto pAttr = get_if<ints>(&(*attr)))
+				cout << "value=" << *pAttr;
+			else
+				cout << "empty";
+			cout << "\n";
+		}
 	}
+	if (true)
 	{
-		//cout << "***** with auto lambda ************************************************\n";
-		//auto lprint = [](attribute_t const& attr)
-		//{
-		//	visit([name = attr.first](auto&& value) {cout << name << "=" << value << "\n"; }, attr.second);
-		//};
-		//for (auto const& attr : attributes)
-		//	lprint(attr);
+		cout << "***** with auto lambda ************************************************\n";
+		auto lprint = [](attribute_t const& attr)
+		{
+			visit([name = attr.first](auto&& value) {cout << name << "=" << value << "\n"; }, attr.second); //new
+		};
+		for (auto const& attr : attributes)
+			lprint(attr);
 	}
+	if (true)
 	{
-		//cout << "***** with printer class ************************************************\n";
-		//for (auto const& attr : attributes)
-		//	print(attr.second);
+		cout << "***** with printer class ************************************************\n";
+		for (auto const& attr : attributes)
+			print(attr.second);
 	}
+	if (true)
 	{
-		//for (auto const& attr : attributes)
-		//	cout << attr;
+		for (auto const& attr : attributes)
+			cout << attr;
 	}
+	if (true)
 	{
-		//cout << "***** with lambda overload ************************************************\n";
-		//for (auto const& attr : attributes)
-		//{
-		//	visit(overloaded
-		//		{
-		//			[](auto   x) { cout << "auto:   " << x << "\n"; },
-		//			[](double x) { cout << "double: " << x << "\n"; },
-		//			[](string x) { cout << "string: " << x << "\n"; },
-		//			[](ints const&  x) { cout << "ints:   " << x << "\n"; },
-		//		}
-		//	, attr.second);
-		//}
+		cout << "***** with lambda overload ************************************************\n";
+		for (auto const& attr : attributes)
+		{
+			visit(overloaded
+				{
+					[](auto   x) { cout << "auto:   " << x << "\n"; },
+					[](double x) { cout << "double: " << x << "\n"; },
+					[](string x) { cout << "string: " << x << "\n"; },
+					[](ints const&  x) { cout << "ints:   " << x << "\n"; },
+				}
+			, attr.second);
+		}
 	}
 }

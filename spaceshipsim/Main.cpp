@@ -9,19 +9,21 @@ class TieComparable
 {
 private:
 	constexpr T const& client() const { return static_cast<const T&>(*this); }
+
 	TieComparable() = default;
-	~TieComparable<T>() = default;
 	TieComparable<T>(const TieComparable<T>& other) = default;
 	TieComparable<T>(TieComparable<T>&& other) = default;
 	TieComparable<T>& operator=(const TieComparable<T>& other) = default;
 	TieComparable<T>& operator=(TieComparable<T>&& other) = default;
 
+	~TieComparable<T>() = default;
+
 	friend T;
 
 public:
-	[[nodiscard]] constexpr bool operator== (const T& o) const { return client().tie() == o.tie(); }
-	OP_DEF( != )
-	OP_DEF( <= )
+	OP_DEF(== )
+	OP_DEF(!= )
+	OP_DEF(<= )
 	OP_DEF( >= )
 	OP_DEF( < )
 	OP_DEF( > )
@@ -34,7 +36,7 @@ struct TestClass : public TieComparable<TestClass> // CRTP
 	int i;
 	double d;
 	std::string s;
-	const auto tie() const { return std::tie(i, d, s); }
+	const auto tie() const { return std::tie(i, d,s); }
 };
 
 
