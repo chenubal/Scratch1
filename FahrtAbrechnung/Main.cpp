@@ -81,10 +81,29 @@ struct PitStop
 
 using PitStops = std::vector<PitStop>;
 
-
-std::ostream& operator<<(std::ostream & os, PitStop const& t)
+double sumAmount(PitStops const& pitstops, Driver driver)
 {
-	os << DriverMap.at(t.driver) << ": " << t.driver << "€";
+	return std::accumulate(pitstops.begin(), pitstops.end(), 0.0, [&](double sum, PitStop pitstop)
+	{
+		return sum + (pitstop.driver == driver ? pitstop.amount : 0); }
+	);
+}
+
+using amountMap = std::map<Driver, double>;
+
+amountMap sumAmount(PitStops const& pitstops)
+{
+	amountMap r;
+	for (auto const& item : DriverMap)
+		r.insert(std::make_pair(item.first, sumAmount(pitstops, item.first)));
+	return r;
+}
+
+
+
+std::ostream& operator<<(std::ostream & os, PitStop const& pitstop)
+{
+	os << DriverMap.at(pitstop.driver) << ": " << pitstop.amount << "Eur";
 	return os;
 }
 
@@ -128,13 +147,47 @@ struct Abrechnung
 		rides.emplace_back(s, e, d);
 	}
 
+	void readPitStops()
+	{
+		pitstops.clear();
+		bool getMore;
+		do 
+		{
+			getMore = false;
+			double price=0;
+			Driver i=0;
+			std::cout << "Kosten: ";
+			std::cin >> price;
+			if (price > 0.0)
+			{
+				std::cout << "Fahrer: ";
+				std::cin >> i;
+				if (DriverMap.count(i))
+				{
+					pitstops.emplace_back(price, i);
+					getMore = true;
+				}
+			}
+
+		} while (getMore);
+
+	}
+
 	friend std::ostream& operator<<(std::ostream & os, Abrechnung const& A)
 	{
-		os << "Gesamt Fahrten: " << A.globalStart << " - " << A.globalEnd << " => " << (A.globalEnd -A.globalStart) <<"km\n";
+		auto totalDist = (A.globalEnd - A.globalStart);
+		os << "Gesamt Fahrten: " << A.globalStart << " - " << A.globalEnd << " => " << totalDist <<"km\n";
 		//for (auto&& f : A.rides) os << f << "\n";
-		for (auto&& t : A.pitstops) os << t << "\n";
-		for (auto&& s : sumDistances(A.rides))
-			os << DriverMap.at(s.first) << ": " << s.second << "km\n";
+		//for (auto&& t : A.pitstops) os << t << "\n";
+		auto sd = sumDistances(A.rides);
+		auto sa = sumAmount(A.pitstops);
+		for (auto&& item : sd) os << DriverMap.at(item.first) << ": " << item.second << "km\n";
+		for (auto&& item : sa) os << DriverMap.at(item.first) << ": " << item.second << " Euro\n";
+		auto totalAmount = std::accumulate(sa.begin(), sa.end(), 0.0, [](double s, amountMap::value_type const& p) { return s + p.second; });
+		std::vector<double> ratios(sd.size());
+		std::transform(sd.begin(), sd.end(), ratios.begin(), [&](distMap::value_type const &p) {return double(p.second) / totalDist; });
+		os << "Sizes " << ratios << "\n";
+		os << "Gesamt Kosten: " << totalAmount << "Euro\n";
 		return os;
 	}
 
@@ -154,6 +207,7 @@ int main(int argc, char *argv[])
 	auto lines = readFile(argv[1]);
 	Abrechnung A(0);
 	A.readRides(lines);
+	A.readPitStops();
  	std::cout << A << "\n";
 	return 0;
 }
