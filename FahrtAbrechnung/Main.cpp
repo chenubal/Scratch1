@@ -116,7 +116,7 @@ std::vector<std::string> split(const std::string& input, const std::string& rege
 
 struct Abrechnung
 {
-	Abrechnung(Position pos) :globalStart(pos), globalEnd(pos) {}
+	Abrechnung(Position pos) :firstPos(pos), lastPos(pos) {}
 
 	void readRides(Strings const& lines)
 	{
@@ -125,25 +125,32 @@ struct Abrechnung
 			auto v = split(line, ";");
 			if (v.size() == 3)
 			{
+				Position start = v.at(0).empty() ? lastPos :  firstPos = std::atoi(v.at(0).c_str());
+				Position end = std::atoi(v.at(1).c_str());
 				Driver driver = std::atoi(v.at(2).c_str());
-				auto te =  std::atoi(v.at(1).c_str());
-				if (v.at(0).empty())
-				{
-					addFahrt(globalEnd, te, driver);
-				}
-				else
-				{
-					globalStart = std::atoi(v.at(0).c_str());
-					addFahrt(globalStart, te, driver);
-				}
-				globalEnd = te;
+				addFahrt(start, end, driver);
+				lastPos = end;
 			}
 		}
 	}
 
+	void readPitStops(Strings const& lines)
+	{
+		pitstops.clear();
+		for (auto&& line : lines)
+		{
+			auto v = split(line, ";");
+			if (v.size() == 2)
+			{
+				double value = std::atof(v.at(0).c_str());
+				Driver driver = std::atoi(v.at(1).c_str());
+				pitstops.emplace_back( value, driver );
+			}
+		}
+	}
 	void addFahrt( Position s, Position e, Driver d)
 	{
-		if (s > e) throw std::exception("Ungueltige Eingabe");
+		if (s > e) throw std::runtime_error("Ungueltige Eingabe");
 		rides.emplace_back(s, e, d);
 	}
 
@@ -175,26 +182,32 @@ struct Abrechnung
 
 	friend std::ostream& operator<<(std::ostream & os, Abrechnung const& A)
 	{
-		auto totalDist = (A.globalEnd - A.globalStart);
-		os << "Gesamt Fahrten: " << A.globalStart << " - " << A.globalEnd << " => " << totalDist <<"km\n";
-		//for (auto&& f : A.rides) os << f << "\n";
-		//for (auto&& t : A.pitstops) os << t << "\n";
+		auto totalDist = (A.lastPos - A.firstPos);
+		os << "Gesamt Fahrten: " << A.firstPos << " - " << A.lastPos << " => " << totalDist <<"km\n\n";
 		auto sd = sumDistances(A.rides);
 		auto sa = sumAmount(A.pitstops);
-		for (auto&& item : sd) os << DriverMap.at(item.first) << ": " << item.second << "km\n";
-		for (auto&& item : sa) os << DriverMap.at(item.first) << ": " << item.second << " Euro\n";
+
+		for (auto&& item : sd) os << DriverMap.at(item.first) << ": " << item.second << "km | ";
+		os  << "\n";
+		for (auto&& item : sa) os << DriverMap.at(item.first) << ": " << item.second << " Euro | ";
+
 		auto totalAmount = std::accumulate(sa.begin(), sa.end(), 0.0, [](double s, amountMap::value_type const& p) { return s + p.second; });
 		std::vector<double> ratios(sd.size());
 		std::transform(sd.begin(), sd.end(), ratios.begin(), [&](distMap::value_type const &p) {return double(p.second) / totalDist; });
-		os << "Sizes " << ratios << "\n";
-		os << "Gesamt Kosten: " << totalAmount << "Euro\n";
+
+		os << "\nAnteil: " << ratios << "\n";
+		os << "\nGesamt Kosten: " << totalAmount << "Euro\n\n";
+		auto pr = ratios.begin();
+		for (auto&& x : sa)
+			std::cout << DriverMap.at(x.first) << ": " << x.second << "Euro, Differenz = " << (x.second - (*(pr++)*totalAmount)) <<" Euro\n";
+
 		return os;
 	}
 
 private:
 	void printError(std::string const & msg) { std::cout << "ERROR: " << msg << "\n"; }
-	Position globalStart;
-	Position globalEnd;
+	Position firstPos;
+	Position lastPos;
 	Rides rides;
 	PitStops pitstops;
 };
@@ -203,11 +216,16 @@ private:
 
 int main(int argc, char *argv[])
 {
-	if (argc <= 1) { std::cout << "No file argument\n"; return 0; }
-	auto lines = readFile(argv[1]);
 	Abrechnung A(0);
-	A.readRides(lines);
-	A.readPitStops();
- 	std::cout << A << "\n";
+	if (argc == 3)
+	{
+		A.readRides(readFile(argv[1]));
+		A.readPitStops(readFile(argv[2]));
+		std::cout << A << "\n";
+	}
+	else
+	{ 
+		std::cout << "usage: " << argv[0]  << " rides.txt pitstops.txt\n";  
+	}
 	return 0;
 }
