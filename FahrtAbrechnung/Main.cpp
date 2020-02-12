@@ -125,10 +125,17 @@ struct Abrechnung
 			auto v = split(line, ";");
 			if (v.size() == 3)
 			{
-				Position start = v.at(0).empty() ? lastPos :  firstPos = std::atoi(v.at(0).c_str());
+				Position start = v.at(0).empty() ? lastPos : firstPos = std::atoi(v.at(0).c_str());
 				Position end = std::atoi(v.at(1).c_str());
 				Driver driver = std::atoi(v.at(2).c_str());
 				addFahrt(start, end, driver);
+				lastPos = end;
+			}
+			else if (v.size() == 2)
+			{
+				Position end = std::atoi(v.at(0).c_str());
+				Driver driver = std::atoi(v.at(1).c_str());
+				addFahrt(lastPos, end, driver);
 				lastPos = end;
 			}
 		}
