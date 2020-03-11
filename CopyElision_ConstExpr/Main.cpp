@@ -1,16 +1,5 @@
 #include <iostream>
 #include <string>
-#include <vector>
-
-template<typename T>
-std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
-{
-	for (auto& el : vec)
-	{
-		os << el << ' ';
-	}
-	return os;
-}
 
 void algorithm_signed(int) { std::cout << "signed\n"; }
 void algorithm_unsigned(unsigned) { std::cout << "unsigned\n"; }
@@ -48,6 +37,7 @@ void fun(X  x)
 int main()
 {
 	algorithm(1);
+
 	X y, z;
 	fun(z);
 	fun(X());
