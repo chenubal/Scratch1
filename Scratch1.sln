@@ -100,6 +100,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geo2", "geo2\geo2.vcxproj",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CopyElision_ConstExpr", "CopyElision_ConstExpr\CopyElision_ConstExpr.vcxproj", "{B60EF483-BC65-40D3-9A49-FF9C8B0FD227}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fold_expresssion", "fold_expresssion\fold_expresssion.vcxproj", "{382626BC-B9B9-4B99-8F2D-80708D38F4AC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zipper", "zipper\zipper.vcxproj", "{6FED2B91-96F3-4ECC-BFCA-EAE73EBD6190}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -458,6 +462,22 @@ Global
 		{B60EF483-BC65-40D3-9A49-FF9C8B0FD227}.Release|x64.Build.0 = Release|x64
 		{B60EF483-BC65-40D3-9A49-FF9C8B0FD227}.Release|x86.ActiveCfg = Release|Win32
 		{B60EF483-BC65-40D3-9A49-FF9C8B0FD227}.Release|x86.Build.0 = Release|Win32
+		{382626BC-B9B9-4B99-8F2D-80708D38F4AC}.Debug|x64.ActiveCfg = Debug|x64
+		{382626BC-B9B9-4B99-8F2D-80708D38F4AC}.Debug|x64.Build.0 = Debug|x64
+		{382626BC-B9B9-4B99-8F2D-80708D38F4AC}.Debug|x86.ActiveCfg = Debug|Win32
+		{382626BC-B9B9-4B99-8F2D-80708D38F4AC}.Debug|x86.Build.0 = Debug|Win32
+		{382626BC-B9B9-4B99-8F2D-80708D38F4AC}.Release|x64.ActiveCfg = Release|x64
+		{382626BC-B9B9-4B99-8F2D-80708D38F4AC}.Release|x64.Build.0 = Release|x64
+		{382626BC-B9B9-4B99-8F2D-80708D38F4AC}.Release|x86.ActiveCfg = Release|Win32
+		{382626BC-B9B9-4B99-8F2D-80708D38F4AC}.Release|x86.Build.0 = Release|Win32
+		{6FED2B91-96F3-4ECC-BFCA-EAE73EBD6190}.Debug|x64.ActiveCfg = Debug|x64
+		{6FED2B91-96F3-4ECC-BFCA-EAE73EBD6190}.Debug|x64.Build.0 = Debug|x64
+		{6FED2B91-96F3-4ECC-BFCA-EAE73EBD6190}.Debug|x86.ActiveCfg = Debug|Win32
+		{6FED2B91-96F3-4ECC-BFCA-EAE73EBD6190}.Debug|x86.Build.0 = Debug|Win32
+		{6FED2B91-96F3-4ECC-BFCA-EAE73EBD6190}.Release|x64.ActiveCfg = Release|x64
+		{6FED2B91-96F3-4ECC-BFCA-EAE73EBD6190}.Release|x64.Build.0 = Release|x64
+		{6FED2B91-96F3-4ECC-BFCA-EAE73EBD6190}.Release|x86.ActiveCfg = Release|Win32
+		{6FED2B91-96F3-4ECC-BFCA-EAE73EBD6190}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

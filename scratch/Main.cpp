@@ -8,6 +8,7 @@
 
 #include <functional>
 #include <algorithm>
+#include <random>
 
 namespace lv
 {
@@ -78,7 +79,28 @@ namespace lv
 		return out;
 	}
 }
-		
+	
+class Rands
+{
+	struct Iterator
+	{
+		Iterator(Rands* pH, unsigned n) :  pHost(pH), count(n) {}
+		Iterator& operator++() { count++; return *this; }
+		bool operator==(Iterator const& o) { return count == o.count; }
+		bool operator!=(Iterator const& o) { return !(*this == o); }
+		double operator*() { return pHost->operator()(); }
+		Rands* pHost;
+		unsigned count;
+	};
+	const unsigned n;
+	std::mt19937 gen;
+	std::uniform_real_distribution<> dis;
+public:
+	Rands(unsigned n, double s = 1.0) :n(n), gen(std::random_device{}()), dis(0, s) {}
+	Iterator begin() { return Iterator(this, 0); }
+	Iterator end() { return Iterator(nullptr, n); }
+	double operator()() { return dis(gen); }
+};
 
 int main(int, char**)
 {
@@ -92,6 +114,8 @@ int main(int, char**)
 	MT b = { {0,10.0},{ 1,11.0 },{ 2,12.0 },{ 3,13.0 },{ 4,14.0 },{ 5,15.0 },{ 6,16.0 },{ 7,17.0 } };
 	for (auto x : lv::filter(b, [](MT::value_type x)->bool {return x.first % 2 == 0; }))
 		std::cout << x.first << "|" << x.second << "\n";
+	for (auto x : Rands(13,33.0))
+		std::cout << x << "\n";
 
 	return 0;
 

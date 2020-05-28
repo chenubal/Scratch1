@@ -4,6 +4,8 @@
 #include <chrono>
 #include <sstream>
 #include <thread>
+#include <xtgmath.h>
+#include <random>
 
 namespace chrono_tools
 {
@@ -59,18 +61,24 @@ void ch_demo()
 	std::cout << "StdTime " << chrono_tools::time_g("%c") << '\n';
 
 }
+int double2int(double d)
+{
+	d += 6755399441055744.0;
+	return reinterpret_cast<int&>(d);
+}
 void sw_demo()
 {
-	chrono_tools::stopwatch<> sw;
-	// do something
-	chrono_tools::sleep(222); 
+	chrono_tools::stopwatch<std::chrono::microseconds> sw;
+	double d = -1233445.9;
+	srand(static_cast <unsigned> (time(0)));
+	for (int i=0; i<10000000; i++)
+	{
+		std::round(100.0*static_cast <double> (rand()) / static_cast <double> (RAND_MAX));
+	}
 	std::cout << sw.reset() << "us\n";
-	// do something
-	chrono_tools::sleep(333);
-	std::cout << sw.count() << "us\n";
 }
 void main()
 {
-	ch_demo();
+	//ch_demo();
 	sw_demo();
 }
