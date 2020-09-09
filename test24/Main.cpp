@@ -11,20 +11,21 @@ namespace jh
 		return std::max(l, std::min(x, u));
 	}
 
-	// Struct for basic interval operations
 	template<class T = double>
 	struct Interval
 	{
 		Interval() = delete;
 		Interval(T x, T y) : lower(std::min(x, y)), upper(std::max(x, y)) {}
+	
 		template<class U>
 		Interval(Interval<U> const& other) : Interval(T(other.lower), T(other.upper)) {}
 
 		bool empty() const { return upper == lower; }
-		T width() const { return upper - lower; }
+		T span() const { return upper - lower; }
 
 		bool contains(T x) const { return x >= lower && x <= upper; }
-		T clip(T x) const { return jh::clip(x, lower, upper); }
+
+		T clamp(T x) const { return std::clamp(x, lower, upper); }
 
 		template<class U>
 		bool intersects(Interval<U> const& other) { return !(*this | other).empty(); }
@@ -67,9 +68,9 @@ int main()
 	Interval<> r4(5.1, 5.1);
 	std::cout << r4.empty() << std::endl;
 	std::cout << r.contains(7.0) << std::endl;
-	std::cout << r2.clip(-1.0) << std::endl;
-	std::cout << Interval<>(7.55, 5.1).clip(6.0) << std::endl;
-	std::cout << r3.clip(100) << std::endl;
+	std::cout << r2.clamp(-1.0) << std::endl;
+	std::cout << Interval<>(7.55, 5.1).clamp(6.0) << std::endl;
+	std::cout << r3.clamp(100) << std::endl;
 	std::cout << r3 << std::endl;
 	std::cout << Interval<>(0, 2).intersects(Interval<int>(1, 4)) << std::endl;
 	std::cout << (Interval<>(0, 2) & Interval<int>(1, 4)) << std::endl;
