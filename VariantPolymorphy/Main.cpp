@@ -4,7 +4,6 @@
 #include <variant>
 #include <functional>
 
-
 struct A
 {
 	void print(std::string const& s) const { std::cout << "A: " << s << "\n"; }
@@ -20,9 +19,7 @@ struct C
 	void print(std::string const& s) const { std::cout << "C: " << s << "\n"; }
 };
 
-
 using V = std::variant<A, B, C>;
-
 
 struct Printer : public V
 {
