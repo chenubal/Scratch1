@@ -155,13 +155,13 @@ inline View* ViewProvider::createViewContainerBase()
 {
 	// Provides random views (as an example)
 	const int m = std::rand() % T::numViewContainerTypes;
-	View* viewContainer = getViewContainer<T>(m);  // Template recursion.
+	auto view = getViewContainer<T>(m);  // Template recursion.
 	const int r = std::rand() % T::numViewTypes;
-	const int numViews = std::rand() % viewContainer->capacity() / 2 + viewContainer->capacity() / 2 + 1;
-	addView<T>(viewContainer, r, numViews);
+	const int numViews = std::rand() % view->capacity() / 2 + view->capacity() / 2 + 1;
+	addView<T>(view, r, numViews);
 	std::cout << "View type = " << m << std::endl;  /////
 	std::cout << "Model type = " << r << std::endl;  /////
-	return viewContainer;
+	return view;
 }
 
 int main() 
