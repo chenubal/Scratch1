@@ -114,6 +114,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Typemapping", "Typemapping\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "reverse", "reverse\reverse.vcxproj", "{CCFF6E44-9988-4FFD-8D85-1FFCCA0EB91F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InheritanceNoPointer", "InheritanceNoPointer\InheritanceNoPointer.vcxproj", "{B653E41E-FCAB-4C60-90C9-459E4E2C1391}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -528,6 +530,14 @@ Global
 		{CCFF6E44-9988-4FFD-8D85-1FFCCA0EB91F}.Release|x64.Build.0 = Release|x64
 		{CCFF6E44-9988-4FFD-8D85-1FFCCA0EB91F}.Release|x86.ActiveCfg = Release|Win32
 		{CCFF6E44-9988-4FFD-8D85-1FFCCA0EB91F}.Release|x86.Build.0 = Release|Win32
+		{B653E41E-FCAB-4C60-90C9-459E4E2C1391}.Debug|x64.ActiveCfg = Debug|x64
+		{B653E41E-FCAB-4C60-90C9-459E4E2C1391}.Debug|x64.Build.0 = Debug|x64
+		{B653E41E-FCAB-4C60-90C9-459E4E2C1391}.Debug|x86.ActiveCfg = Debug|Win32
+		{B653E41E-FCAB-4C60-90C9-459E4E2C1391}.Debug|x86.Build.0 = Debug|Win32
+		{B653E41E-FCAB-4C60-90C9-459E4E2C1391}.Release|x64.ActiveCfg = Release|x64
+		{B653E41E-FCAB-4C60-90C9-459E4E2C1391}.Release|x64.Build.0 = Release|x64
+		{B653E41E-FCAB-4C60-90C9-459E4E2C1391}.Release|x86.ActiveCfg = Release|Win32
+		{B653E41E-FCAB-4C60-90C9-459E4E2C1391}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
