@@ -116,6 +116,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "reverse", "reverse\reverse.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InheritanceNoPointer", "InheritanceNoPointer\InheritanceNoPointer.vcxproj", "{B653E41E-FCAB-4C60-90C9-459E4E2C1391}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "histogram", "histogram\histogram.vcxproj", "{87067859-976E-41D5-8798-1CA699EAFDA1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -538,6 +540,14 @@ Global
 		{B653E41E-FCAB-4C60-90C9-459E4E2C1391}.Release|x64.Build.0 = Release|x64
 		{B653E41E-FCAB-4C60-90C9-459E4E2C1391}.Release|x86.ActiveCfg = Release|Win32
 		{B653E41E-FCAB-4C60-90C9-459E4E2C1391}.Release|x86.Build.0 = Release|Win32
+		{87067859-976E-41D5-8798-1CA699EAFDA1}.Debug|x64.ActiveCfg = Debug|x64
+		{87067859-976E-41D5-8798-1CA699EAFDA1}.Debug|x64.Build.0 = Debug|x64
+		{87067859-976E-41D5-8798-1CA699EAFDA1}.Debug|x86.ActiveCfg = Debug|Win32
+		{87067859-976E-41D5-8798-1CA699EAFDA1}.Debug|x86.Build.0 = Debug|Win32
+		{87067859-976E-41D5-8798-1CA699EAFDA1}.Release|x64.ActiveCfg = Release|x64
+		{87067859-976E-41D5-8798-1CA699EAFDA1}.Release|x64.Build.0 = Release|x64
+		{87067859-976E-41D5-8798-1CA699EAFDA1}.Release|x86.ActiveCfg = Release|Win32
+		{87067859-976E-41D5-8798-1CA699EAFDA1}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

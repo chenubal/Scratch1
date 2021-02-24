@@ -3,10 +3,11 @@
 #include <any>
 #include <functional>
 
-template<typename R, typename T>
+template<typename I, typename T>
 auto makeGetter()
 {
-	return [](std::any &storage)->R& { return std::any_cast<T&>(storage); };
+	using A = std::any&;
+	return [](A storage)->I& { return std::any_cast<T&>(storage); };
 }
 
 template<typename Interface>
@@ -21,7 +22,7 @@ public:
 
 private:
 	std::any storage;
-	std::function<I&(std::any&)> getter;
+	std::function<I&(std::any &)> getter;
 };
 
 struct IDog
