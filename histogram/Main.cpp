@@ -23,21 +23,29 @@ namespace jh
 	using sample_t = std::tuple<T, unsigned>;
 
 	template<class C, class T = typename C::value_type>
-	auto makeHistogram(C const& container, T lower, T upper, T slot)
+	auto makeEmptyHistogram(C const& container, T lower, T upper, T step)
 	{
 		using S = sample_t<T>;
 
-		auto numSamples = unsigned(floor((upper - lower) / slot) + 1);
+		auto numSamples = unsigned(floor((upper - lower) / step) + 1);
 		std::vector<S> histogram(numSamples);
 
-		auto createSample = [&]() {static auto next = lower; return S{ std::exchange(next,next + slot),0 }; };
+		auto createSample = [&,x = lower]() mutable { return S{ std::exchange(x,x + step),0 }; };
 		for (auto& sample : histogram)  sample = createSample();
+		return histogram;
+	}
+
+
+	template<class C, class T = typename C::value_type>
+	auto makeHistogram(C const& container, T lower, T upper, T step)
+	{
+		auto histogram = makeEmptyHistogram(container, lower, upper, step);
 
 		for (auto&& sample : frequency(container))
 		{
 			if (T y = sample.first; (y >= lower && y <= upper))
 			{
-				auto l = unsigned(floor((y - lower) / slot));
+				auto l = unsigned(floor((y - lower) / step));
 				std::get<1>(histogram[l]) += sample.second;
 			}
 		}
@@ -45,20 +53,13 @@ namespace jh
 	}
 
 	template<class C, class T = typename C::value_type>
-	auto makeHistogram2(C const& container, T lower, T upper, T slot)
+	auto makeHistogram2(C const& container, T lower, T upper, T step)
 	{
-		using S = sample_t<T>;
-		auto idx = [&](auto x) { return unsigned(floor((x - lower) / slot)); };
-
-		std::vector<S> histogram(idx(upper) + 1);
-
-		auto createSample = [&]() {static auto ss = lower; return S{ std::exchange(ss,ss + slot),0 }; };
-		for (auto& sample : histogram)  
-			sample = createSample();
-
-		auto count = [&](auto x) { if (x >= lower && x <= upper) std::get<1>(histogram[idx(x)]) += 1; };
+		auto histogram = makeEmptyHistogram(container, lower, upper, step);
+		auto slot = [&](auto x) { return unsigned(floor((x - lower) / step)); };
+		auto drop = [&](auto x) { if (x >= lower && x <= upper) std::get<1>(histogram[slot(x)]) += 1; };
 		for (auto&& value : container) 
-			count(value);
+			drop(value);
 		return histogram;
 	}
 }
@@ -66,9 +67,10 @@ namespace jh
 int main()
 {
     std::vector<int> vec = {-200,-200, 200,400,200,100,1000,300, 1000,400,310,400,400,-200};
-    for(auto x : jh::makeHistogram(vec,-200,1000,200))
-       std::cout << std::get<0>(x) << "->" <<std::get<1>(x) << "\n";
 	 for (auto x : jh::makeHistogram2(vec, -200, 1000, 200))
+		 std::cout << std::get<0>(x) << "->" << std::get<1>(x) << "\n";
+	 std::cout << "-----------\n";
+	 for (auto x : jh::makeHistogram(vec, -200, 1000, 200))
 		 std::cout << std::get<0>(x) << "->" << std::get<1>(x) << "\n";
 
 }
