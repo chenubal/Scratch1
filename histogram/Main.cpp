@@ -22,8 +22,8 @@ namespace jh
 	template<class T>
 	using sample_t = std::tuple<T, unsigned>;
 
-	template<class C, class T = typename C::value_type>
-	auto makeEmptyHistogram(C const& container, T lower, T upper, T step)
+	template<class T>
+	auto makeEmptyHistogram(T lower, T upper, T step) // upper > lower, step > 0
 	{
 		using S = sample_t<T>;
 
@@ -39,7 +39,7 @@ namespace jh
 	template<class C, class T = typename C::value_type>
 	auto makeHistogram(C const& container, T lower, T upper, T step)
 	{
-		auto histogram = makeEmptyHistogram(container, lower, upper, step);
+		auto histogram = makeEmptyHistogram<T>(lower, upper, step);
 
 		for (auto&& sample : frequency(container))
 		{
@@ -55,7 +55,7 @@ namespace jh
 	template<class C, class T = typename C::value_type>
 	auto makeHistogram2(C const& container, T lower, T upper, T step)
 	{
-		auto histogram = makeEmptyHistogram(container, lower, upper, step);
+		auto histogram = makeEmptyHistogram<T>( lower, upper, step);
 		auto slot = [&](auto x) { return unsigned(floor((x - lower) / step)); };
 		auto drop = [&](auto x) { if (x >= lower && x <= upper) std::get<1>(histogram[slot(x)]) += 1; };
 		for (auto&& value : container) 
