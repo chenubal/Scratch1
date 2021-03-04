@@ -4,18 +4,21 @@
 #include <utility>
 #include <algorithm>
 
+template<class C, class I>
+auto iterator_n(C &c, I n) { auto i = c.begin(); std::advance(i, n); return i; }
+
 template<class C>
 struct crop
 {
 	using iterator = typename C::iterator;
-	using const_iterator = typename C::const_iterator;
+	using const_iterator = const iterator;
 	using value_type = typename C::value_type;
 	using index_t = unsigned;
 
 	crop(C & c, index_t i0, index_t iN) 
 	{ 
-		e = iter(c, std::min<index_t>(iN+1, index_t(c.size())));
-		s = iter(c, std::min<index_t>(i0, index_t(c.size())) );
+		s = iterator_n(c, std::min<index_t>(i0, index_t(c.size())));
+		e = iterator_n(c, std::min<index_t>(iN+1, index_t(c.size())));
 	}
 	crop(C & c, index_t i0 = 0) : crop(c, i0, index_t(c.size()) - 1) {}
 
@@ -25,7 +28,6 @@ struct crop
 	const_iterator end()   const { return (e); }
 	auto size() const {return std::distance(begin(), end());}
 private:
-	auto iter(C &c, index_t n) { auto i = c.begin(); std::advance(i, n); return i; }
 	iterator s, e;
 };
 
@@ -44,7 +46,7 @@ struct slice
 		using reference = value_type&;
 
 		iterator() = default;
-		iterator(pointer iter, index_t d=1) : m_iter(iter), dist(d) {}
+		iterator(pointer p, index_t d=1) : m_iter(p), dist(d) {}
 		reference operator*() const { return *m_iter; }
 		pointer operator->() { return m_iter; }
 		iterator& operator++() { std::advance(m_iter,dist); return *this; }
@@ -54,23 +56,21 @@ struct slice
 
 	private:
 		index_t dist = 1;
-		pointer m_iter ;
+		pointer m_iter;
 	};
 	using const_iterator = const iterator;
 
-	slice(C & c, index_t d=1) 
+	slice(C & c, index_t d = 1): dist(d)
 	{
-		dist = d;
-		s = iterator(iter(c, 0));
-		e = iterator(iter(c, (index_t(c.size()) / dist)*dist));
+		s = { iterator_n(c, 0), dist };
+		e = { iterator_n(c, (index_t(c.size()) / dist)*dist),dist };
 	}
 	iterator begin() { return s; }
 	iterator end() { return e; }
-	iterator begin() const { return s; }
-	iterator end()   const { return e; }
-	auto size() const { return std::distance(begin(), end()); }
+	const_iterator begin() const { return s; }
+	const_iterator end()   const { return e; }
+	auto size() const { return std::distance(s, e); }
 private:
-	iterator iter(C &c, index_t n) { auto i = c.begin(); std::advance(i, n); return { i,dist }; }
 	index_t dist = 1;
 	iterator s, e;
 };
@@ -87,6 +87,7 @@ int main()
 {
 	std::vector<double> vd(20);
 	std::generate(vd.begin(), vd.end(), makeNumberGen<double>());
+
 	for (auto&& x : crop(vd, 3, 7))  std::cout << x << "\n";
 	std::cout << "---------\n";
 	for (auto&& x : slice(vd, 2))  std::cout << x << "\n";
@@ -94,4 +95,7 @@ int main()
 	for (auto&& x : crop(slice(vd, 2), 2))  std::cout << x << "\n";
 	std::cout << "---------\n";
 	for (auto&& x : slice(crop(vd, 2), 3))  std::cout << x << "\n";
+	for (auto&& x : slice(crop(vd, 2), 3)) x=99;
+	std::cout << "---------\n";
+	for (auto&& x : vd)  std::cout << x << "\n";
 }
