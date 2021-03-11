@@ -65,10 +65,11 @@ namespace jh
 			auto& operator*() const { return *m_iter; }
 			auto& operator++() {m_count -= m_step; std::advance(m_iter, m_step); return *this; }
 			auto operator++(int) { return std::exchange(*this, ++(*this)); }
-			friend bool operator== (const iterator& a, const iterator& b) { return a.m_iter == b.m_iter || (a.m_count*b.m_count) > 0; }
+			friend bool operator== (const iterator& a, const iterator& b) { return a.m_iter == b.m_iter || (a.isEnd() && b.isEnd()); }
 			friend bool operator!= (const iterator& a, const iterator& b) { return !(a == b); };
 
 		private:
+			bool isEnd() const { return m_count < 0; }
 			index_t m_step = 1;
 			int m_count = -1; // negative indicates 'end'
 			pointer m_iter;
@@ -98,8 +99,12 @@ namespace jh
 	template <typename S, typename... Rest>
 	slice(S&&, Rest...)->slice<S, std::is_const_v<std::remove_reference_t<S>>>;
 }
+
+//------------------------------------------------------------------------------------------------------------------------------
+
 #include <iostream>
 #include <vector>
+#include <map>
 #include <algorithm>
 
 int main()
@@ -144,13 +149,29 @@ int main()
 		for (auto && x : crop(slice(numbers, 2), 2)) std::cout << x << " ";
 	}
 	{
-		std::cout << "\nTest: slice/crop on non-const vector\n";
+		std::cout << "\n\nTest: slice/crop on non-const vector";
 		V  numbers{ 0, 1,2,3,4,5,6,7,8,9 };
+		std::cout << "\nslice(crop(numbers, 2), 2) x=99: ";
 		for (auto && x : slice(crop(numbers, 2), 2)) x = 99;
 		for (auto const& x : numbers) std::cout << x << " ";
-		std::cout << "\n---------\n";
-		auto sc = slice(crop(numbers, 3), 2);
+		std::cout << "\nslice(crop(numbers, 3), 2) x=77: ";
+		auto sc = slice(crop(numbers, 2), 2);
 		std::for_each(sc.begin(), sc.end(), [](auto &x) {x = 77; });
 		for (auto const& x : numbers) std::cout << x << " ";
+	}
+
+	{
+		std::cout << "\n\nTest: slice/crop on non-const map";
+		std::map<int, double>  numbers{ {0,8},{1,7},{-4,4},{6,1},{8,0},{33,-5} };
+		std::cout << "\nall: ";
+		for (auto const&[a, b] : numbers) std::cout << a << "|" << b << " ";
+		std::cout << "\ncrop(numbers, 2)); ";
+		for (auto const&[a, b] : crop(numbers, 2)) std::cout << a << "|" <<b << " ";
+		std::cout << "\nslice(numbers, 2)): ";
+		for (auto const&[a, b] : slice(numbers, 2)) std::cout << a << "|" << b << " ";
+		std::cout << "\ncrop(slice(numbers, 2), 1)): ";
+		for (auto const&[a, b] : crop(slice(numbers, 2), 1)) std::cout << a << "|" << b << " ";
+		std::cout << "\nslice(crop(numbers, 1), 2)): ";
+		for (auto const&[a, b] : slice(crop(numbers, 1), 2)) std::cout << a << "|" << b << " ";
 	}
 }
