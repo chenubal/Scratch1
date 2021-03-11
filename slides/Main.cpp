@@ -43,18 +43,10 @@ namespace jh
 	};
 
 	// User CTAD
-	template <typename S>
-	crop(S&, index_t, index_t)->crop<S, std::is_const_v<std::remove_reference_t<S>>>;
-	template <typename S>
-	crop(S&, index_t)->crop<S, std::is_const_v<std::remove_reference_t<S>>>;
-	template <typename S>
-	crop(S&)->crop<S, std::is_const_v<std::remove_reference_t<S>>>;
-	template <typename S>
-	crop(S&&, index_t, index_t)->crop<S, std::is_const_v<std::remove_reference_t<S>>>;
-	template <typename S>
-	crop(S&&, index_t)->crop<S, std::is_const_v<std::remove_reference_t<S>>>;
-	template <typename S>
-	crop(S&&)->crop<S, std::is_const_v<std::remove_reference_t<S>>>;
+	template <typename S, typename ...Rest>
+	crop(S&, Rest...)->crop<S, std::is_const_v<std::remove_reference_t<S>>>;
+	template <typename S, typename ...Rest>
+	crop(S&&, Rest...)->crop<S, std::is_const_v<std::remove_reference_t<S>>>;
 
 	template<class Iterable, bool is_const>
 	struct slice
@@ -101,14 +93,10 @@ namespace jh
 	};
 
 	// User CTAD
-	template <typename S>
-	slice(S&, index_t)->slice<S, std::is_const_v<std::remove_reference_t<S>>>;
-	template <typename S>
-	slice(S&)->slice<S, std::is_const_v<std::remove_reference_t<S>>>;
-	template <typename S>
-	slice(S&&, index_t)->slice<S, std::is_const_v<std::remove_reference_t<S>>>;
-	template <typename S>
-	slice(S&&)->slice<S, std::is_const_v<std::remove_reference_t<S>>>;
+	template <typename S, typename... Rest>
+	slice(S&, Rest...)->slice<S, std::is_const_v<std::remove_reference_t<S>>>;
+	template <typename S, typename... Rest>
+	slice(S&&, Rest...)->slice<S, std::is_const_v<std::remove_reference_t<S>>>;
 }
 #include <iostream>
 #include <vector>
