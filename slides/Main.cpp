@@ -84,17 +84,10 @@ namespace jh
 		using const_iterator = const iterator;
 
 		template<class S>
-		slice(S& c, index_t step) : m_step(step)
-		{
-			m_begin = { c.begin(), m_step , int(c.size())};
-			m_end = { c.end(), m_step };
-		}
+		slice(S& c, index_t step) : m_step(step), m_begin(c.begin(), m_step, int(c.size())), m_end(c.end(), m_step) {}
 		template<class S>
-		slice(S&& c, index_t step) : m_step(step)
-		{
-			m_begin = { c.begin(), m_step , int(c.size()) };
-			m_end = { c.end(), m_step };
-		}
+		slice(S&& c, index_t step) : m_step(step), m_begin(c.begin(), m_step, int(c.size())), m_end(c.end(), m_step) {}
+
 		slice() = default;
 
 		auto begin() { return m_begin; }
@@ -126,47 +119,50 @@ int main()
 	using namespace jh;
 	using V = std::vector<double>;
 	{
+		std::cout << "\nTest: slice\n";
+		const V  numbers{ 0,1,2,3,4,5,6,7,8,9 };
+		for (auto && x : slice(numbers, 1)) std::cout << x << " ";
+		std::cout << "\n---------\n";
+		for (auto && x : slice(numbers, 2)) std::cout << x << " ";
+		std::cout << "\n---------\n";
+		for (auto && x : slice(numbers, 3)) std::cout << x << " ";
+		std::cout << "\n---------\n";
+		for (auto && x : slice(numbers, 4)) std::cout << x << " ";
+		std::cout << "\n---------\n";
+		for (auto && x : slice(numbers, 5)) std::cout << x << " ";
+		std::cout << "\n---------\n";
+		for (auto && x : slice(numbers, 6)) std::cout << x << " ";
+		std::cout << "\n---------\n";
+		for (auto && x : slice(numbers, 7)) std::cout << x << " ";
+		std::cout << "\n---------\n";
+		for (auto && x : slice(numbers, 8)) std::cout << x << " ";
+		std::cout << "\n---------\n";
+		for (auto && x : slice(numbers, 9)) std::cout << x << " ";
+		std::cout << "\n---------\n";
+		for (auto && x : slice(numbers, 10)) std::cout << x << " ";
+		std::cout << "\n---------\n";
+		std::cout << "size=" << slice(numbers, 2).size() << "\n";
+		std::cout << "size=" << slice(numbers, 3).size() << "\n";
+	}
+	{
 		std::cout << "\nTest: slice/crop on const vector\n";
-		const V  v{ 1,2,3,4,5,6,7,8,9,0 };
-		for (auto && x : slice(crop(v, 2), 2)) std::cout << x << " ";
+		const V  numbers{ 0,1,2,3,4,5,6,7,8,9 };
+		for (auto && x : slice(crop(numbers, 2), 2)) std::cout << x << " ";
 		std::cout << "\n---------\n";
-		for (auto && x : slice(v, 2)) std::cout << x << " ";
+		for (auto && x : slice(numbers, 2)) std::cout << x << " ";
 		std::cout << "\n---------\n";
-		for (auto && x : crop(v, 3, 6)) std::cout << x << " ";
+		for (auto && x : crop(numbers, 3, 6)) std::cout << x << " ";
 		std::cout << "\n---------\n";
-		for (auto && x : crop(slice(v, 2), 2)) std::cout << x << " ";
+		for (auto && x : crop(slice(numbers, 2), 2)) std::cout << x << " ";
 	}
 	{
 		std::cout << "\nTest: slice/crop on non-const vector\n";
-		V  w{ 1,2,3,4,5,6,7,8,9,0 };
-		for (auto && x : slice(crop(w, 2), 2)) x = 99;
-		for (auto const& x : w) std::cout << x << " ";
+		V  numbers{ 0, 1,2,3,4,5,6,7,8,9 };
+		for (auto && x : slice(crop(numbers, 2), 2)) x = 99;
+		for (auto const& x : numbers) std::cout << x << " ";
 		std::cout << "\n---------\n";
-		auto sc = slice(crop(w, 3), 2);
+		auto sc = slice(crop(numbers, 3), 2);
 		std::for_each(sc.begin(), sc.end(), [](auto &x) {x = 77; });
-		for (auto const& x : w) std::cout << x << " ";
-	}
-	{
-		std::cout << "\nTest: slice\n";
-		V  u{ 0,1,2,3,4,5,6,7,8,9 };
-		for (auto && x : slice(u, 1)) std::cout << x << " ";
-		std::cout << "\n---------\n";
-		for (auto && x : slice(u, 2)) std::cout << x << " ";
-		std::cout << "\n---------\n";
-		for (auto && x : slice(u, 3)) std::cout << x << " ";
-		std::cout << "\n---------\n";
-		for (auto && x : slice(u, 4)) std::cout << x << " ";
-		std::cout << "\n---------\n";
-		for (auto && x : slice(u, 5)) std::cout << x << " ";
-		std::cout << "\n---------\n";
-		for (auto && x : slice(u, 6)) std::cout << x << " ";
-		std::cout << "\n---------\n";
-		for (auto && x : slice(u, 7)) std::cout << x << " ";
-		std::cout << "\n---------\n";
-		for (auto && x : slice(u, 8)) std::cout << x << " ";
-		std::cout << "\n---------\n";
-		for (auto && x : slice(u, 9)) std::cout << x << " ";
-		std::cout << "\n---------\n";
-		for (auto && x : slice(u, 10)) std::cout << x << " ";
+		for (auto const& x : numbers) std::cout << x << " ";
 	}
 }
