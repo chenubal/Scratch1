@@ -1,5 +1,7 @@
 #include <utility>
 #include <xutility>
+#include <functional>
+#include <type_traits>
 
 namespace jh
 {
@@ -64,7 +66,7 @@ namespace jh
 			iterator(pointer iter, index_t step, int count=-1) : m_iter(iter), m_step(step),m_count(count) {}
 			auto& operator*() const { return *m_iter; }
 			auto& operator++() {m_count -= m_step; std::advance(m_iter, m_step); return *this; }
-			auto operator++(int) { return std::exchange(*this, ++(*this)); }
+			auto operator++(int) { auto t = *this; ++(*this); return t; }
 			friend bool operator== (const iterator& a, const iterator& b) { return a.m_iter == b.m_iter || (a.isEnd() && b.isEnd()); }
 			friend bool operator!= (const iterator& a, const iterator& b) { return !(a == b); };
 
@@ -98,6 +100,13 @@ namespace jh
 	slice(S&, Rest...)->slice<S, std::is_const_v<std::remove_reference_t<S>>>;
 	template <typename S, typename... Rest>
 	slice(S&&, Rest...)->slice<S, std::is_const_v<std::remove_reference_t<S>>>;
+
+	template<class T>
+	auto makeNumberGen(T start = T(0), T inc = T(1))
+	{
+		return [v = start, i = inc]()mutable->T {return std::exchange(v, v + i); };
+	}
+
 }
 
 //------------------------------------------------------------------------------------------------------------------------------
@@ -174,4 +183,5 @@ int main()
 		std::cout << "\nslice(crop(numbers, 1), 2)): ";
 		for (auto const&[a, b] : slice(crop(numbers, 1), 2)) std::cout << a << "|" << b << " ";
 	}
+
 }
