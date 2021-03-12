@@ -47,13 +47,17 @@ int main()
 			std::cout << x << " ";
 	});
 	runTest([] {
-		for (auto&& x : Loop([](auto i){ return i + 5; }, 7))
+		for (auto&& x : Loop([](auto i) { return i + 5; }, 7))
 			std::cout << x << " ";
+	});
+	runTest([] {
+		for (auto&& x : Loop([](auto i){ return 1.1*i+10.0; }, 7))
+			std::cout << x << " "; 
 	});
 	runTest([] {
 		auto f = [](unsigned i)->int { return i * 3+4; };
 		for (auto&& x : Loop(f, 7))
-			std::cout << x << " ";
+			std::cout << x << " "; 
 	});
 	runTest([] {
 		struct X
