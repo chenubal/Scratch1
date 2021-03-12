@@ -67,13 +67,13 @@ namespace jh
 			auto& operator*() const { return *m_iter; }
 			auto& operator++() {m_count -= m_step; std::advance(m_iter, m_step); return *this; }
 			auto operator++(int) { auto t = *this; ++(*this); return t; }
-			friend bool operator== (const iterator& a, const iterator& b) { return a.m_iter == b.m_iter || (a.isEnd() && b.isEnd()); }
+			friend bool operator== (const iterator& a, const iterator& b) { return a.m_iter == b.m_iter || (a.isValid() && b.isValid()); }
 			friend bool operator!= (const iterator& a, const iterator& b) { return !(a == b); };
 
 		private:
-			bool isEnd() const { return m_count < 0; }
+			bool isValid() const { return m_count < 0; }
 			index_t m_step = 1;
-			int m_count = -1; // negative indicates 'end'
+			int m_count = -1; // negative indicates 'invalid'
 			pointer m_iter;
 		};
 		using const_iterator = const iterator;

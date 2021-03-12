@@ -5,7 +5,7 @@
 
 namespace jh
 {
-	template<class F, class I = unsigned long> // R=F(I)
+	template<class F, class I = unsigned long> // for function object with R=F(I)
 	struct Loop
 	{
 		using R = std::invoke_result_t<F, I>;
