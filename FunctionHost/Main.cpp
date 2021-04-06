@@ -31,6 +31,18 @@ namespace jh
 	// CTAD
 	template <typename I>
 	Loop(I)->Loop<std::function<I(I)>, I>;
+
+	template<class F, class ... Args>
+	void apply(F f, Args&& ...args)	{(f(std::forward<Args>(args)),...);}
+
+	template<class ... Args>
+	void printer(Args&& ...args)
+	{
+		apply([](auto&& x) {std::cout << x << " "; },args...);
+		std::cout << "\n";
+	}
+
+
 }
 
 void testHeader() { static int k = 1;  std::cout << "----------- Test " << (k++) << " --------------\n"; }
@@ -41,25 +53,34 @@ void runTest(F f) { testHeader(); f();  std::cout << "\n"; }
 int main()
 {
 	using namespace jh;
-	runTest([]{
-		auto f = [](unsigned i)->int { return i * i; };
-		for (auto&& x : Loop(f, 7))
-			std::cout << x << " ";
+
+	auto print = [](auto&& x) {std::cout << x << " "; };
+
+	printer("sfadf", 44, 5.50);
+
+	runTest([&] 
+	{
+		for (auto&& x : Loop(12))  print(x);	
 	});
-	runTest([] {
-		for (auto&& x : Loop([](auto i) { return i + 5; }, 7))
-			std::cout << x << " ";
+	runTest([&]
+	{
+		for (auto&& x : Loop([](unsigned i)->int { return i * i; }, 7)) print( x );
 	});
-	runTest([] {
-		for (auto&& x : Loop([](auto i){ return 1.1*i+10.0; }, 7))
-			std::cout << x << " "; 
+	runTest([&] 
+	{
+		for (auto&& x : Loop([](auto i) { return i + 5; }, 7)) print(x);
 	});
-	runTest([] {
-		auto f = [](unsigned i)->int { return i * 3+4; };
-		for (auto&& x : Loop(f, 7))
-			std::cout << x << " "; 
+	runTest([&] 
+	{
+		for (auto&& x : Loop([](auto i){ return 1.1*i+10.0; }, 7))	print(x);
 	});
-	runTest([] {
+	runTest([&] 
+	{
+		for (auto&& x : Loop([](unsigned i)->int { return i * 3 + 4; }, 7)) print(x);
+	});
+
+	runTest([&] 
+	{
 		struct X
 		{
 			int get(unsigned i) const { return data[i]; }
@@ -68,17 +89,14 @@ int main()
 			std::vector<int> data = { 4,5,6,77,8 };
 		} b;
 		for (auto&& x : Loop([&b](unsigned i) { return b.get(i); }, b.size()))
-			std::cout << x << " ";
+			print(x);
 	});
-	runTest([] {
+	runTest([&] 
+	{
 		auto b = Loop([](unsigned i) { return i + 77; }, 5).begin();
-		std::cout << *(++b) << " ";
-		std::cout << *b++ << " ";
-		std::cout << *b++ << " ";
-		std::cout << *b++ << " ";
-	});
-	runTest([] {
-		for (auto&& x : Loop(12))
-			std::cout << x << " ";
+		print(*(++b));
+		print(*b++);
+		print(*b++);
+		print(*b++);
 	});
 }
