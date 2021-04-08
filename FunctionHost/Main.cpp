@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <variant>
 
 namespace jh
 {
@@ -42,6 +43,9 @@ namespace jh
 		std::cout << "\n";
 	}
 
+	template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
+	template<class... Ts> overload(Ts...)->overload<Ts...>; // CTAD
+
 
 }
 
@@ -56,11 +60,21 @@ int main()
 
 	auto print = [](auto&& x) {std::cout << x << " "; };
 
-	printer("sfadf", 44, 5.50);
+	runTest([&]
+	{
+		using Vs = std::variant<int, float, std::string,double>;
+		overload ops{
+			[&](const int& i)->int {apply(print,i,"int"); return 1; },
+			[&](const float& f)->int { apply(print,f,"float"); return 2; },
+			[&](auto const& s)->int { std::cout << s << " default "; return 0; }
+		};
+		auto j= std::visit(ops,	Vs{ 5.5f });
+		apply(print, "return", j);
+	});
 
 	runTest([&] 
 	{
-		for (auto&& x : Loop(12))  print(x);	
+		for (auto&& x : Loop(12))  apply(print,x, "|");	
 	});
 	runTest([&]
 	{
@@ -81,13 +95,14 @@ int main()
 
 	runTest([&] 
 	{
-		struct X
+		struct B
 		{
 			int get(unsigned i) const { return data[i]; }
 			auto size() const { return unsigned(data.size()); }
 		private:
 			std::vector<int> data = { 4,5,6,77,8 };
 		} b;
+
 		for (auto&& x : Loop([&b](unsigned i) { return b.get(i); }, b.size()))
 			print(x);
 	});
