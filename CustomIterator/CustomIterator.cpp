@@ -87,7 +87,7 @@ int main()
 	print("tc+=20", tc);
 
 	// tc = CC
-	std::transform(tcc.begin(), tcc.end(), tc.begin(), [](auto& e) { return e; });
+	std::transform(tcc.begin(), tcc.end(), tc.begin(), [](V const& e) { return e; });
 	print("tc=tcc", tc);
 
 	// Use it->
