@@ -30,11 +30,13 @@ std::optional<double> fun_optional(bool b)
 
 int main()
 {
+	// Switchable test suite
 	auto  test_suite = [](bool flag)
 	{
+		// Some printer
 		auto print_none = []() { std::cout << "none\n"; };
 		auto print_value = [](auto v) {  std::cout << "v=" << v << "\n"; };
-
+		// Run tests
 		if (auto x = fun_any(flag); x.has_value())
 			print_value(std::any_cast<double>(x));
 		else
@@ -55,7 +57,7 @@ int main()
 		else
 			print_none();
 	};
-
+	// Run test suites
 	test_suite(true);
 	test_suite(false);
 }
