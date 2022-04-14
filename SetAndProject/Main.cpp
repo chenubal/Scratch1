@@ -45,33 +45,50 @@ namespace jh
 	Loop(Index)->Loop<std::function<Index(Index)>, Index>;
 }
 
-struct AbstractSet
+struct BufferAccess
 {
-	using BufferRef = std::reference_wrapper<Buffer>;
-	using BufferRefConst = std::reference_wrapper<Buffer const>;
+	template<typename T>
+	using RW = std::reference_wrapper<T>;
 
-	using SetRef = std::reference_wrapper<AbstractSet>;
-	using SRC = std::reference_wrapper<AbstractSet const>;
-	// Const methods
+	//virtual std::optional<RW<Buffer const>>  get(size_t) const = 0;
+	//virtual std::optional<RW<Buffer>> get(size_t) = 0;
+	virtual Buffer const& at(size_t) const = 0;
+	virtual Buffer& at(size_t) = 0;
+	virtual Buffer const& operator[](size_t) const = 0;
+	virtual Buffer& operator[](size_t) = 0;
+
+	virtual Buffer& insert(Buffer const&, size_t pos) = 0;
+	virtual Buffer& insert(Buffer &&, size_t pos) = 0;
+	virtual std::unique_ptr<Buffer> release(size_t) = 0;
+	virtual bool remove(size_t) = 0;
+
+	virtual ~BufferAccess() = 0;
+};
+struct AbstractSet : public BufferAccess
+{
+	template<typename T>
+	using RW = std::reference_wrapper<T>;
+
 	virtual size_t size() const = 0;
 	virtual size_t numSubSets() const = 0;
-	virtual std::unordered_set<SetId> getSubIds() const = 0;
-	virtual std::optional<SRC>  getSet(SetId const&) const = 0;
-	virtual bool hasSet(SetId const&) const;
-	virtual std::optional<BufferRefConst>  getBuffer(size_t) const = 0;
-	virtual SetAttibutes const& getAttributes() const = 0;
-	// Non-const methods
-	virtual std::optional<BufferRef> getBuffer(size_t) = 0;
-	virtual std::optional<BufferRef> insertBuffer(Buffer const&, size_t pos) = 0;
-	virtual std::optional<BufferRef> insertBuffer(Buffer &&, size_t pos) = 0;
-	virtual std::unique_ptr<Buffer> removeBuffer(size_t) = 0;
-	virtual bool deleteBuffer(size_t) = 0;
-	virtual std::optional<SetRef> getSet(SetId const&) = 0;
-	virtual std::optional<SetRef> addSet(AbstractSet const&, SetId const&) = 0;
-	virtual std::optional<SetRef> addSet(AbstractSet&&, SetId const&) = 0;
-	virtual std::unique_ptr<AbstractSet> removeSet(SetId const&) = 0;
-	virtual bool deleteSet(SetId const&) = 0;
+	virtual bool hasSet(SetId const&) const = 0;
 
+	virtual std::unordered_set<SetId> getSubIds() const = 0;
+
+	//virtual std::optional<RW<AbstractSet const>>  get(SetId const&) const = 0;
+	//virtual std::optional<RW<AbstractSet const>> get(SetId const&) = 0;
+
+	virtual AbstractSet& at(SetId const&) = 0;
+	virtual AbstractSet& operator[](SetId const&) = 0;
+	virtual AbstractSet const& at(SetId const&) const = 0;
+	virtual AbstractSet const& operator[](SetId const&) const = 0;
+
+	virtual AbstractSet& add(AbstractSet const&, SetId const&) = 0;
+	virtual AbstractSet& add(AbstractSet&&, SetId const&) = 0;
+	virtual std::unique_ptr<AbstractSet> release(SetId const&) = 0;
+	virtual bool remove(SetId const&) = 0;
+
+	virtual SetAttibutes const& getAttributes() const = 0;
 	virtual SetAttibutes& getAttributes() = 0;
 
 	virtual ~AbstractSet() = 0;
@@ -87,23 +104,10 @@ std::optional<Buffer> fun(bool ok) { if (ok) return  { b }; else return{}; }
 struct ProjectProperties : public AbstractSet
 {};
 
-struct AbstractProject
+struct AbstractProject : public AbstractSet
 {
-	// Const methods
-	virtual size_t size() const = 0;
-	virtual std::unordered_set<SetId> const& getIds() const = 0;
-	virtual std::optional<AbstractSet::SRC>  getSet(SetId const&) const = 0;
-	virtual bool hasSet(SetId const&) const = 0;
 	virtual ProjectProperties const& getProperties() const = 0;
-	virtual SetAttibutes const& getAttributes() const = 0;
-	// Non-const methods
-	virtual std::optional<AbstractSet::SetRef> getSet(SetId const&) = 0;
-	virtual std::optional<AbstractSet::SetRef> addSet(AbstractSet const&, SetId const&) = 0;
-	virtual std::optional<AbstractSet::SetRef> addSet(AbstractSet&&, SetId const&) = 0;
-	virtual std::unique_ptr<AbstractSet> removeSet(SetId const&) = 0;
-	virtual bool deleteSet(SetId const&) = 0;
 	virtual ProjectProperties& getProperties() = 0;
-	virtual SetAttibutes& getAttributes() = 0;
 
 	virtual ~AbstractProject() = 0;
 

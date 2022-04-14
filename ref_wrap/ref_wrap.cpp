@@ -7,6 +7,7 @@
 #include <functional>
 #include <algorithm>
 #include <optional>
+#include <xutility>
 
 auto print = [](auto const rem,  auto const& v) 
 {
@@ -15,6 +16,24 @@ auto print = [](auto const rem,  auto const& v)
 		std::cout << e << ' ';
 	std::cout << '\n';
 };
+
+struct X
+{
+	X() { std::cout << "X default\n"; }
+	X(X const &o) { c = o.c; std::cout << "X copy\n"; }
+	X(X&& o) { c = std::move(o.c); std::cout << "X move\n"; }
+	std::vector<int> c;
+};
+
+std::unique_ptr<X> mu1(X&& s)
+{
+	return std::make_unique<X>(s);
+}
+
+std::unique_ptr<X> mu2(X&& s)
+{
+	return std::make_unique<X>(std::forward<X>(s));
+}
 
 int main()
 {
@@ -36,5 +55,11 @@ int main()
 	std::optional<RV> x (*l.begin());
 	if (x)
 		std::cout << *x << '\n';
+
+	X xx; xx.c = { 4,7,9 };
+	auto yy = std::make_unique<X>(std::move(xx));
+	auto vv = mu1(std::move(*yy));
+	auto uu = mu2(std::move(*vv));
+	std::cout << uu->c[1] << ' ' << uu->c[0] << '\n';
 	system("pause");
 }
