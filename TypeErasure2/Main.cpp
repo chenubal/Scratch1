@@ -25,7 +25,6 @@ struct Foo
 std::string print(Bar const& b) { return b.print(); }
 std::string print(Foo const& f) { return f.print(); }
 
-
 class PrintObject
 {
 
@@ -62,14 +61,14 @@ std::string print(std::vector<PrintObject> const& vec)
 
 int main()
 {
+	Foo f{ "fooooooooo" };
+	std::vector<PrintObject> vec0{ std::move(f), Bar() }; 
+	std::vector<PrintObject> vec1{ vec0, Bar(),vec0, Foo() }; 
+	std::vector<PrintObject> vec2{ vec1,vec1, Foo(), Bar() }; 
 
-	Foo f{ "Heers" };
-	std::vector<PrintObject> v0{ std::move(f), Bar() };  // (1)
-	std::vector<PrintObject> vn{ v0, Bar(),v0, Foo() };  // (1)
-
-	std::cout << print(vn) << '\n';
+	std::cout << print(vec2) << '\n';
 	ONL;
-	for (auto&& x : vn) std::cout << x.print() << "\n";
+	for (auto&& x : vec2) std::cout << x.print() << "\n";
 	ONL;
 }
 
