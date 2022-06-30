@@ -60,8 +60,8 @@ namespace jh
 	using LengthMM = TaggedType<double, struct LengthMMTag>;
 	using LengthM = TaggedType<double, struct LengthMTag>;
 	using LengthKM = TaggedType<double, struct LengthKMTag>;
-	using LengthMLS = TaggedType<double, struct LengthMLSTag>;
-	using LengthType = std::variant<LengthMM, LengthM, LengthKM, LengthMLS>;
+	using LengthMiles = TaggedType<double, struct LengthMilesTag>;
+	using LengthType = std::variant<LengthMM, LengthM, LengthKM, LengthMiles>;
 
 	std::string unit(LengthType l)
 	{
@@ -70,7 +70,7 @@ namespace jh
 				[](LengthMM) { return std::string("mm"); },
 				[](LengthM) { return std::string("m"); },
 				[](LengthKM) { return std::string("km"); },
-				[](LengthMLS) { return std::string("mil"); }
+				[](LengthMiles) { return std::string("mil"); }
 		), l);
 	}
 
@@ -81,7 +81,7 @@ namespace jh
 				[](LengthMM l) { return 0.001; },
 				[](LengthM l) { return 1.0; },
 				[](LengthKM l) { return 1000.0; },
-				[](LengthMLS l) { return 1609.34; }
+				[](LengthMiles l) { return 1609.34; }
 		), l);
 	}
 
@@ -187,9 +187,9 @@ int main(int, char**)
 	std::cout << "angle: " << toStr(convert<Radiant>(x)) << "\n";
 	NL
 	print(LengthM(11));
-	print(LengthMLS(2));
+	print(LengthMiles(2));
 	print<LengthMM>(LengthM(11));
-	print<LengthKM>(LengthMLS(2));
+	print<LengthKM>(LengthMiles(2));
 	NL
 	Temperature t = Celsius(30.0);
 	std::cout << "temperature: " << toStr(convert<Celsius>(t)) << "\n";
