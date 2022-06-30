@@ -117,8 +117,8 @@ int main(int, char**)
 	std::cout << "Value: " << toStr(x) << "\n";
 	std::cout << "Value: " << toStr(convert<Radiant>(x)) << "\n";
 	std::cout << "Value: " << value(x) << "\n";
-	x = Radiant(44);
-	std::cout << "Value: " << toStr(x) << "\n";
+	x = Radiant(jh::PI);
+	std::cout << "Value: " << toStr(convert<Angle>(x)) << "\n";
 	print(LengthM(11));
 	print(LengthMLS(2));
 	print<LengthMM>(LengthM(11));
