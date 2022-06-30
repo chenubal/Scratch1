@@ -5,6 +5,8 @@
 
 namespace jh
 {
+	const double PI = 3.141592653589793238463;
+
 	template<typename... Functions>
 	struct overload : Functions...
 	{
@@ -32,9 +34,24 @@ namespace jh
 		return std::visit(
 			overload(
 				[](Angle) { return std::string("\370"); },
-				[](Radiant) { return std::string("rad");; },
-				[](auto) { return std::string(""); }
+				[](Radiant) { return std::string("rad"); }
 		), a);
+	}
+
+	double factor(AngleType l)
+	{
+		return std::visit(
+			overload(
+				[](Angle ) { return 1.0; },
+				[](Radiant ) { return 180.0/PI; }
+		), l);
+	}
+
+	template<class T = Angle>
+	AngleType convert(AngleType l)
+	{
+		auto q = factor(l) / factor(AngleType(T(0)));
+		return T(std::visit([&](auto l) { return  *l * q; }, l));
 	}
 
 	using LengthMM = TaggedType<double, struct LengthMMTag>;
@@ -96,8 +113,9 @@ void print(LengthType l)
 
 int main(int, char**)
 {
-	jh::AngleType x = Angle(33);
+	jh::AngleType x = Angle(45);
 	std::cout << "Value: " << toStr(x) << "\n";
+	std::cout << "Value: " << toStr(convert<Radiant>(x)) << "\n";
 	std::cout << "Value: " << value(x) << "\n";
 	x = Radiant(44);
 	std::cout << "Value: " << toStr(x) << "\n";
