@@ -9,7 +9,7 @@ struct X : public M
 {
 	void operator()() override { std::cout << "X\n"; }
 };
-struct Y : public M
+struct TestClass : public M
 {
 	void operator()() override { std::cout << "Y\n"; }
 };
@@ -33,7 +33,7 @@ struct WX : public W
 struct WY : public W
 {
 	void paint() override { std::cout << "paint WY\n"; }
-	M* model() override { return (Y*)(nullptr); }
+	M* model() override { return (TestClass*)(nullptr); }
 };
 struct WZ : public W
 {
@@ -46,7 +46,7 @@ W* newDialog(X const&)
 	return new WX();
 }
 
-W* newDialog(Y const&)
+W* newDialog(TestClass const&)
 {
 	return new WY();
 }
@@ -60,11 +60,11 @@ int main(int, char**)
 	using V = std::vector<std::unique_ptr<M>>;
 	V v;
 	v.emplace_back(std::make_unique<X>());
-	v.emplace_back(std::make_unique<Y>());
+	v.emplace_back(std::make_unique<TestClass>());
 	v.emplace_back(std::make_unique<Z>());
 	for (auto&& x : v) (*x)();
 
-	Y x;
+	TestClass x;
 	auto w = newDialog(x);
 	w->paint();
 	delete w;
