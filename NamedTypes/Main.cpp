@@ -25,6 +25,19 @@ namespace jh
 		T value;
 	};
 
+	template<class T>
+	double value(T l)
+	{
+		return std::visit([](auto l) { return *l; }, l);
+	}
+
+	template<class T>
+	std::string asLabel(T l)
+	{
+		return std::to_string(value(l)) + unit(l);
+	}
+
+
 	///////////////////////////////////////////////////////////////////////////////////////
 
 	using Angle = TaggedType<double, struct AngleTag>;
@@ -55,15 +68,22 @@ namespace jh
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////
+	using LengthPM = TaggedType<double, struct LengthPMTag>;
+	using LengthNM = TaggedType<double, struct LengthNMTag>;
+	using LengthUM = TaggedType<double, struct LengthUMTag>;
 	using LengthMM = TaggedType<double, struct LengthMMTag>;
 	using LengthM = TaggedType<double, struct LengthMTag>;
 	using LengthKM = TaggedType<double, struct LengthKMTag>;
 	using LengthMiles = TaggedType<double, struct LengthMilesTag>;
-	using LengthType = std::variant<LengthMM, LengthM, LengthKM, LengthMiles>;
+
+	using LengthType = std::variant<LengthPM, LengthNM, LengthUM, LengthMM, LengthM, LengthKM, LengthMiles>;
 
 	std::string unit(LengthType l)
 	{
 		auto v = overload(
+			[](LengthPM) { return std::string("pm"); },
+			[](LengthNM) { return std::string("nm"); },
+			[](LengthUM) { return std::string("µm"); },
 			[](LengthMM) { return std::string("mm"); },
 			[](LengthM) { return std::string("m"); },
 			[](LengthKM) { return std::string("km"); },
@@ -74,9 +94,12 @@ namespace jh
 	double factor(LengthType l)
 	{
 		auto v = overload(
-			[](LengthMM l) { return 0.001; },
+			[](LengthPM l) { return 1e-12; },
+			[](LengthNM l) { return 1e-9; },
+			[](LengthUM l) { return 1e-6; },
+			[](LengthMM l) { return 1e-3; },
 			[](LengthM l) { return 1.0; },
-			[](LengthKM l) { return 1000.0; },
+			[](LengthKM l) { return 1e3; },
 			[](LengthMiles l) { return 1609.34; });
 		return std::visit(v, l);
 	}
@@ -97,6 +120,7 @@ namespace jh
 	using Kelvin = TaggedType<double, struct KelvinTag>;
 	using Celsius = TaggedType<double, struct CelsiusTag>;
 	using Fahrenheit = TaggedType<double, struct FahrenheitTag>;
+
 	using Temperature = std::variant<Kelvin, Celsius, Fahrenheit>;
 
 	std::string unit(Temperature t)
@@ -124,7 +148,7 @@ namespace jh
 	double offset(Temperature t)
 	{
 		auto v =	overload(
-				[](Kelvin) { return 271.0; },
+				[](Kelvin) { return 273.15; },
 				[](Celsius) { return 0.0; },
 				[](Fahrenheit) { return 32.0; });
 		return std::visit(v, t);
@@ -153,19 +177,9 @@ namespace jh
 		return t;
 	}
 
-	///////////////////////////////////////////////////////////////////////////////////////
+	bool operator==(Temperature a, Temperature b) { return value(convert(a)) == value(convert(b)); }
+	bool operator!=(Temperature a, Temperature b) { return !(a == b); }
 
-	template<class T>
-	double value(T l)
-	{
-		return std::visit([](auto l){ return *l; }, l);
-	}
-
-	template<class T>
-	std::string asLabel(T l)
-	{
-		return std::to_string(value(l)) + unit(l);
-	}
 }
 
 using namespace jh;
@@ -176,40 +190,59 @@ void print(LengthType l)
 	std::cout << "Length: " << asLabel(convert<T>(l)) << "\n";
 }
 
-#define NL std::cout <<"\n";
+
+LengthPM operator"" _pm(long double val) { return LengthPM(val); }
+LengthNM operator"" _nm(long double val) { return LengthNM(val); }
+LengthUM operator"" _um(long double val) { return LengthUM(val); }
+LengthMM operator"" _mm(long double val) { return LengthMM(val); }
+LengthM operator"" _m(long double val) { return LengthM(val); }
+LengthKM operator"" _km(long double val) { return LengthKM(val); }
+LengthMiles operator"" _mi(long double val) {return LengthMiles(val);}
+
+#define NL std::cout <<"\n"
 
 int main(int, char**)
 {
 	auto test = [](std::string const l, auto v) {	std::cout << l << " " << v << "\n";	};
-	jh::AngleType x = Angle(45);
+	AngleType x = Angle(45);
 	test("angle:", asLabel(x));
 	test("angle:", value(x));
-	NL
+	NL;
 	test("angle:", asLabel(convert<Angle>(x)));
 	test("angle:", asLabel(convert<Radiant>(x)));
 	x = Radiant(jh::PI/4.0);
 	test("angle:", asLabel(convert<Angle>(x)));
 	test("angle:", asLabel(convert<Radiant>(x)));
-	NL
+	NL;
 	print(LengthM(11));
 	print(LengthMiles(2));
 	print<LengthMM>(LengthM(11));
-	print<LengthKM>(LengthMiles(2));
-	NL
+	print<LengthM>(2.0_um);
+	print<LengthMM>(3.0_nm);
+	print<LengthKM>(4.0_mi);
+	NL;
 	Temperature t = Celsius(30.0);
 	test("temperature:", asLabel(convert<Celsius>(t)));
 	test("temperature:", asLabel(convert<Kelvin>(t)));
 	test("temperature:", asLabel(convert<Fahrenheit>(t)));
-	NL
+	NL;
 	t = Fahrenheit(86);
 	test("temperature:", asLabel(convert<Celsius>(t)) );
 	test("temperature:", asLabel(convert<Kelvin>(t)) );
 	test("temperature:", asLabel(convert<Fahrenheit>(t)));
-	NL
-	t = Kelvin(301);
+	NL;
+	t = Kelvin(303.15);
 	test("temperature:", asLabel(convert<Celsius>(t)));
 	test("temperature:", asLabel(convert<Kelvin>(t)));
 	test("temperature:", asLabel(convert<Fahrenheit>(t)));
+	NL;
+	test("temperature:", asLabel(convert<Kelvin>(Celsius(30.0))));
+	test("temperature:", asLabel(convert<Celsius>(Kelvin(303.15))));
+	test("temperature:", asLabel(convert<Celsius>(Fahrenheit(212))));
+	test("temperature:", asLabel(convert<Fahrenheit>(Celsius(100))));
+	test("equal temperature:", Celsius(100) == Fahrenheit(212) ? "true" : "false");
+	test("different temperature:", Celsius(100) != Kelvin(100) ? "true" : "false");
+
 	return 0;
 
 }
