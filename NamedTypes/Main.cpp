@@ -36,8 +36,10 @@ namespace jh
 	{
 		return std::to_string(value(l)) + unit(l);
 	}
-
-
+}
+ namespace units
+ {
+	 using namespace jh;
 	///////////////////////////////////////////////////////////////////////////////////////
 
 	using Angle = TaggedType<double, struct AngleTag>;
@@ -67,6 +69,9 @@ namespace jh
 		return a;
 	}
 
+	bool operator==(AngleType a, AngleType b) { return value(convert(a)) == value(convert(b)); }
+	bool operator!=(AngleType a, AngleType b) { return !(a == b); }
+
 	///////////////////////////////////////////////////////////////////////////////////////
 	using LengthPM = TaggedType<double, struct LengthPMTag>;
 	using LengthNM = TaggedType<double, struct LengthNMTag>;
@@ -75,6 +80,14 @@ namespace jh
 	using LengthM = TaggedType<double, struct LengthMTag>;
 	using LengthKM = TaggedType<double, struct LengthKMTag>;
 	using LengthMiles = TaggedType<double, struct LengthMilesTag>;
+
+	LengthPM operator"" _pm(long double val) { return LengthPM(val); }
+	LengthNM operator"" _nm(long double val) { return LengthNM(val); }
+	LengthUM operator"" _um(long double val) { return LengthUM(val); }
+	LengthMM operator"" _mm(long double val) { return LengthMM(val); }
+	LengthM operator"" _m(long double val) { return LengthM(val); }
+	LengthKM operator"" _km(long double val) { return LengthKM(val); }
+	LengthMiles operator"" _mi(long double val) { return LengthMiles(val); }
 
 	using LengthType = std::variant<LengthPM, LengthNM, LengthUM, LengthMM, LengthM, LengthKM, LengthMiles>;
 
@@ -115,6 +128,9 @@ namespace jh
 		return l;
 	}
 
+	bool operator==(LengthType a, LengthType b) { return value(convert(a)) == value(convert(b)); }
+	bool operator!=(LengthType a, LengthType b) { return !(a == b); }
+	
 	///////////////////////////////////////////////////////////////////////////////////////
 	
 	using Kelvin = TaggedType<double, struct KelvinTag>;
@@ -132,7 +148,7 @@ namespace jh
 		return std::visit(v, t);
 	}
 
-	///Temperature conversion K = C + 270; F = C*1.8 + 32
+	///Temperature conversion: K = C + 273.15; F = C*1.8 + 32
 
 	/// Scaling factor w.r.t Celsius
 	double factor(Temperature t)
@@ -182,22 +198,13 @@ namespace jh
 
 }
 
-using namespace jh;
+using namespace units;
 
 template<class T = LengthM>
 void print(LengthType l)
 {
 	std::cout << "Length: " << asLabel(convert<T>(l)) << "\n";
 }
-
-
-LengthPM operator"" _pm(long double val) { return LengthPM(val); }
-LengthNM operator"" _nm(long double val) { return LengthNM(val); }
-LengthUM operator"" _um(long double val) { return LengthUM(val); }
-LengthMM operator"" _mm(long double val) { return LengthMM(val); }
-LengthM operator"" _m(long double val) { return LengthM(val); }
-LengthKM operator"" _km(long double val) { return LengthKM(val); }
-LengthMiles operator"" _mi(long double val) {return LengthMiles(val);}
 
 #define NL std::cout <<"\n"
 
