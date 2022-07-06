@@ -14,7 +14,7 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
 	if (!vec.empty())
 	{
 		os << vec.front();
-		std::for_each(++vec.begin(), vec.end(), [&](auto const& x) {os << ";" << x; });
+		std::for_each(std::next(vec.begin()), vec.end(), [&](auto const& x) {os << ";" << x; });
 	}
 	return os;
 }

@@ -2,6 +2,8 @@
 #include <vector>
 #include <variant>
 #include <string>
+#include <algorithm>
+#include <numeric>
 
 namespace jh
 {
@@ -193,6 +195,7 @@ namespace jh
 		return t;
 	}
 
+	bool operator<(Temperature a, Temperature b) { return value(convert(a)) < value(convert(b)); }
 	bool operator==(Temperature a, Temperature b) { return value(convert(a)) == value(convert(b)); }
 	bool operator!=(Temperature a, Temperature b) { return !(a == b); }
 
@@ -249,8 +252,18 @@ int main(int, char**)
 	test("temperature:", asLabel(convert<Celsius>(Fahrenheit(212))));
 	test("temperature:", asLabel(convert<Fahrenheit>(Celsius(100))));
 	test("equal temperature:", Celsius(100) == Fahrenheit(212) ? "true" : "false");
-	test("different temperature:", Celsius(100) != Kelvin(100) ? "true" : "false");
+	test("diff. temperature:", Celsius(100) != Kelvin(100) ? "true" : "false");
 
+	std::vector<Temperature> temps{ Fahrenheit(212), Kelvin(310), Celsius(5), Fahrenheit(88) };
+	for (auto&& x : temps)	std::cout << asLabel(convert<Kelvin>(x)) << " ";
+	NL;
+	std::sort(temps.begin(), temps.end());
+	for (auto&& t : temps)	
+		std::cout << asLabel(convert<Kelvin>(t)) << "=" << asLabel(t) << " ";
+	NL;
+	auto acc = [](Kelvin const& s, Temperature const& t){return Kelvin(*s + value(convert<Kelvin>(t))); };
+	Temperature avg = Kelvin(*std::accumulate(temps.begin(), temps.end(), Kelvin(0.0),acc)/temps.size());
+	test("avg(t) = ", asLabel(avg));
 	return 0;
 
 }
