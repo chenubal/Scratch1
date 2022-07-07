@@ -16,7 +16,7 @@ namespace jh
 		overload(Functions... functions) : Functions(functions)... {}
 	};
 
-	template <typename T, typename Parameter>
+	template <typename T, typename Tag>
 	class TaggedType
 	{
 	public:
@@ -89,7 +89,7 @@ namespace jh
 	LengthMM operator"" _mm(long double val) { return LengthMM(val); }
 	LengthM operator"" _m(long double val) { return LengthM(val); }
 	LengthKM operator"" _km(long double val) { return LengthKM(val); }
-	LengthMiles operator"" _mi(long double val) { return LengthMiles(val); }
+	LengthMiles operator"" _mil(long double val) { return LengthMiles(val); }
 
 	using Length = std::variant<LengthPM, LengthNM, LengthUM, LengthMM, LengthM, LengthKM, LengthMiles>;
 
@@ -109,13 +109,13 @@ namespace jh
 	double factor(Length l)
 	{
 		auto v = overload(
-			[](LengthPM l) { return 1e-12; },
-			[](LengthNM l) { return 1e-9; },
-			[](LengthUM l) { return 1e-6; },
-			[](LengthMM l) { return 1e-3; },
-			[](LengthM l) { return 1.0; },
-			[](LengthKM l) { return 1e3; },
-			[](LengthMiles l) { return 1609.34; });
+			[](LengthPM) { return 1e-12; },
+			[](LengthNM) { return 1e-9; },
+			[](LengthUM) { return 1e-6; },
+			[](LengthMM) { return 1e-3; },
+			[](LengthM) { return 1.0; },
+			[](LengthKM) { return 1e3; },
+			[](LengthMiles) { return 1609.34; });
 		return std::visit(v, l);
 	}
 
@@ -130,6 +130,7 @@ namespace jh
 		return l;
 	}
 
+	bool operator<(Length a, Length b) { return value(convert(a)) < value(convert(b)); }
 	bool operator==(Length a, Length b) { return value(convert(a)) == value(convert(b)); }
 	bool operator!=(Length a, Length b) { return !(a == b); }
 	
@@ -156,8 +157,7 @@ namespace jh
 	double factor(Temperature t)
 	{
 		auto v =	overload(
-				[](Kelvin) { return 1.0; },
-				[](Celsius) { return 1.0; },
+				[](auto) { return 1.0; },
 				[](Fahrenheit) { return 1.8; });
 		return std::visit(v, t);
 	}
@@ -230,7 +230,7 @@ int main(int, char**)
 	print<LengthMM>(LengthM(11));
 	print<LengthM>(2.0_um);
 	print<LengthMM>(3.0_nm);
-	print<LengthKM>(4.0_mi);
+	print<LengthKM>(4.0_mil);
 	NL;
 	Temperature temperature = Celsius(30.0);
 	test("temperature:", asLabel(convert<Celsius>(temperature)));
