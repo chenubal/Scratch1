@@ -62,13 +62,13 @@ struct overload : Functions...
 
 size_t size(Matrix const& m)
 {
-	return std::visit(overload([](auto const& mat) { return mat.size(); }), m);
+	return std::visit([](auto const& mat) { return mat.size(); }, m);
 }
 
 template<class T = double>
 T get(Matrix const& m, size_t i, size_t j)
 {
-	return std::visit(overload([=](auto const& mat) { return T(mat(i, j)); }), m);
+	return std::visit([=](auto const& mat) { return T(mat(i, j)); }, m);
 }
 
 void set(Matrix& m, size_t i, size_t j, double s)
@@ -82,40 +82,34 @@ void set(Matrix& m, size_t i, size_t j, double s)
 	return std::visit(v, m);
 }
 
-
 Matrix& operator+=(Matrix& m, double s)
 {
-	auto v = overload([=](auto& mat) {mat += s; });
-	std::visit(v, m);
+	std::visit([=](auto& mat) {mat += s; }, m);
 	return m;
 }
 
 Matrix& operator*=(Matrix& m, double s)
 {
-	auto v = overload([=](auto& mat) {mat *= s; });
-	std::visit(v, m);
+	std::visit([=](auto& mat) {mat *= s; }, m);
 	return m;
 }
 
 Matrix& operator+=(Matrix& m1, Matrix const& m2)
 {
-	auto outer = overload([&](auto& matA)
+	auto v = [&](auto& matA)
 	{
-		auto inner = overload([&](auto& matB) {matA += matB; });
-		std::visit(inner, m2);
-	});
-	std::visit(outer, m1);
+		std::visit([&](auto& matB) {matA += matB; }, m2);
+	};
+	std::visit(v, m1);
 	return m1;
 }
 
 Matrix& operator*=(Matrix& m1, Matrix const& m2)
 {
-	auto outer = overload([&](auto& matA)
+	std::visit([&](auto& matA)
 	{
-		auto inner = overload([&](auto& matB) {matA *= matB; });
-		std::visit(inner, m2);
-	});
-	std::visit(outer, m1);
+		std::visit([&](auto& matB) {matA *= matB; }, m2);
+	}, m1);
 	return m1;
 }
 
@@ -136,8 +130,7 @@ Matrix convert(Matrix const& m)
 {
 	if (!std::holds_alternative<SqrMat<T>>(m))
 	{
-		auto v = [&](auto const& mat) { return SqrMat<T>(mat); };
-		return std::visit(v, m);
+		return std::visit([&](auto const& mat) { return SqrMat<T>(mat); }, m);
 	}
 	return m;
 }
