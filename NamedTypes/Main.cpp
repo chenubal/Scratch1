@@ -125,7 +125,7 @@ namespace jh
 		if (!std::holds_alternative<T>(l))
 		{
 			auto q = factor(l) / factor(Length(T(0)));
-			l = T(std::visit([&](auto l) { return  *l * q; }, l));
+			l = T(std::visit([&](auto x) { return  *x * q; }, l));
 		}
 		return l;
 	}

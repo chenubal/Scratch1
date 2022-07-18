@@ -68,7 +68,7 @@ protected:
 
 ////////////////////////// Matrix /////////////////////////////////////////
 
-using Matrix = std::variant<SqrMat<uint8_t>, SqrMat<int>, SqrMat<float>, SqrMat<double>>;
+using Matrix = std::variant<SqrMat<uint8_t>, SqrMat<uint16_t>, SqrMat<int>, SqrMat<float>, SqrMat<double>>;
 
 template<typename... Functions>
 struct overload : Functions...
@@ -93,6 +93,7 @@ void set(Matrix& m, Col i, Row j, double s)
 	auto v = overload(
 		[](auto&) {/*error*/},
 		[=](SqrMat<uint8_t>& mat) { mat(i, j) = uint8_t(s); },
+		[=](SqrMat<uint16_t>& mat) { mat(i, j) = uint16_t(s); },
 		[=](SqrMat<int>& mat) { mat(i, j) = int(s); },
 		[=](SqrMat<float>& mat) { mat(i, j) = float(s); },
 		[=](SqrMat<double>& mat) { mat(i, j) = double(s); });
@@ -113,27 +114,22 @@ Matrix& operator*=(Matrix& m, double s)
 
 Matrix& operator+=(Matrix& m1, Matrix const& m2)
 {
-	auto v = [&](auto& matA)
+	std::visit([&](auto& matA)
 	{
 		std::visit([&](auto& matB) {matA += matB; }, m2);
-	};
-	std::visit(v, m1);
+	}, m1);
 	return m1;
 }
 
 Matrix& operator*=(Matrix& m1, Matrix const& m2)
 {
-	std::visit([&](auto& matA)
-	{
-		std::visit([&](auto& matB) {matA *= matB; }, m2);
-	}, m1);
+	std::visit([&](auto& matA, auto const& matB) {matA *= matB; }, m1,m2);
 	return m1;
 }
 
 Matrix operator+(Matrix const& m1, Matrix const& m2)
 {
-	Matrix mat = m1;
-	return mat += m2;
+	return Matrix(m1) += m2;
 }
 
 Matrix operator*(Matrix const& m1, Matrix const& m2)
@@ -154,7 +150,7 @@ Matrix convert(Matrix const& m)
 
 void execute(Matrix& m, std::function<double(double)> fun)
 {
-	std::visit(overload([&](auto& mat) { mat.apply(fun); }), m);
+	std::visit([&](auto& mat) { mat.apply(fun); }, m);
 }
 
 bool sameType(Matrix const& m1, Matrix const& m2)
