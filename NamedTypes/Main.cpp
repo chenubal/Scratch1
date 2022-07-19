@@ -28,20 +28,20 @@ namespace jh
 	};
 
 	template<class T>
-	double value(T l)
+	double value(T v)
 	{
-		return std::visit([](auto l) { return *l; }, l);
+		return std::visit([](auto tt) { return *tt; }, v);
 	}
 
 	template<class T>
-	std::string asLabel(T l)
+	std::string asLabel(T v)
 	{
-		return std::to_string(value(l)) + unit(l);
+		return std::to_string(value(v)) + unit(v);
 	}
 }
- namespace units
- {
-	 using namespace jh;
+namespace units
+{
+	using namespace jh;
 	///////////////////////////////////////////////////////////////////////////////////////
 
 	using AngleDeg = TaggedType<double, struct AngleTag>;
@@ -50,13 +50,21 @@ namespace jh
 
 	std::string unit(Angle a)
 	{
-		auto v = overload([](AngleDeg) { return std::string("\370"); },[](AngleRad) { return std::string("rad"); });
-		return std::visit( v, a);
+		auto v = overload
+		(
+			[](AngleDeg) { return std::string("\370"); }, 
+			[](AngleRad) { return std::string("rad"); }
+		);
+		return std::visit(v, a);
 	}
 
 	double factor(Angle a)
 	{
-		auto v = overload( [](AngleDeg) { return 1.0; }, [](AngleRad) { return 180.0 / PI; });
+		auto v = overload
+		(
+			[](AngleDeg) { return 1.0; }, 
+			[](AngleRad) { return 180.0 / PI; }
+		);
 		return std::visit(v, a);
 	}
 
@@ -133,9 +141,9 @@ namespace jh
 	bool operator<(Length a, Length b) { return value(convert(a)) < value(convert(b)); }
 	bool operator==(Length a, Length b) { return value(convert(a)) == value(convert(b)); }
 	bool operator!=(Length a, Length b) { return !(a == b); }
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////
-	
+
 	using Kelvin = TaggedType<double, struct KelvinTag>;
 	using Celsius = TaggedType<double, struct CelsiusTag>;
 	using Fahrenheit = TaggedType<double, struct FahrenheitTag>;
@@ -144,10 +152,12 @@ namespace jh
 
 	std::string unit(Temperature t)
 	{
-		auto v =	overload(
-				[](Kelvin) { return std::string("K"); },
-				[](Celsius) { return std::string("\370C"); },
-				[](Fahrenheit) { return std::string("\370F"); }	);
+		auto v = overload
+		(
+			[](Kelvin) { return std::string("K"); },
+			[](Celsius) { return std::string("\370C"); },
+			[](Fahrenheit) { return std::string("\370F"); }
+		);
 		return std::visit(v, t);
 	}
 
@@ -156,19 +166,23 @@ namespace jh
 	/// Scaling factor w.r.t Celsius
 	double factor(Temperature t)
 	{
-		auto v =	overload(
-				[](auto) { return 1.0; },
-				[](Fahrenheit) { return 1.8; });
+		auto v = overload
+		(
+			[](auto) { return 1.0; },
+			[](Fahrenheit) { return 1.8; }
+		);
 		return std::visit(v, t);
 	}
 
 	/// Scaling offset w.r.t Celsius
 	double offset(Temperature t)
 	{
-		auto v =	overload(
-				[](Kelvin) { return 273.15; },
-				[](Celsius) { return 0.0; },
-				[](Fahrenheit) { return 32.0; });
+		auto v = overload
+		(
+			[](Kelvin) { return 273.15; },
+			[](Celsius) { return 0.0; },
+			[](Fahrenheit) { return 32.0; }
+		);
 		return std::visit(v, t);
 	}
 
@@ -220,7 +234,7 @@ int main(int, char**)
 	NL;
 	test("angle:", asLabel(convert<AngleDeg>(angle)));
 	test("angle:", asLabel(convert<AngleRad>(angle)));
-	angle = AngleRad(jh::PI/4.0);
+	angle = AngleRad(jh::PI / 4.0);
 	test("angle:", asLabel(convert<AngleDeg>(angle)));
 	test("angle:", asLabel(convert<AngleRad>(angle)));
 	NL;
@@ -238,8 +252,8 @@ int main(int, char**)
 	test("temperature:", asLabel(convert<Fahrenheit>(temperature)));
 	NL;
 	temperature = Fahrenheit(86);
-	test("temperature:", asLabel(convert<Celsius>(temperature)) );
-	test("temperature:", asLabel(convert<Kelvin>(temperature)) );
+	test("temperature:", asLabel(convert<Celsius>(temperature)));
+	test("temperature:", asLabel(convert<Kelvin>(temperature)));
 	test("temperature:", asLabel(convert<Fahrenheit>(temperature)));
 	NL;
 	temperature = Kelvin(303.15);
@@ -258,11 +272,11 @@ int main(int, char**)
 	for (auto&& x : temps)	std::cout << asLabel(convert<Kelvin>(x)) << " ";
 	NL;
 	std::sort(temps.begin(), temps.end());
-	for (auto&& t : temps)	
+	for (auto&& t : temps)
 		std::cout << asLabel(convert<Kelvin>(t)) << "=" << asLabel(t) << " ";
 	NL;
-	auto acc = [](Kelvin const& s, Temperature const& t){return Kelvin(*s + value(convert<Kelvin>(t))); };
-	Temperature avg = Kelvin(*std::accumulate(temps.begin(), temps.end(), Kelvin(0.0),acc)/temps.size());
+	auto acc = [](Kelvin const& s, Temperature const& t) {return Kelvin(*s + value(convert<Kelvin>(t))); };
+	Temperature avg = Kelvin(*std::accumulate(temps.begin(), temps.end(), Kelvin(0.0), acc) / temps.size());
 	test("avg(t) = ", asLabel(avg));
 	return 0;
 
