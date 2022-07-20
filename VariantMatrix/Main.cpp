@@ -95,7 +95,7 @@ T get(Matrix const& m, Col i, Row j)
 
 void set(Matrix& m, Col i, Row j, double s)
 {
-	auto v = overload(
+	static auto v = overload(
 		[](auto&) {/*error*/},
 		[=](SqrMat<uint8_t>& mat) { mat(i, j) = uint8_t(s); },
 		[=](SqrMat<uint16_t>& mat) { mat(i, j) = uint16_t(s); },
@@ -111,7 +111,7 @@ Matrix& operator*=(Matrix& m, double s)
 	return m;
 }
 
-Matrix operator*(Matrix& m, double s)
+Matrix operator*(Matrix const& m, double s)
 {
 	return Matrix(m) *= s;
 }
@@ -134,7 +134,7 @@ Matrix& operator+=(Matrix& m1, Matrix const& m2)
 
 Matrix& operator*=(Matrix& m1, Matrix const& m2)
 {
-	std::visit([&](auto& matA, auto const& matB) {matA *= matB; }, m1,m2);
+	std::visit([&](auto& matA, auto const& matB) {matA *= matB; }, m1, m2);
 	return m1;
 }
 
@@ -145,8 +145,7 @@ Matrix operator+(Matrix const& m1, Matrix const& m2)
 
 Matrix operator*(Matrix const& m1, Matrix const& m2)
 {
-	Matrix mat = m1;
-	return mat *= m2;
+	return Matrix(m1) *= m2;
 }
 
 template<class T=double>
