@@ -146,6 +146,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NamedTypes", "NamedTypes\Na
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VariantMatrix", "VariantMatrix\VariantMatrix.vcxproj", "{E67E778D-9E14-4CC6-BFF4-DEB5ACD69FD1}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pointAndline", "pointAndline\pointAndline.vcxproj", "{27F3CD5E-8AEA-4F9D-974F-79BB60AFAC5A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -688,6 +690,14 @@ Global
 		{E67E778D-9E14-4CC6-BFF4-DEB5ACD69FD1}.Release|x64.Build.0 = Release|x64
 		{E67E778D-9E14-4CC6-BFF4-DEB5ACD69FD1}.Release|x86.ActiveCfg = Release|Win32
 		{E67E778D-9E14-4CC6-BFF4-DEB5ACD69FD1}.Release|x86.Build.0 = Release|Win32
+		{27F3CD5E-8AEA-4F9D-974F-79BB60AFAC5A}.Debug|x64.ActiveCfg = Debug|x64
+		{27F3CD5E-8AEA-4F9D-974F-79BB60AFAC5A}.Debug|x64.Build.0 = Debug|x64
+		{27F3CD5E-8AEA-4F9D-974F-79BB60AFAC5A}.Debug|x86.ActiveCfg = Debug|Win32
+		{27F3CD5E-8AEA-4F9D-974F-79BB60AFAC5A}.Debug|x86.Build.0 = Debug|Win32
+		{27F3CD5E-8AEA-4F9D-974F-79BB60AFAC5A}.Release|x64.ActiveCfg = Release|x64
+		{27F3CD5E-8AEA-4F9D-974F-79BB60AFAC5A}.Release|x64.Build.0 = Release|x64
+		{27F3CD5E-8AEA-4F9D-974F-79BB60AFAC5A}.Release|x86.ActiveCfg = Release|Win32
+		{27F3CD5E-8AEA-4F9D-974F-79BB60AFAC5A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
