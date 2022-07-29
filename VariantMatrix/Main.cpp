@@ -104,7 +104,7 @@ struct Mat
 	Mat(size_t n = 1, size_t m = 1, T init=0) : numRows(n), data(n*m, init) {}
 
 	template<class S>
-	Mat(Mat<S> const& o) : Mat(o.size()) { *this = o; }
+	Mat(Mat<S> const& o) : Mat(o.rows(),o.cols()) { *this = o; }
 
 	size_t size() const { return data.size(); }
 	size_t rows() const { return numRows; }
@@ -146,6 +146,26 @@ protected:
 	size_t numRows;
 	std::vector<T> data;
 };
+
+struct alignas(128) fheader 
+{ 
+	size_t cols = 0; 
+	size_t rows = 0; 
+	size_t numBytes = 0;
+	size_t start = sizeof(fheader);
+};
+
+std::ostream& operator<<( std::ostream& os, fheader const& h)
+{
+	os << h.cols << " " << h.rows << " " << h.numBytes << " " << h.start;
+	return os;
+}
+template<class T>
+void write(Mat<T>const& m, std::ostream& os)
+{
+	fheader h{ m.cols(),m.rows(),m.size() * sizeof(T) };
+	os << h;
+}
 
 ////////////////////////// Matrix /////////////////////////////////////////
 
@@ -262,11 +282,22 @@ bool sameType(Matrix const& m1, Matrix const& m2)
 	return m1.index() == m2.index();
 }
 
+void write(Matrix const& m, std::ostream& os)
+{
+	auto v = tools::overload(
+		[&](Mat<uint8_t> const& mat) { write<uint8_t>(mat, os); },
+		[&](Mat<uint16_t> const& mat) { write<uint16_t>(mat, os); },
+		[&](Mat<int> const& mat) { write<int>(mat, os);  },
+		[&](Mat<float> const& mat) { write<float>(mat, os);  },
+		[&](Mat<double> const& mat) { write<double>(mat, os); });
+	return std::visit(v, m);
+}
+
 int main()
 {
 	{
 		std::cout << "\n-------- Size, Get, Set --------------\n";
-		Matrix M1 = Mat<int>(5);
+		Matrix M1 = Mat<int>(5,5);
 
 		std::cout << "sz1=" << size(M1) << "\n";
 
@@ -281,7 +312,7 @@ int main()
 
 	{
 		std::cout << "\n------ Ops +=, *=, +, *, convert, execute ----------------\n";
-		Matrix M1 = Mat<int>(5);
+		Matrix M1 = Mat<int>(5,5);
 		
 		M1 += 2;
 		std::cout << "x1=" << get(M1, Col(3), Row(3)) << "\n";
@@ -378,5 +409,11 @@ int main()
 
 		auto M3 = eval(M1, M2, [](double a, double b) { return 5*a + 2.0*b; });
 		std::cout << "m3=" << get(M3, Col(3), Row(3)) << "\n";
+	}
+
+	{
+		Matrix M1 = Mat<float>(5, 5, 200.1f);
+		write(M1, std::cout);
+
 	}
 }
