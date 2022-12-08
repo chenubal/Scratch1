@@ -60,7 +60,7 @@ namespace Lv
 		auto operator++(int) { return iteratorBA(client,c++); }
 
 		bool operator==(iteratorBA const& o) const { return c == o.c; }
-		bool operator!=(iteratorBA const& o) const { !(*this == o;) }
+		bool operator!=(iteratorBA const& o) const { return !(*this == o); }
 	protected:
 		BA& client;
 		unsigned c;
@@ -87,10 +87,10 @@ namespace Lv
 		virtual SetAttibutes const& getAttributes() const = 0;
 		virtual SetAttibutes& getAttributes() = 0;
 
-		auto begin() { return iteratorBA<AbstractSet>(*this, 0); }
-		auto end() { return iteratorBA<AbstractSet>(*this, size()); }
-		auto begin() const { return iteratorBA<AbstractSet const>(*this, 0); }
-		auto end() const { return iteratorBA<AbstractSet const>(*this, size()); }
+		auto begin() { return iteratorBA<AbstractSet>(*this, 0u); }
+		auto end() { return iteratorBA<AbstractSet>(*this, unsigned(size())); }
+		auto begin() const { return iteratorBA<AbstractSet const>(*this, 0u); }
+		auto end() const { return iteratorBA<AbstractSet const>(*this, unsigned(size())); }
 
 		virtual ~AbstractSet() = 0;
 	};
@@ -121,7 +121,7 @@ struct MemSet : public Lv::AbstractSet
 	//-------------------------------------------------------
 	//-------------------------------------------------------
 
-	auto ip(size_t i) { return std::next(data.begin(), i); }
+	std::vector<value_type>::iterator ip(size_t i) { return std::next(data.begin(), i); }
 	std::vector<value_type> data;
 	std::map<SetId, AbstractSet> subsets;
 };
