@@ -25,12 +25,12 @@ ostream& operator<<(ostream& os, const vector<T>& vec)
 
 using attribute_variant = variant<int, double, string, ints>; //new
 using attribute_t = pair<string, attribute_variant>;
-using attributes_t = unordered_map<string,attribute_variant>;
+using attributeMap = unordered_map<string,attribute_variant>;
 
 
 namespace helper
 {
-	optional<attribute_variant> find(attributes_t const& attrs, string const& s) //new
+	optional<attribute_variant> find(attributeMap const& attrs, string const& s) //new
 	{
 		auto hasKey = [&](auto const&a) {return a.first == s; };
 		if (auto it = find_if(attrs.begin(), attrs.end(), hasKey); it != attrs.end())
@@ -75,7 +75,7 @@ int main()
 {
 	using namespace helper;
 
-	attributes_t attributes = { {"one",10}, {"two",1.5}, {"three","hello"}, {"four",ints{7,8,9}} };
+	attributeMap attributes = { {"one",10}, {"two",1.5}, {"three","hello"}, {"four",ints{7,8,9}} };
 	auto key = "four"s;
 
 	if (true)

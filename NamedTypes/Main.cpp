@@ -4,6 +4,9 @@
 #include <string>
 #include <algorithm>
 #include <numeric>
+#include <map>
+#include <functional>
+#include <optional>
 
 namespace jh
 {
@@ -149,6 +152,15 @@ namespace units
 	using Fahrenheit = TaggedType<double, struct FahrenheitTag>;
 
 	using Temperature = std::variant<Kelvin, Celsius, Fahrenheit>;
+	// NOTE: keys have to match the indexes of Temperature
+	static std::map<unsigned, std::function<Temperature(double)>> temperatureMaker = { {0u, [](double v) {return Kelvin(v); } },{1u, [](double v) {return Celsius(v); } },{2u, [](double v) {return Fahrenheit(v); } } };
+
+	std::optional<Temperature> createTemperature(unsigned i, double v = 0)
+	{
+		if (temperatureMaker.count(i))
+			return temperatureMaker.at(i)(v);
+		return {};
+	}
 
 	std::string unit(Temperature t)
 	{
