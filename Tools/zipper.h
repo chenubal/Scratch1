@@ -10,12 +10,11 @@ namespace jh
 	{
 		struct iterator 
 		{
-			using vt = std::tuple<decltype(*std::declval<T>().begin())...>;
 			using iterator_category = std::forward_iterator_tag;
-			using value_type = vt;
-			using difference_type = int;
-			using pointer = vt*;
-			using reference = vt&;
+			using difference_type = std::ptrdiff_t;
+			using value_type = std::tuple<decltype(*std::declval<T>().begin())...>;
+			using pointer = value_type*;
+			using reference = value_type&;
 
 		private:
 			std::tuple<decltype(std::declval<T>().begin())...> iterator_pack;
@@ -23,7 +22,7 @@ namespace jh
 			template <std::size_t... I>
 			auto deref(std::index_sequence<I...>) const
 			{
-				return vt{ *std::get<I>(iterator_pack)... };
+				return value_type{ *std::get<I>(iterator_pack)... };
 			}
 
 			template <std::size_t... I>
@@ -73,10 +72,5 @@ namespace jh
 	/// @brief Short key with CTAD
 	template<typename ...T>
 	zip(T&&...)->zip<T...>;
-
-}
-
-namespace std
-{
 
 }
