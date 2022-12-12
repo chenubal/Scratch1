@@ -8,9 +8,15 @@ namespace jh
 	template <typename... T>
 	struct zip
 	{
-		class iterator 
+		struct iterator 
 		{
-			using vt = typename std::tuple<decltype(*std::declval<T>().begin())...>;
+			using vt = std::tuple<decltype(*std::declval<T>().begin())...>;
+			using iterator_category = std::forward_iterator_tag;
+			using value_type = vt;
+			using difference_type = int;
+			using pointer = vt*;
+			using reference = vt&;
+
 		private:
 			std::tuple<decltype(std::declval<T>().begin())...> iterator_pack;
 
@@ -28,6 +34,7 @@ namespace jh
 			}
 
 		public:
+			iterator() = default;
 			explicit iterator(decltype(iterator_pack) iters) : iterator_pack{ std::move(iters) } {}
 
 			iterator& operator++()
@@ -67,5 +74,9 @@ namespace jh
 	template<typename ...T>
 	zip(T&&...)->zip<T...>;
 
+}
+
+namespace std
+{
 
 }
