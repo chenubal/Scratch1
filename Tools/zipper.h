@@ -1,9 +1,27 @@
 #pragma once
 #include <iterator>
 #include <tuple>
+#include <vector>
+
 
 namespace jh
 {
+
+	template<typename It>
+	struct span
+	{
+		span(It start, It end) : b(start), e(end) {}
+		span(It start, size_t n) : span(start, std::next(start, n)) {}
+		It begin() { return b; }
+		It end() { return e; }
+		const It begin() const { return b; }
+		const It end() const { return e; }
+	private:
+		It b, e;
+	};
+
+
+
 	/// @brief Combines several equal sized containers. Provides STL forward iterators (as tuple).
 	template <typename... T>
 	struct zip
@@ -73,4 +91,11 @@ namespace jh
 	template<typename ...T>
 	zip(T&&...)->zip<T...>;
 
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
+{
+	for (auto& el : vec)	os << el << ' ';
+	return os;
 }

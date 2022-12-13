@@ -16,7 +16,7 @@ namespace jh
 	{
 		stopwatch() : start(now()) { }
 		typename T::rep reset() { auto c = count(); start = now(); return c; }
-		T duration() { auto t = now(); return std::chrono::duration_cast<T>(t - start); }
+		T duration() {return std::chrono::duration_cast<T>(now() - start); }
 		typename T::rep count() { return duration().count(); }
 	private:
 		clk::time_point start;
