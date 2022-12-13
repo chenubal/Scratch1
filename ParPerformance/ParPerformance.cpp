@@ -131,10 +131,10 @@ int main()
 	runTest("Slice", [&]
 	{
 		std::vector<T> w(20, 1);
-		std::iota(w.begin(), w.end(),0);
-		auto sl = jh::slice(w.begin(), w.end(), 3);
-		for (auto&& x : sl) x *= 5;
-		for (auto&& x : jh::slice(w.begin(), w.end(), 3)) std::cout << x << " ";
+		std::iota(w.begin(), w.end(),1);
+		auto sl = jh::make_slice(w, 3);
+		for (auto&& x : sl) x =0;
+		for (auto&& x : w) std::cout << x << " ";
 	});
 
 }

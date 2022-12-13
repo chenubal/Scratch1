@@ -12,8 +12,8 @@ namespace jh
 		struct Iterator
 		{
 			Iterator(It it, size_t skip, size_t start) : it(it), n(skip), k(start) {}
-			Iterator& operator++() { inc();	return *this; }
-			Iterator operator++(int) { auto t{ *this };	inc(); return t; }
+			auto& operator++() { inc();	return *this; }
+			auto operator++(int) { auto t{ *this };	inc(); return t; }
 			bool operator!=(const Iterator& other) const {return  k < other.k;}
 			const auto& operator*() const { return *it; }
 			auto& operator*() { return *it; }
@@ -33,7 +33,17 @@ namespace jh
 		Iterator b, e;
 	};
 
+	template<class Iterable>
+	auto make_slice(Iterable& c, size_t n )
+	{
+		return slice(c.begin(), c.end(), n);
+	}
 
+	template<class Iterable>
+	auto make_slice(Iterable const& c, size_t n)
+	{
+		return slice(c.begin(), c.end(), n);
+	}
 
 	template<typename It>
 	struct span
@@ -61,6 +71,11 @@ namespace jh
 		return drop(c.begin(), c.end(),n);
 	}
 
+	template<class Iterable>
+	auto drop(Iterable& c, size_t n = 1u)
+	{
+		return drop(c.begin(), c.end(), n);
+	}
 
 
 	/// @brief Combines several equal sized containers. Provides STL forward iterators (as tuple).
