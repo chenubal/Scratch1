@@ -7,6 +7,35 @@
 namespace jh
 {
 	template<typename It>
+	struct skip
+	{
+		struct Iterator
+		{
+			Iterator(It it, size_t skip, size_t start) : it(it), n(skip), k(start) {}
+			auto& operator++() { inc();	return *this; }
+			auto operator++(int) { auto t{ *this };	inc(); return t; }
+			bool operator!=(const Iterator& other) const { return  k < other.k; }
+			const auto& operator*() const { return *it; }
+			auto& operator*() { return *it; }
+		protected:
+			void inc_1() { k++; it++; }
+			void inc() { if ((k % n) == 1) inc_1();  inc_1();}
+			It it;
+			const size_t n;
+			size_t k = 0;
+		};
+
+		skip(It start, It end, size_t n) : b(start, n, 0), e(end, n, std::distance(start, end)) {}
+		auto begin() { return b; }
+		auto end() { return e; }
+		const auto begin() const { return b; }
+		const auto end() const { return e; }
+	private:
+		Iterator b, e;
+	};
+
+
+	template<typename It>
 	struct slice
 	{
 		struct Iterator
