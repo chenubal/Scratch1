@@ -6,6 +6,34 @@
 
 namespace jh
 {
+	template<typename It>
+	struct slice
+	{
+		struct Iterator
+		{
+			Iterator(It it, size_t skip, size_t start) : it(it), n(skip), k(start) {}
+			Iterator& operator++() { inc();	return *this; }
+			Iterator operator++(int) { auto t{ *this };	inc(); return t; }
+			bool operator!=(const Iterator& other) const {return  k < other.k;}
+			const auto& operator*() const { return *it; }
+			auto& operator*() { return *it; }
+		protected:
+			void inc() { it = std::next(it, n); k += n; }
+			It it;
+			size_t n;
+			size_t k = 0;
+		};
+		
+		slice(It start, It end, size_t n) : b(start, n, 0), e(end, n, std::distance(start, end)) {}
+		auto begin() { return b; }
+		auto end() { return e; }
+		const auto begin() const { return b;  }
+		const auto end() const { return e;}
+	private:
+		Iterator b, e;
+	};
+
+
 
 	template<typename It>
 	struct span
@@ -19,6 +47,19 @@ namespace jh
 	private:
 		It b, e;
 	};
+
+	template<class It>
+	auto drop(It b, It e, size_t n = 1u)
+	{
+		n = std::min<size_t>(n, std::distance(b,e));
+		return span(std::next(b, n),e);
+	}
+
+	template<class Iterable>
+	auto drop(Iterable const& c, size_t n=1u)
+	{
+		return drop(c.begin(), c.end(),n);
+	}
 
 
 
@@ -99,3 +140,12 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
 	for (auto& el : vec)	os << el << ' ';
 	return os;
 }
+//
+//namespace std
+//{
+//	template<typename ...Ts>
+//	auto distance(typename jh::zip<Ts...>::iterator b, typename jh::zip<Ts...>::iterator e)
+//	{
+//		return distance(std::get<0>(b), std::get<0>(e));
+//	}
+//}

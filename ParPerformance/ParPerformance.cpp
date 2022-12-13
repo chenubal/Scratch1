@@ -20,7 +20,7 @@ int main()
 	auto gen = [a=100.0] {return T(/*std::round(a/RAND_MAX * rand())*/ 3.33); };
    std::generate(v1.begin(), v1.end(), gen);
 	std::generate(v2.begin(), v2.end(), gen);
-	auto f = [](double x) {return std::sin(x); };
+	auto f = [](double x) {return x;/*std::sin(x);*/ };
 	auto add = [&](T a, T b) { return f(a + b); };
 	auto tuple_sum = [&](auto&& tpl) { return  f(std::get<0>(tpl) + std::get<1>(tpl)); };
 	auto sum_a = [&](auto&& t) {auto&& [x, a, b] = t; x = f(a + b); };
@@ -118,6 +118,23 @@ int main()
 		auto sp = jh::span(w.begin()+3, 5u);
 		for (auto&& x : sp) x = 7;
 		for (auto&& x : w) std::cout << x << " ";
+	});
+
+	runTest("Drop", [&]
+	{
+		std::vector<T> w(20, 1);
+		auto sp = jh::span(w.begin() + 3, 5u);
+		for (auto&& x : sp) x = 7;
+		for (auto&& x : jh::drop(w,3)) std::cout << x << " ";
+	});
+
+	runTest("Slice", [&]
+	{
+		std::vector<T> w(20, 1);
+		std::iota(w.begin(), w.end(),0);
+		auto sl = jh::slice(w.begin(), w.end(), 3);
+		for (auto&& x : sl) x *= 5;
+		for (auto&& x : jh::slice(w.begin(), w.end(), 3)) std::cout << x << " ";
 	});
 
 }
