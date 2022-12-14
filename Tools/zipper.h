@@ -7,43 +7,62 @@
 namespace jh
 {
 	template<typename It>
-	struct skip
+	struct ignore
 	{
+		ignore(It start, It end, size_t nth) : start_(start, nth, 0), end_(end, nth, (nth > 1 ?std::distance(start, end):0)) {}
+		auto begin() { return start_; }
+		auto end() { return end_; }
+		const auto begin() const { return start_; }
+		const auto end() const { return end_; }
+
+	private:
 		struct Iterator
 		{
-			Iterator(It it, size_t skip, size_t start) : it(it), n(skip), k(start) {}
+			Iterator() = default;
+			Iterator(It it, size_t nth, size_t start) : iter(it), nth(nth), counter(start) {}
 			auto& operator++() { inc();	return *this; }
-			auto operator++(int) { auto t{ *this };	inc(); return t; }
-			bool operator!=(const Iterator& other) const { return  k < other.k; }
-			const auto& operator*() const { return *it; }
-			auto& operator*() { return *it; }
+			auto operator++(int) { auto t{ *this }; inc(); return t; }
+			bool operator!=(const Iterator& other) const { return  counter < other.counter; }
+			const auto& operator*() const { return *iter; }
+			auto& operator*() { return *iter; }
 		protected:
-			void inc_1() { k++; it++; }
-			void inc() { if ((k % n) == 1) inc_1();  inc_1();}
-			It it;
-			const size_t n;
-			size_t k = 0;
+			void inc_1() { counter++; iter++; }
+			void inc() { if ((counter % nth) == (nth - 2)) inc_1();  inc_1(); }
+			It iter;
+			size_t nth;
+			size_t counter = 0;
 		};
 
-		skip(It start, It end, size_t n) : b(start, n, 0), e(end, n, std::distance(start, end)) {}
-		auto begin() { return b; }
-		auto end() { return e; }
-		const auto begin() const { return b; }
-		const auto end() const { return e; }
-	private:
-		Iterator b, e;
+		Iterator start_, end_;
 	};
 
+	template<class Iterable>
+	auto make_ignore(Iterable& c, size_t nth)
+	{
+		return ignore(c.begin(), c.end(), nth);
+	}
+
+	template<class Iterable>
+	auto make_ignore(Iterable const& c, size_t nth)
+	{
+		return ignore(c.begin(), c.end(), nth);
+	}
 
 	template<typename It>
 	struct slice
 	{
+		slice(It start, It end, size_t n) : begin_(start, n, 0), end_(end, n, std::distance(start, end)) {}
+		auto begin() { return begin_; }
+		auto end() { return end_; }
+		const auto begin() const { return begin_;  }
+		const auto end() const { return end_;}
+	private:
 		struct Iterator
 		{
-			Iterator(It it, size_t skip, size_t start) : it(it), n(skip), k(start) {}
+			Iterator(It it, size_t nth, size_t start) : it(it), n(nth), k(start) {}
 			auto& operator++() { inc();	return *this; }
 			auto operator++(int) { auto t{ *this };	inc(); return t; }
-			bool operator!=(const Iterator& other) const {return  k < other.k;}
+			bool operator!=(const Iterator& other) const { return  k < other.k; }
 			const auto& operator*() const { return *it; }
 			auto& operator*() { return *it; }
 		protected:
@@ -52,14 +71,8 @@ namespace jh
 			size_t n;
 			size_t k = 0;
 		};
-		
-		slice(It start, It end, size_t n) : b(start, n, 0), e(end, n, std::distance(start, end)) {}
-		auto begin() { return b; }
-		auto end() { return e; }
-		const auto begin() const { return b;  }
-		const auto end() const { return e;}
-	private:
-		Iterator b, e;
+
+		Iterator begin_, end_;
 	};
 
 	template<class Iterable>

@@ -140,8 +140,10 @@ int main()
 	runTest("Skip", [&]
 	{
 		std::vector<T> w(20, 1);
-		std::iota(w.begin(), w.end(), 11);
-		for (auto&& x : jh::skip(w.begin(), w.end(), 3)) x=-1;
+		std::iota(w.begin(), w.end(), 1);
+		for (auto&& x : jh::make_ignore(w, 3)) std::cout << x << " ";
+	std::cout << "\n";
+		for (auto&& x : jh::make_ignore(w, 6)) x = -1;
 		for (auto&& x : w) std::cout << x << " ";
 	});
 
