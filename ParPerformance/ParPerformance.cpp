@@ -8,7 +8,6 @@
 #include <execution>
 #include <iterator>
 
-
 int main()
 {
 
@@ -59,7 +58,7 @@ int main()
 		std::cout << "ok: " << (w == w_ref);
 	});
 
-	runTest("Zip for_each par", [&]
+	runTest("zip for_each par", [&]
 	{
 		std::vector<T> w(N);
 		auto threeVecs = jh::zip(w, v1, v2);
@@ -70,7 +69,7 @@ int main()
 		std::cout << "ok: " << (w == w_ref);
 	});
 
-	runTest("Zip for_each seq", [&]
+	runTest("zip for_each seq", [&]
 	{
 		std::vector<T> w(N);
 		auto threeVecs = jh::zip(w, v1, v2);
@@ -81,7 +80,7 @@ int main()
 		std::cout << "ok: " << (w == w_ref);
 	});
 
-	runTest("Zip trafo seg", [&]
+	runTest("zip trafo seg", [&]
 	{
 		std::vector<T> w(N);
 		auto twoVecs = jh::zip(v1, v2);
@@ -92,7 +91,7 @@ int main()
 		std::cout << "ok: " << (w == w_ref);
 	});
 
-	runTest("Zip trafo par", [&]
+	runTest("zip trafo par", [&]
 	{
 		std::vector<T> w(N);
 		auto twoVecs = jh::zip(v1, v2);
@@ -103,7 +102,7 @@ int main()
 		std::cout << "ok: " << (w == w_ref);
 	});
 
-	runTest("Zip range-for", [&]
+	runTest("zip range-for", [&]
 	{
 		std::vector<T> w(N);
 		jh::stopwatch<std::chrono::microseconds> sw;
@@ -142,10 +141,13 @@ int main()
 		std::vector<T> w(20, 1);
 		std::iota(w.begin(), w.end(), 1);
 		for (auto&& x : jh::make_ignore(w, 3)) std::cout << x << " ";
-	std::cout << "\n";
+	   std::cout << "\n";
 		for (auto&& x : jh::make_ignore(w, 6)) x = -1;
-		for (auto&& x : w) std::cout << x << " ";
+		std::cout << w << " ";
 	});
+
+
+
 
 }
 

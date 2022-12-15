@@ -6,117 +6,122 @@
 
 namespace jh
 {
-	template<typename It>
-	struct ignore
+	template<typename Iterator>
+	struct ignore_nth
 	{
-		ignore(It start, It end, size_t nth) : start_(start, nth, 0), end_(end, nth, (nth > 1 ?std::distance(start, end):0)) {}
+		ignore_nth(Iterator start, Iterator end, size_t nth) : start_(start, nth, 0), end_(end, nth, (nth > 1 ?std::distance(start, end):0)) {}
 		auto begin() { return start_; }
 		auto end() { return end_; }
 		const auto begin() const { return start_; }
 		const auto end() const { return end_; }
 
 	private:
-		struct Iterator
+		struct IteratorAdapter
 		{
-			Iterator() = default;
-			Iterator(It it, size_t nth, size_t start) : iter(it), nth(nth), counter(start) {}
+			IteratorAdapter() = default;
+			IteratorAdapter(Iterator it, size_t nth, size_t start) : iter(it), nth(nth), counter(start) {}
 			auto& operator++() { inc();	return *this; }
 			auto operator++(int) { auto t{ *this }; inc(); return t; }
-			bool operator!=(const Iterator& other) const { return  counter < other.counter; }
+			bool operator!=(const IteratorAdapter& other) const { return  counter < other.counter; }
 			const auto& operator*() const { return *iter; }
 			auto& operator*() { return *iter; }
 		protected:
 			void inc_1() { counter++; iter++; }
 			void inc() { if ((counter % nth) == (nth - 2)) inc_1();  inc_1(); }
-			It iter;
+			Iterator iter;
 			size_t nth;
 			size_t counter = 0;
 		};
 
-		Iterator start_, end_;
+		IteratorAdapter start_, end_;
 	};
 
-	template<class Iterable>
-	auto make_ignore(Iterable& c, size_t nth)
+	template<class Container>
+	auto make_ignore(Container& container, size_t nth)
 	{
-		return ignore(c.begin(), c.end(), nth);
+		return ignore_nth(container.begin(), container.end(), nth);
 	}
 
-	template<class Iterable>
-	auto make_ignore(Iterable const& c, size_t nth)
+	template<class Container>
+	auto make_ignore(Container const& container, size_t nth)
 	{
-		return ignore(c.begin(), c.end(), nth);
+		return ignore_nth(container.begin(), container.end(), nth);
 	}
 
-	template<typename It>
-	struct slice
+	template<typename Iterator>
+	struct pick_nth
 	{
-		slice(It start, It end, size_t n) : begin_(start, n, 0), end_(end, n, std::distance(start, end)) {}
+		pick_nth(Iterator begin, Iterator end, size_t n) : begin_(begin, n, 0), end_(end, n, std::distance(begin, end)) {}
 		auto begin() { return begin_; }
 		auto end() { return end_; }
 		const auto begin() const { return begin_;  }
 		const auto end() const { return end_;}
+
 	private:
-		struct Iterator
+		struct iteratorA
 		{
-			Iterator(It it, size_t nth, size_t start) : it(it), n(nth), k(start) {}
+			iteratorA(Iterator it, size_t nth, size_t start) : iter(it), nth(nth), counter(start) {}
 			auto& operator++() { inc();	return *this; }
 			auto operator++(int) { auto t{ *this };	inc(); return t; }
-			bool operator!=(const Iterator& other) const { return  k < other.k; }
-			const auto& operator*() const { return *it; }
-			auto& operator*() { return *it; }
+			bool operator!=(const iteratorA& other) const { return  counter < other.counter; }
+			const auto& operator*() const { return *iter; }
+			auto& operator*() { return *iter; }
 		protected:
-			void inc() { it = std::next(it, n); k += n; }
-			It it;
-			size_t n;
-			size_t k = 0;
+			void inc() { iter = std::next(iter, nth); counter += nth; }
+			Iterator iter;
+			size_t nth;
+			size_t counter = 0;
 		};
 
+		iteratorA begin_, end_;
+	};
+
+	template<class Container>
+	auto make_slice(Container& container, size_t nth )
+	{
+		return pick_nth(container.begin(), container.end(), nth);
+	}
+
+	template<class Container>
+	auto make_slice(Container const& container, size_t nth)
+	{
+		return pick_nth(container.begin(), container.end(), nth);
+	}
+
+	/// Provides an span adapter on iterators.
+	template<typename Iterator>
+	struct span
+	{
+		span(Iterator begin, Iterator end) : begin_(begin), end_(end) {}
+		span(Iterator begin, size_t count) : span(begin, std::next(begin, count)) {}
+		Iterator begin() { return begin_; }
+		Iterator end() { return end_; }
+		const Iterator begin() const { return begin_; }
+		const Iterator end() const { return end_; }
+	private:
 		Iterator begin_, end_;
 	};
 
-	template<class Iterable>
-	auto make_slice(Iterable& c, size_t n )
+	/// Provides an drop adapter on iterators. Drops n elements on begin
+	template<class Iterator>
+	auto drop(Iterator begin, Iterator end, size_t count = 1u)
 	{
-		return slice(c.begin(), c.end(), n);
+		count = std::min<size_t>(count, std::distance(begin,end));
+		return span(std::next(begin, count),end);
 	}
 
-	template<class Iterable>
-	auto make_slice(Iterable const& c, size_t n)
+	/// Provides an drop adapter on const container. Drops n elements on begin
+	template<class Container>
+	auto drop(Container const& container, size_t count=1u)
 	{
-		return slice(c.begin(), c.end(), n);
+		return drop(container.begin(), container.end(),count);
 	}
 
-	template<typename It>
-	struct span
+	/// Provides an drop adapter on container. Drops n elements on begin
+	template<class Container>
+	auto drop(Container& container, size_t count = 1u)
 	{
-		span(It start, It end) : b(start), e(end) {}
-		span(It start, size_t n) : span(start, std::next(start, n)) {}
-		It begin() { return b; }
-		It end() { return e; }
-		const It begin() const { return b; }
-		const It end() const { return e; }
-	private:
-		It b, e;
-	};
-
-	template<class It>
-	auto drop(It b, It e, size_t n = 1u)
-	{
-		n = std::min<size_t>(n, std::distance(b,e));
-		return span(std::next(b, n),e);
-	}
-
-	template<class Iterable>
-	auto drop(Iterable const& c, size_t n=1u)
-	{
-		return drop(c.begin(), c.end(),n);
-	}
-
-	template<class Iterable>
-	auto drop(Iterable& c, size_t n = 1u)
-	{
-		return drop(c.begin(), c.end(), n);
+		return drop(container.begin(), container.end(), count);
 	}
 
 
@@ -181,8 +186,7 @@ namespace jh
 		iterator end() { return end_; }
 
 	private:
-		iterator begin_;
-		iterator end_;
+		iterator begin_, end_;
 	};
 
 	/// @brief Short key with CTAD
@@ -194,7 +198,11 @@ namespace jh
 template<typename T>
 std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
 {
-	for (auto& el : vec)	os << el << ' ';
+	if (!vec.empty())
+	{
+		std::cout << vec.front();
+		for (auto&& x : jh::drop(vec,1)) std::cout << "," << x;
+	}
 	return os;
 }
 //
