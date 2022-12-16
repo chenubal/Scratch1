@@ -7,6 +7,7 @@
 #include "../Tools/zipper.h"
 #include <execution>
 #include <iterator>
+#include <map>
 
 int main()
 {
@@ -144,6 +145,19 @@ int main()
 	   std::cout << "\n";
 		for (auto&& x : jh::make_ignore(w, 6)) x = -1;
 		std::cout << w << " ";
+	});
+
+	runTest("Zip with containers", [&]
+	{
+		const std::map<std::string, int> M = { {"x",7},{"y",8},{"u",5}, {"v",55} };
+		std::vector<double> V = { 1.1,2.2,3.3,4.4 };
+		unsigned W[] = { 4,5,6,7 };
+
+		for (auto&& [v, w, p] : jh::zip(V, W,M)) v *= w + p.second;
+			
+		const auto Z = jh::zip(V, W, M);
+		for (auto const& [v, w ,p] : Z)
+			std::cout << "v="<<v << "\tw=" << w << "\tp=" << p.first << "|" << p.second << "\n";
 	});
 
 

@@ -9,7 +9,7 @@ namespace jh
 	template<typename Iterator>
 	struct ignore_nth
 	{
-		ignore_nth(Iterator start, Iterator end, size_t nth) : start_(start, nth, 0), end_(end, nth, (nth > 1 ?std::distance(start, end):0)) {}
+		ignore_nth(Iterator start, Iterator end, size_t nth) : start_(start, nth, 0), end_(end, nth, (nth > 1 ? std::distance(start, end) : 0)) {}
 		auto begin() { return start_; }
 		auto end() { return end_; }
 		const auto begin() const { return start_; }
@@ -39,13 +39,13 @@ namespace jh
 	template<class Container>
 	auto make_ignore(Container& container, size_t nth)
 	{
-		return ignore_nth(container.begin(), container.end(), nth);
+		return ignore_nth(std::begin(container), std::end(container), nth);
 	}
 
 	template<class Container>
 	auto make_ignore(Container const& container, size_t nth)
 	{
-		return ignore_nth(container.begin(), container.end(), nth);
+		return ignore_nth(std::begin(container), std::end(container), nth);
 	}
 
 	template<typename Iterator>
@@ -54,8 +54,8 @@ namespace jh
 		pick_nth(Iterator begin, Iterator end, size_t n) : begin_(begin, n, 0), end_(end, n, std::distance(begin, end)) {}
 		auto begin() { return begin_; }
 		auto end() { return end_; }
-		const auto begin() const { return begin_;  }
-		const auto end() const { return end_;}
+		const auto begin() const { return begin_; }
+		const auto end() const { return end_; }
 
 	private:
 		struct iteratorA
@@ -77,15 +77,15 @@ namespace jh
 	};
 
 	template<class Container>
-	auto make_slice(Container& container, size_t nth )
+	auto make_slice(Container& container, size_t nth)
 	{
-		return pick_nth(container.begin(), container.end(), nth);
+		return pick_nth(std::begin(container), std::end(container), nth);
 	}
 
 	template<class Container>
 	auto make_slice(Container const& container, size_t nth)
 	{
-		return pick_nth(container.begin(), container.end(), nth);
+		return pick_nth(std::begin(container), std::end(container), nth);
 	}
 
 	/// Provides an span adapter on iterators.
@@ -106,22 +106,22 @@ namespace jh
 	template<class Iterator>
 	auto drop(Iterator begin, Iterator end, size_t count = 1u)
 	{
-		count = std::min<size_t>(count, std::distance(begin,end));
-		return span(std::next(begin, count),end);
+		count = std::min<size_t>(count, std::distance(begin, end));
+		return span(std::next(begin, count), end);
 	}
 
 	/// Provides an drop adapter on const container. Drops n elements on begin
 	template<class Container>
-	auto drop(Container const& container, size_t count=1u)
+	auto drop(Container const& container, size_t count = 1u)
 	{
-		return drop(container.begin(), container.end(),count);
+		return drop(std::begin(container), std::end(container), count);
 	}
 
 	/// Provides an drop adapter on container. Drops n elements on begin
 	template<class Container>
 	auto drop(Container& container, size_t count = 1u)
 	{
-		return drop(container.begin(), container.end(), count);
+		return drop(std::begin(container), std::end(container), count);
 	}
 
 
@@ -129,30 +129,30 @@ namespace jh
 	template <typename... T>
 	struct zip
 	{
-		struct iterator 
+		struct iterator;
+
+		zip(T&&... ts) : begin_{ std::make_tuple(std::begin(ts)...) }, end_{ std::make_tuple(std::end(ts)...) } {}
+
+		bool empty() const { return begin_ == end_; }
+		const iterator begin() const { return begin_; }
+		const iterator end() const { return end_; }
+		iterator begin() { return begin_; }
+		iterator end() { return end_; }
+
+	private:
+		iterator begin_, end_;
+
+		struct iterator
 		{
 			using iterator_category = std::forward_iterator_tag;
 			using difference_type = std::ptrdiff_t;
-			using value_type = std::tuple<decltype(*std::declval<T>().begin())...>;
+			using value_type = std::tuple<decltype(*std::begin(std::declval<T>()))...>;
 			using pointer = value_type*;
 			using reference = value_type&;
 
 		private:
-			std::tuple<decltype(std::declval<T>().begin())...> iterator_pack;
-
-			template <std::size_t... I>
-			auto deref(std::index_sequence<I...>) const
-			{
-				return value_type{ *std::get<I>(iterator_pack)... };
-			}
-
-			template <std::size_t... I>
-			void increment(std::index_sequence<I...>)
-			{
-				auto l = { (++std::get<I>(iterator_pack), 0)... };
-				l;
-			}
-
+			std::tuple<decltype(std::begin(std::declval<T>()))...> iterator_pack;
+		
 		public:
 			iterator() = default;
 			explicit iterator(decltype(iterator_pack) iters) : iterator_pack{ std::move(iters) } {}
@@ -165,28 +165,38 @@ namespace jh
 
 			iterator operator++(int)
 			{
-				auto saved{ *this };
+				auto t{ *this };
 				increment(std::index_sequence_for<T...>{});
-				return saved;
+				return t;
 			}
 
+			bool operator==(const iterator& other) const
+			{
+				return iterator_pack == other.iterator_pack; 
+			}
 			bool operator!=(const iterator& other) const
 			{
 				return iterator_pack != other.iterator_pack;
 			}
 
-			auto operator*() const { return deref(std::index_sequence_for<T...>{}); }
+			auto operator*() const
+			{ 
+				return deref(std::index_sequence_for<T...>{}); 
+			}
+
+		private:
+			template <std::size_t... I>
+			auto deref(std::index_sequence<I...>) const
+			{
+				return value_type{ *std::get<I>(iterator_pack)... };
+			}
+
+			template <std::size_t... I>
+			void increment(std::index_sequence<I...>)
+			{
+				auto l = { (++std::get<I>(iterator_pack), 0)... };	l;
+			}
 		};
-
-		zip(T&&... seqs) : begin_{ std::make_tuple(seqs.begin()...) }, end_{ std::make_tuple(seqs.end()...) } {}
-
-		const iterator begin() const { return begin_; }
-		const iterator end() const { return end_; }
-		iterator begin() { return begin_; }
-		iterator end() { return end_; }
-
-	private:
-		iterator begin_, end_;
 	};
 
 	/// @brief Short key with CTAD
@@ -201,7 +211,7 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
 	if (!vec.empty())
 	{
 		std::cout << vec.front();
-		for (auto&& x : jh::drop(vec,1)) std::cout << "," << x;
+		for (auto&& x : jh::drop(vec, 1)) std::cout << "," << x;
 	}
 	return os;
 }
