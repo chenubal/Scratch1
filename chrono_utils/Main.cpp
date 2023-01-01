@@ -4,7 +4,6 @@
 #include <chrono>
 #include <sstream>
 #include <thread>
-#include <xtgmath.h>
 #include <random>
 
 namespace chrono_tools
