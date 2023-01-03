@@ -112,7 +112,7 @@ int main()
 		std::cout << "ok: " << (w == w_ref);
 	});
 
-	runTest("Span", [&]
+	runTest("Span 3(5)", [&]
 	{
 		std::vector<T> w(20,1);
 		auto sp = jh::span(w.begin()+3, 5u);
@@ -120,15 +120,21 @@ int main()
 		for (auto&& x : w) std::cout << x << " ";
 	});
 
-	runTest("Drop", [&]
+	runTest("Drop 10", [&]
 	{
 		std::vector<T> w(20, 1);
-		auto sp = jh::span(w.begin() + 3, 5u);
-		for (auto&& x : sp) x = 7;
-		for (auto&& x : jh::drop(w,3)) std::cout << x << " ";
+		std::iota(w.begin(), w.end(), 1);
+		for (auto&& x : jh::drop(w,10)) std::cout << x << " ";
 	});
 
-	runTest("Slice", [&]
+	runTest("Take 7", [&]
+	{
+		std::vector<T> w(20, 1);
+		std::iota(w.begin(), w.end(), 1);
+		for (auto&& x : jh::take(w, 7)) std::cout << x << " ";
+	});
+
+	runTest("Slice 3", [&]
 	{
 		std::vector<T> w(20, 1);
 		std::iota(w.begin(), w.end(),1);

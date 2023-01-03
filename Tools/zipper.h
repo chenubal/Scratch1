@@ -104,6 +104,28 @@ namespace jh
 
 	/// Provides an drop adapter on iterators. Drops n elements on begin
 	template<class Iterator>
+	auto take(Iterator begin, Iterator end, size_t count = 1u)
+	{
+		count = std::min<size_t>(count, std::distance(begin, end));
+		return span(begin, std::next(begin, count));
+	}
+
+	/// Provides an drop adapter on const container. Drops n elements on begin
+	template<class Container>
+	auto take(Container const& container, size_t count = 1u)
+	{
+		return take(std::begin(container), std::end(container), count);
+	}
+
+	/// Provides an drop adapter on container. Drops n elements on begin
+	template<class Container>
+	auto take(Container& container, size_t count = 1u)
+	{
+		return take(std::begin(container), std::end(container), count);
+	}
+
+	/// Provides an drop adapter on iterators. Drops n elements on begin
+	template<class Iterator>
 	auto drop(Iterator begin, Iterator end, size_t count = 1u)
 	{
 		count = std::min<size_t>(count, std::distance(begin, end));
