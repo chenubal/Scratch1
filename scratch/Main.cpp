@@ -102,6 +102,11 @@ public:
 	double operator()() { return dis(gen); }
 };
 
+template<class T=double>
+constexpr auto l = [](double i) {return T(i); };
+
+
+
 int main(int, char**)
 {
 
@@ -116,6 +121,8 @@ int main(int, char**)
 		std::cout << x.first << "|" << x.second << "\n";
 	for (auto x : Rands(13,33.0))
 		std::cout << x << "\n";
+
+	std::cout << "LL=" << l<unsigned>(3.1) << "\n";
 
 	return 0;
 
