@@ -1,10 +1,10 @@
 #pragma once
-#include <string>
 #include <vector>
 #include <span>
 #include <numeric>
 #include <compare>
 #include <fstream>
+#include <sstream>
 
 namespace jh
 {
@@ -134,6 +134,33 @@ namespace jh
 					while (!f.eof()) { bills.emplace_back(); f >> bills.back(); }
 				}
 			}
+		}
+		std::string invoice(std::vector<driver_t> const& drivers) const
+		{
+			std::stringstream ss;
+			ss << "----------------- " << name << " -----------------------\n";
+			if (!trips.empty())
+			{
+				auto totalKm = total(trips);
+				auto totalEuro = total(bills);
+				auto eval = [&](driver_t d)
+				{
+					auto km = double(total(trips, d)); 
+					auto r = (km / totalKm);	
+					auto credit = totalEuro * r;
+					auto debit = total(bills, d);
+					ss << "\n----------------- " <<d.name << " -----------------------\n";
+				   ss << "Strecke:   " << km << "km  Anteil: " << int(100.0*r) << "%\n";
+					ss << "Soll:      " << credit << " Euro\n";
+					ss << "Haben:     " << debit << " Euro\n";
+					ss << "Ausgleich: " << (debit-credit) << " Euro\n";
+				};
+
+				ss << "Gefahren gesamt: " << totalKm << "km\n";
+				ss << "Bezahlt gesamt: " << totalEuro << " Euro\n";
+				for( auto&& d : drivers) eval(d);
+			}
+			return ss.str();
 		}
 	};
 

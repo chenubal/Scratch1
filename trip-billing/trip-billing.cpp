@@ -28,10 +28,11 @@ int main()
     //   b.store();
     //}
     {
-       jh::billing b("test");
+       jh::billing b("Abrechnung 06.02.2023");
        b.load();
        std::cout << b.trips << "\n";
        std::cout << b.bills << "\n";
+       std::cout << b.invoice({ {"Josef"},{"Jannes"},{"Luis"} }) << "\n";
    }
 }
 
