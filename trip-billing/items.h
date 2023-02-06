@@ -107,32 +107,31 @@ namespace jh
 	struct billing
 	{
 		explicit billing(std::string name) : name(std::move(name)) {}
+
 		std::string name;
 		trips_t trips{};
 		bills_t bills{};
 		void store(std::string folder = "./") const
 		{
-			if (auto f = std::ofstream(folder + "trips.txt"))	f << trips;
-			if (auto f = std::ofstream(folder + "bills.txt"))	f << bills;
+			if (auto f = std::ofstream(folder + "trips.txt"))	
+				f << trips;
+			if (auto f = std::ofstream(folder + "bills.txt"))	
+				f << bills;
 		}
 		void load(std::string folder = "./") 
 		{
 			trips.clear();
 			if (auto f = std::ifstream(folder + "trips.txt"))
 			{
-				trip_t t; 
-				while (!f.eof()) 
-				{
-					f >> t; trips.push_back(t);
-				}
+				while (!f.eof()) { trips.emplace_back(); f >> trips.back(); }
 			}
 			bills.clear();
 			if (auto f = std::ifstream(folder + "bills.txt"))
 			{
-				bill_t t; 
-				while (!f.eof())
+				bills.clear();
+				if (auto f = std::ifstream(folder + "bills.txt"))
 				{
-					f >> t; bills.push_back(t);
+					while (!f.eof()) { bills.emplace_back(); f >> bills.back(); }
 				}
 			}
 		}

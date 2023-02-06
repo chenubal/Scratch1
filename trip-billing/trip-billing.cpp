@@ -30,8 +30,8 @@ int main()
     {
        jh::billing b("test");
        b.load();
-       std::cout << b.bills << "\n";
        std::cout << b.trips << "\n";
-    }
+       std::cout << b.bills << "\n";
+   }
 }
 

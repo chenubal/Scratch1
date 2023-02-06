@@ -248,3 +248,4 @@ ModelManifest.xml
 /CMakeProject1/buildWin
 /attributes/jh-attributes.xml
 *.bin
+*.txt
