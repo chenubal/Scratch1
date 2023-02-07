@@ -27,8 +27,9 @@ int main()
     //   std::cout << b.name << "\n";
     //   b.store();
     //}
+
     {
-       jh::billing b("Abrechnung 06.02.2023");
+       jh::billing b("Abrechnung vom 06.02.2023");
        b.load();
        std::cout << b.trips << "\n";
        std::cout << b.bills << "\n";

@@ -27,19 +27,14 @@ namespace jh
 	struct driver_t
 	{
 		std::string name;
+
+		friend std::istream& operator>>(std::istream& is, driver_t& trip);
+		friend std::ostream& operator<<(std::ostream& os, driver_t const& trip);
 		auto operator<=>(const driver_t&) const = default;
 	};
 
-	std::ostream& operator<<(std::ostream& os, driver_t const& driver)
-	{
-		os << driver.name;
-		return os;
-	}
-	std::istream& operator>>(std::istream& is, driver_t& driver)
-	{
-		is >> driver.name;
-		return is;
-	}
+	std::ostream& operator<<(std::ostream& os, driver_t const& d) {os << d.name; return os; }
+	std::istream& operator>>(std::istream& is, driver_t& d) { is >> d.name;	return is; }
 
 	//----------------------------------------------------------------
 	struct trip_t
@@ -47,31 +42,27 @@ namespace jh
 		int start;
 		int end;
 		driver_t driver;
+
 		int dist() const { return end - start; }
 		friend std::istream& operator>>(std::istream& is, trip_t& trip);
 		friend std::ostream& operator<<(std::ostream& os, trip_t const& trip);
+		auto operator<=>(const trip_t&) const = default;
 	};
 
-	std::istream& operator>>(std::istream& is, trip_t& trip)
-	{
-		is >> trip.start >> trip.end >> trip.driver;
-		return is;
-	}
-
-	std::ostream& operator<<(std::ostream& os, trip_t const& trip)
-	{
-		os << trip.start << '\t' << trip.end << '\t' << trip.driver;
-		return os;
-	}
+	std::istream& operator>>(std::istream& is, trip_t& t)	{ is >> t.start >> t.end >> t.driver; return is; }
+	std::ostream& operator<<(std::ostream& os, trip_t const& t)	{ os << t.start << '\t' << t.end << '\t' << t.driver;	return os; }
 
 	using trips_t = std::vector<trip_t>;
-	int total(trips_t const trips) 
+
+	int total(trips_t const t) 
 	{	
-		return sum_f<trips_t, int>(trips, [](int s, trip_t const& t) {return s + t.dist(); }); 
+		auto f = [](int s, trip_t const& tt) {return s + tt.dist(); };
+		return sum_f<trips_t, int>(t, f); 
 	}
-	int total(trips_t const trips, driver_t const& d) 
-	{ 
-		return sum_f<trips_t, int>(trips, [&d](int s, trip_t const& t) {return s + (t.driver==d? t.dist() : 0); }); 
+	int total(trips_t const t, driver_t const& d) 
+	{
+		auto f = [&d](int s, trip_t const& tt) {return s + (tt.driver == d ? tt.dist() : 0); };
+		return sum_f<trips_t, int>(t, f); 
 	}
 
 	//----------------------------------------------------------------
@@ -79,28 +70,26 @@ namespace jh
 	{
 		double amount;
 		driver_t driver;
+
+		friend std::istream& operator>>(std::istream& is, bill_t& trip);
+		friend std::ostream& operator<<(std::ostream& os, bill_t const& trip);
+		auto operator<=>(const bill_t&) const = default;
 	};
 
-	std::ostream& operator<<(std::ostream& os, bill_t const& bill)
-	{
-		os << bill.amount << '\t' << bill.driver;
-		return os;
-	}
-
-	std::istream& operator>>(std::istream& is, bill_t& bill)
-	{
-		is >> bill.amount >> bill.driver;
-		return is;
-	}
+	std::ostream& operator<<(std::ostream& os, bill_t const& b)	{ os << b.amount << '\t' << b.driver; return os;}
+	std::istream& operator>>(std::istream& is, bill_t& b)	{ is >> b.amount >> b.driver;	return is; }
 
 	using bills_t = std::vector<bill_t>;
-   double total(bills_t const trips) 
+
+   double total(bills_t const b) 
 	{	
-		return sum_f<bills_t, double>(trips, [](double s, bill_t const& t) {return s + t.amount; }); 
+		auto f = [](double s, bill_t const& bb) {return s + bb.amount; };
+		return sum_f<bills_t, double>(b,f); 
 	}
-	double total(bills_t const trips, driver_t const& d) 
+	double total(bills_t const b, driver_t const& d) 
 	{
-		return sum_f<bills_t, double>(trips, [&d](double s, bill_t const& t) {return s + (t.driver == d ? t.amount : 0.0); });
+		auto f = [&d](double s, bill_t const& bb) {return s + (bb.driver == d ? bb.amount : 0.0); };
+		return sum_f<bills_t, double>(b, f);
 	}
 
 	//----------------------------------------------------------------
@@ -108,57 +97,48 @@ namespace jh
 	{
 		explicit billing(std::string name) : name(std::move(name)) {}
 
-		std::string name;
+		std::string name{};
 		trips_t trips{};
 		bills_t bills{};
+
 		void store(std::string folder = "./") const
 		{
-			if (auto f = std::ofstream(folder + "trips.txt"))	
-				f << trips;
-			if (auto f = std::ofstream(folder + "bills.txt"))	
-				f << bills;
+			auto write = [](auto& in, auto&& out) {if (out) out << in; } ;
+			write( trips, std::ofstream(folder + "trips.txt"));
+			write( bills, std::ofstream(folder + "bills.txt"));
 		}
 		void load(std::string folder = "./") 
 		{
-			trips.clear();
-			if (auto f = std::ifstream(folder + "trips.txt"))
-			{
-				while (!f.eof()) { trips.emplace_back(); f >> trips.back(); }
-			}
-			bills.clear();
-			if (auto f = std::ifstream(folder + "bills.txt"))
-			{
-				bills.clear();
-				if (auto f = std::ifstream(folder + "bills.txt"))
-				{
-					while (!f.eof()) { bills.emplace_back(); f >> bills.back(); }
-				}
-			}
+			auto read = [](auto&& in, auto& out) {out.clear(); if (in) { while (!in.eof()) { out.emplace_back(); in >> out.back(); } } };
+			read(std::ifstream(folder + "trips.txt"), trips);
+			read(std::ifstream(folder + "bills.txt"), bills);
 		}
+
 		std::string invoice(std::vector<driver_t> const& drivers) const
 		{
 			std::stringstream ss;
 			ss << "----------------- " << name << " -----------------------\n";
 			if (!trips.empty())
 			{
-				auto totalKm = total(trips);
-				auto totalEuro = total(bills);
-				auto eval = [&](driver_t d)
+				auto completeTrack = total(trips);
+				auto completeAmount = total(bills);
+				auto evaluate = [&](driver_t driver)
 				{
-					auto km = double(total(trips, d)); 
-					auto r = (km / totalKm);	
-					auto credit = totalEuro * r;
-					auto debit = total(bills, d);
-					ss << "\n----------------- " <<d.name << " -----------------------\n";
-				   ss << "Strecke:   " << km << "km  Anteil: " << int(100.0*r) << "%\n";
-					ss << "Soll:      " << credit << " Euro\n";
-					ss << "Haben:     " << debit << " Euro\n";
-					ss << "Ausgleich: " << (debit-credit) << " Euro\n";
+					auto track = double(total(trips, driver)); 
+					auto ratio = (track / completeTrack);
+					auto credit = total(bills, driver);
+					auto debit = completeAmount * ratio;
+					ss << "\n----------------- " <<driver.name << " -----------------------\n";
+				   ss << "Strecke:   " << track << "km  Anteil: " << 0.1*int(1000*ratio) << "%\n";
+					ss << "Soll:      " << debit << " Euro\n";
+					ss << "Haben:     " << credit << " Euro\n";
+					ss << "Ausgleich: " << (credit-debit) << " Euro\n";
 				};
 
-				ss << "Gefahren gesamt: " << totalKm << "km\n";
-				ss << "Bezahlt gesamt: " << totalEuro << " Euro\n";
-				for( auto&& d : drivers) eval(d);
+				ss << "Gefahren gesamt: " << completeTrack << "km\n";
+				ss << "Bezahlt gesamt: " << completeAmount << " Euro\n";
+				for( auto&& driver : drivers) 
+					evaluate(driver);
 			}
 			return ss.str();
 		}
