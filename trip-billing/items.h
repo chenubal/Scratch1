@@ -1,13 +1,25 @@
 #pragma once
 #include <vector>
-#include <span>
 #include <numeric>
-#include <compare>
 #include <fstream>
 #include <sstream>
 
 namespace jh
 {
+	/// Provides an span adapter on iterators.
+	template<typename It>
+	struct span
+	{
+		span(It begin, It end) : begin_(begin), end_(end) {}
+		span(It begin, size_t count) : span(begin, std::next(begin, count)) {}
+		It begin() { return begin_; }
+		It end() { return end_; }
+		const It begin() const { return begin_; }
+		const It end() const { return end_; }
+	private:
+		It begin_, end_;
+	};
+
 	template<typename T>
 	std::ostream& operator<<(std::ostream& os, const std::vector<T>& v)
 	{
@@ -15,7 +27,7 @@ namespace jh
 		if (auto s = std::begin(v); s!=e)
 		{
 			os << *s;
-			for (auto&& v : std::span(std::next(s), e)) os << '\n' << v;
+			for (auto&& v : span(std::next(s), e)) os << '\n' << v;
 		}
 		return os;
 	}
@@ -30,7 +42,7 @@ namespace jh
 
 		friend std::istream& operator>>(std::istream& is, driver_t& trip);
 		friend std::ostream& operator<<(std::ostream& os, driver_t const& trip);
-		auto operator<=>(const driver_t&) const = default;
+		auto operator==(const driver_t& o) const { return name == o.name; }
 	};
 
 	std::ostream& operator<<(std::ostream& os, driver_t const& d) {os << d.name; return os; }
@@ -46,7 +58,7 @@ namespace jh
 		int dist() const { return end - start; }
 		friend std::istream& operator>>(std::istream& is, trip_t& trip);
 		friend std::ostream& operator<<(std::ostream& os, trip_t const& trip);
-		auto operator<=>(const trip_t&) const = default;
+		auto operator==(const trip_t& o) const { return std::tie(start, end, driver) == std::tie(o.start, o.end, o.driver); }
 	};
 
 	std::istream& operator>>(std::istream& is, trip_t& t)	{ is >> t.start >> t.end >> t.driver; return is; }
@@ -73,7 +85,7 @@ namespace jh
 
 		friend std::istream& operator>>(std::istream& is, bill_t& trip);
 		friend std::ostream& operator<<(std::ostream& os, bill_t const& trip);
-		auto operator<=>(const bill_t&) const = default;
+		auto operator==(const bill_t& o) const { return std::tie(amount, driver) == std::tie(o.amount, o.driver); }
 	};
 
 	std::ostream& operator<<(std::ostream& os, bill_t const& b)	{ os << b.amount << '\t' << b.driver; return os;}
