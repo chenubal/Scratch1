@@ -154,6 +154,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tools", "Tools\Tools.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "trip-billing", "trip-billing\trip-billing.vcxproj", "{8715A8FE-8905-4E0B-9663-1CB0C9ED9F1F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Qt2", "Qt2\Qt2.vcxproj", "{0026F6E2-FDE4-45E2-B9CA-9ED2693A9D86}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -728,6 +730,14 @@ Global
 		{8715A8FE-8905-4E0B-9663-1CB0C9ED9F1F}.Release|x64.Build.0 = Release|x64
 		{8715A8FE-8905-4E0B-9663-1CB0C9ED9F1F}.Release|x86.ActiveCfg = Release|Win32
 		{8715A8FE-8905-4E0B-9663-1CB0C9ED9F1F}.Release|x86.Build.0 = Release|Win32
+		{0026F6E2-FDE4-45E2-B9CA-9ED2693A9D86}.Debug|x64.ActiveCfg = Debug|x64
+		{0026F6E2-FDE4-45E2-B9CA-9ED2693A9D86}.Debug|x64.Build.0 = Debug|x64
+		{0026F6E2-FDE4-45E2-B9CA-9ED2693A9D86}.Debug|x86.ActiveCfg = Debug|x64
+		{0026F6E2-FDE4-45E2-B9CA-9ED2693A9D86}.Debug|x86.Build.0 = Debug|x64
+		{0026F6E2-FDE4-45E2-B9CA-9ED2693A9D86}.Release|x64.ActiveCfg = Release|x64
+		{0026F6E2-FDE4-45E2-B9CA-9ED2693A9D86}.Release|x64.Build.0 = Release|x64
+		{0026F6E2-FDE4-45E2-B9CA-9ED2693A9D86}.Release|x86.ActiveCfg = Release|x64
+		{0026F6E2-FDE4-45E2-B9CA-9ED2693A9D86}.Release|x86.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
