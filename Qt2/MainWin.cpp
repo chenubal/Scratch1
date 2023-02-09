@@ -3,13 +3,12 @@
 #include <qboxlayout>
 #include <qlistwidget.h>
 #include <qtablewidget.h>
+#include "../trip-billing/items.h"
+
 
 MainWin::MainWin(QWidget *parent) : QMainWindow(parent)
 {
-   auto w = new QWidget();
-   w->setMinimumSize(800, 600);
-   auto layout = new QHBoxLayout();
-   auto makeRBox = [this]
+   auto makeBillViews = [this]
    {
       auto l = new QVBoxLayout();
       l->addLayout(makeBillsView());
@@ -17,32 +16,49 @@ MainWin::MainWin(QWidget *parent) : QMainWindow(parent)
       l->addLayout(makeReportView());
       return l;
    };
-   layout->addLayout(makeBillingsView());
-   layout->addLayout(makeRBox());
+   auto mainLayout = [&, this]
+   {
+      auto l = new QHBoxLayout();
+      l->addLayout(makeBillingsView());
+      l->addLayout(makeBillViews());
+      return l;
+   };
+   auto makeMainWidget = [&, this]
+   {
+      auto w = new QWidget();
+      w->setMinimumSize(800, 600);
+      w->setLayout(mainLayout());
+      return w;
+   };
 
-   w->setLayout(layout);
-   setCentralWidget(w);
+   setCentralWidget(makeMainWidget());
+   load();
 }
-
 QLayout* MainWin::makeBillingsView() 
 { 
-   auto w = new QListWidget(this);
-   w->setMaximumSize(300, 800);
-   w->addItem(new QListWidgetItem("b1"));
-   w->addItem("b2");
-   auto l = new QHBoxLayout();
-   l->addWidget(w);
-   return l; 
+   if (!billingsView)
+   {
+      billingsView = new QListWidget(this);
+      billingsView->setMaximumSize(300, 800);
+      auto l = new QHBoxLayout();
+      l->addWidget(billingsView);
+      return l;
+   }
+   return nullptr; 
 }
 
 QLayout* MainWin::makeBillsView() 
 {
-   auto w = new QTableWidget(this);
-   w->setColumnCount(2);
-   w->setHorizontalHeaderLabels({ "Summe","Fahrer" });
-   auto l = new QHBoxLayout();
-   l->addWidget(w);
-   return l;
+   if (!billTable)
+   {
+      billTable = new QTableWidget(this);
+      billTable->setColumnCount(2);
+      billTable->setHorizontalHeaderLabels({ "Summe","Fahrer" });
+      auto l = new QHBoxLayout();
+      l->addWidget(billTable);
+      return l;
+   }
+   return nullptr;
 }
 
  QLayout* MainWin::makeTripsView() 
@@ -62,5 +78,23 @@ QLayout* MainWin::makeBillsView()
     l->addWidget(new QLabel("D"));
     return l;
 
+ }
+
+ void MainWin::load() 
+ {
+    auto db_path = fs::current_path().append("billing_db");
+    fs::create_directory(db_path);
+    if (fs::exists(db_path))
+    {
+       billingsView->clear();
+       for (auto const& d :  fs::directory_iterator{ db_path })
+       {
+          if (d.is_directory())
+          {
+             billings.emplace_back(d.path().string());
+             billingsView->addItem(d.path().filename().string().c_str());
+          }
+       }
+    }
  }
 

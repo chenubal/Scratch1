@@ -1,7 +1,14 @@
 #pragma once
 
 #include <QtWidgets/QMainWindow>
+#include <filesystem>
+
+namespace fs = std::filesystem;
+using path = fs::path;
+
 class Qlayout;
+class QListWidget;
+class QTableWidget;
 
 class MainWin : public QMainWindow
 {
@@ -14,5 +21,8 @@ private:
    QLayout* makeBillsView();
    QLayout* makeTripsView();
    QLayout* makeReportView();
- 
+   void load();
+   std::vector<path> billings;
+   QListWidget* billingsView = nullptr;
+   QTableWidget* billTable = nullptr;
 };
