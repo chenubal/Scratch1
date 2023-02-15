@@ -113,6 +113,7 @@ namespace jh
 
 		std::string invoice(std::vector<driver_t> const& drivers) const
 		{
+			auto rnd = [](auto v, char n) { auto f = std::pow(10, -1.0*n); return f * std::round(v / f); };
 			std::stringstream ss;
 			ss << "----------------- " << name << " -----------------------\n";
 			if (!trips.empty())
@@ -126,15 +127,16 @@ namespace jh
 					auto credit = total(bills, driver);
 					auto debit = completeAmount * ratio;
 					ss << "\n----------------- " <<driver.name << " -----------------------\n";
-				   ss << "Strecke:   " << track << "km  Anteil: " << 0.1*int(1000*ratio) << "%\n";
-					ss << "Soll:      " << debit << " Euro\n";
-					ss << "Haben:     " << credit << " Euro\n";
-					ss << "Ausgleich: " << (credit-debit) << " Euro\n";
+				   ss << "Strecke:   " << track << "km  Anteil: " << rnd(100*ratio,1) << "%\n";
+					ss << "Soll:      " << rnd(debit,2) << " Euro\n";
+					ss << "Haben:     " << rnd(credit,2) << " Euro\n";
+					ss << "Ausgleich: " << rnd(credit-debit,2) << " Euro\n";
 				};
 
-				ss << "Gefahren gesamt: " << completeTrack << "km\n";
-				ss << "Bezahlt gesamt: " << completeAmount << " Euro\n";
-				for( auto&& driver : drivers) 
+				ss << "Gefahren gesamt:" << completeTrack << "km\n";
+				ss << "Bezahlt  gesamt: " << completeAmount << " Euro\n";
+				ss << "Quote: " << rnd(100*completeAmount/ completeTrack,1) << " ct/km\n";
+				for( auto&& driver : drivers)
 					evaluate(driver);
 			}
 			return ss.str();
