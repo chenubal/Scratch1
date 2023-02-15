@@ -13,7 +13,6 @@ QLabel* makeLabel(T v, QString const& u)
 	return lbl; 
 };
 
-
 MainWin::MainWin(QWidget* parent) : QMainWindow(parent)
 {
 	auto makeBillViews = [this]
@@ -42,6 +41,7 @@ MainWin::MainWin(QWidget* parent) : QMainWindow(parent)
 	setCentralWidget(makeMainWidget());
 	load();
 }
+
 QLayout* MainWin::makeBillingsView()
 {
 	if (!m_billingsView)
@@ -133,7 +133,9 @@ void MainWin::updateAll()
 	if (m_billingsView && !m_billings.empty())
 	{
 		auto n = std::max(0, m_billingsView->currentRow());
-		m_work.load(m_billings.at(n).string());
+		auto path = m_billings.at(n);
+		m_work.load(path.string());
+		m_work.name = path.filename().string();
 	}
 	updateBillsTable();
 	updateTripsTable();
@@ -144,7 +146,7 @@ void MainWin::updateReport()
 {
 	if (m_report)
 	{
-		auto s = m_work.invoice({ { "Josef" },{ "Jannes" },{ "Luis" } });
+		auto s = m_work.invoiceAll();
 		m_report->setText(s.c_str());
 	}
 }
@@ -156,13 +158,13 @@ void MainWin::load()
 	if (fs::exists(db_path))
 	{
 		m_billingsView->clear();
-		for (auto const& d : fs::directory_iterator{ db_path })
+		for (auto const& file : fs::directory_iterator{ db_path })
 		{
 			m_billingsView->setCurrentRow(0);
-			if (d.is_directory())
+			if (file.is_directory())
 			{
-				m_billings.emplace_back(d.path().string());
-				m_billingsView->addItem(d.path().filename().string().c_str());
+				m_billings.emplace_back(file.path().string());
+				m_billingsView->addItem(file.path().filename().string().c_str());
 			}
 		}
 	}
