@@ -22,10 +22,13 @@ private:
    QLayout* makeBillsView();
    QLayout* makeTripsView();
    QLayout* makeReportView();
-   void updateBillView();
+   void updateBillsTable();
+   void updateTripsTable();
+   void updateAll();
    void load();
    std::vector<path> m_billings;
    QListWidget* m_billingsView = nullptr;
    QTableWidget* m_billTable = nullptr;
+   QTableWidget* m_tripTable = nullptr;
    jh::billing m_work;
 };
