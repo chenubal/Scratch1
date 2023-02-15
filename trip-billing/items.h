@@ -139,6 +139,11 @@ namespace jh
 			}
 			return ss.str();
 		}
+		void clear()
+		{
+			bills.clear();
+			trips.clear();
+		}
 	};
 
 }

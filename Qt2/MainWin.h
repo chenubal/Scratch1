@@ -10,6 +10,7 @@ using path = fs::path;
 class Qlayout;
 class QListWidget;
 class QTableWidget;
+class QTextEdit;
 
 class MainWin : public QMainWindow
 {
@@ -25,10 +26,12 @@ private:
    void updateBillsTable();
    void updateTripsTable();
    void updateAll();
+   void updateReport();
    void load();
    std::vector<path> m_billings;
    QListWidget* m_billingsView = nullptr;
    QTableWidget* m_billTable = nullptr;
    QTableWidget* m_tripTable = nullptr;
+   QTextEdit* m_report;
    jh::billing m_work;
 };

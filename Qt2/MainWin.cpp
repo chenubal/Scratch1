@@ -3,6 +3,16 @@
 #include <qboxlayout>
 #include <qlistwidget.h>
 #include <qtablewidget.h>
+#include <qtextedit.h>
+
+template<class T>
+QLabel* makeLabel(T v, QString const& u) 
+{
+	auto lbl = new QLabel(QString("%1%2").arg(v).arg(u)); 
+	lbl->setAlignment(Qt::AlignCenter); 
+	return lbl; 
+};
+
 
 MainWin::MainWin(QWidget* parent) : QMainWindow(parent)
 {
@@ -53,6 +63,8 @@ QLayout* MainWin::makeBillsView()
 	if (!m_billTable)
 	{
 		m_billTable = new QTableWidget(this);
+		m_billTable->setColumnCount(2);
+		m_billTable->setHorizontalHeaderLabels({ "Summe","Fahrer" });
 		auto l = new QHBoxLayout();
 		l->addWidget(m_billTable);
 		updateAll();
@@ -67,6 +79,7 @@ QLayout* MainWin::makeTripsView()
 	{
 		m_tripTable = new QTableWidget(this);
 		m_tripTable->setColumnCount(3);
+		m_tripTable->setHorizontalHeaderLabels({ "Start","Ende","Fahrer" });
 		auto l = new QHBoxLayout();
 		l->addWidget(m_tripTable);
 		return l;
@@ -76,57 +89,64 @@ QLayout* MainWin::makeTripsView()
 
 QLayout* MainWin::makeReportView()
 {
+	m_report = new QTextEdit();
 	auto l = new QHBoxLayout();
-	l->addWidget(new QLabel("D"));
+	l->addWidget(m_report);
 	return l;
 
 }
 
 void MainWin::updateBillsTable()
 {
-	if (m_billTable && m_billingsView && !m_billings.empty())
+	if (m_billTable)
 	{
-		auto n = std::max(0, m_billingsView->currentIndex().row());
-		m_work.load(m_billings.at(n).string());
 		auto& bills = m_work.bills;
-		m_billTable->clear();
-		m_billTable->setColumnCount(2);
+		m_billTable->clearContents();
 		m_billTable->setRowCount(bills.size());
-		m_billTable->setHorizontalHeaderLabels({ "Summe","Fahrer" });
-		for (auto&& [x, i] : jh::zip(bills, jh::Loop(bills.size())))
+		for (auto&& [bill, i] : jh::zip(bills, jh::Loop(bills.size())))
 		{
-			auto fmt = [](auto v, QString const& u) {auto l = new QLabel(QString("%1%2").arg(v).arg(u)); l->setAlignment(Qt::AlignCenter); return l; };
-			m_billTable->setCellWidget(i, 0, fmt(x.amount, " Euro"));
-			m_billTable->setCellWidget(i, 1, fmt(x.driver.name.c_str(), ""));
+			m_billTable->setCellWidget(i, 0, makeLabel(bill.amount, " Euro"));
+			m_billTable->setCellWidget(i, 1, makeLabel(bill.driver.name.c_str(), ""));
 		}
 	}
 }
 
 void MainWin::updateTripsTable()
 {
-	if (m_tripTable && m_billingsView && !m_billings.empty())
+	if (m_tripTable)
 	{
-		auto n = std::max(0, m_billingsView->currentIndex().row());
-		m_work.load(m_billings.at(n).string());
 		auto& trips = m_work.trips;
-		m_tripTable->clear();
-		m_tripTable->setColumnCount(3);
+		m_tripTable->clearContents();
 		m_tripTable->setRowCount(trips.size());
-		m_tripTable->setHorizontalHeaderLabels({ "Start","Ende","Fahrer" });
-		for (auto&& [x, i] : jh::zip(trips, jh::Loop(trips.size())))
+		for (auto&& [trip, i] : jh::zip(trips, jh::Loop(trips.size())))
 		{
-			auto fmt = [](auto v, QString const& u) {auto l = new QLabel(QString("%1%2").arg(v).arg(u)); l->setAlignment(Qt::AlignCenter); return l; };
-			m_tripTable->setCellWidget(i, 0, fmt(x.start, " km"));
-			m_tripTable->setCellWidget(i, 1, fmt(x.end, " km"));
-			m_tripTable->setCellWidget(i, 2, fmt(x.driver.name.c_str(), ""));
+			m_tripTable->setCellWidget(i, 0, makeLabel(trip.start, " km"));
+			m_tripTable->setCellWidget(i, 1, makeLabel(trip.end, " km"));
+			m_tripTable->setCellWidget(i, 2, makeLabel(trip.driver.name.c_str(), ""));
 		}
 	}
 }
 
-void MainWin::updateAll() 
+void MainWin::updateAll()
 {
+	m_work.clear();
+	if (m_billingsView && !m_billings.empty())
+	{
+		auto n = std::max(0, m_billingsView->currentRow());
+		m_work.load(m_billings.at(n).string());
+	}
 	updateBillsTable();
 	updateTripsTable();
+	updateReport();
+}
+
+void MainWin::updateReport()
+{
+	if (m_report)
+	{
+		auto s = m_work.invoice({ { "Josef" },{ "Jannes" },{ "Luis" } });
+		m_report->setText(s.c_str());
+	}
 }
 
 void MainWin::load()
