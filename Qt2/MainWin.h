@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include <filesystem>
+#include "../trip-billing/items.h"
 
 namespace fs = std::filesystem;
 using path = fs::path;
@@ -21,8 +22,10 @@ private:
    QLayout* makeBillsView();
    QLayout* makeTripsView();
    QLayout* makeReportView();
+   void updateBillView();
    void load();
-   std::vector<path> billings;
-   QListWidget* billingsView = nullptr;
-   QTableWidget* billTable = nullptr;
+   std::vector<path> m_billings;
+   QListWidget* m_billingsView = nullptr;
+   QTableWidget* m_billTable = nullptr;
+   jh::billing m_work;
 };
