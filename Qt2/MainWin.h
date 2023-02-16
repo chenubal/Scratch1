@@ -27,6 +27,7 @@ private:
    void updateReport();
    void load();
    void addBilling();
+   void delBilling();
    std::vector<std::filesystem::path> m_billings;
    QListWidget* m_billingsView = nullptr;
    QTableWidget* m_billTable = nullptr;

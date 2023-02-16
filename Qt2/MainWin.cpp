@@ -103,15 +103,24 @@ QLayout* MainWin::makeBillingsView()
 	{
 		m_billingsView = new QListWidget(this);
 		m_billingsView->setMaximumSize(300, 800);
-		auto l = new QVBoxLayout();
-		l->addWidget(m_billingsView);
+		auto vBox = new QVBoxLayout();
+		vBox->addWidget(m_billingsView);
 		connect(m_billingsView, &QListWidget::currentRowChanged, this, [this](int) {updateAll(); });
-		auto button = new QPushButton("Add billing");
-		l->addWidget(button);
-		connect(button, &QPushButton::pressed, this, [this]{ addBilling();});
+
+		auto addBtn = new QPushButton("Neu");
+		connect(addBtn, &QPushButton::pressed, this, [this]{ addBilling();});
+
+		auto delBtn = new QPushButton("Entfernen");
+		connect(delBtn, &QPushButton::pressed, this, [this] {delBilling(); });
+
+		auto btnBox = new QHBoxLayout();
+	   btnBox->addWidget(addBtn);
+		btnBox->addWidget(delBtn);
+		vBox->addLayout(btnBox);
+
 		m_billingsView->setCurrentRow(0);
 		updateBillsTable();
-		return l;
+		return vBox;
 	}
 	return nullptr;
 }
@@ -163,7 +172,7 @@ void MainWin::updateBillsTable()
 		m_billTable->setRowCount(bills.size());
 		for (auto&& [bill, i] : jh::zip(bills, jh::Loop(bills.size())))
 		{
-			m_billTable->setCellWidget(i, 0, jh::makeLabel(bill.amount, " Euro"));
+			m_billTable->setCellWidget(i, 0, jh::makeLabel(bill.amount," Euro"));
 			m_billTable->setCellWidget(i, 1, jh::makeLabel(bill.driver.name.c_str(), ""));
 		}
 	}
@@ -241,4 +250,15 @@ void MainWin::addBilling()
 		updateAll();
 	}
 }
+void MainWin::delBilling()
+{
+	if (auto r = m_billingsView->currentRow(); r >=0)
+	{
+		jh::toBackup(m_billings.at(r));
+		load();
+		m_billingsView->setCurrentRow(m_billingsView->count() - 1);
+		updateAll();
+	}
+}
+
 
