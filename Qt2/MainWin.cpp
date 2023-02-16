@@ -14,11 +14,6 @@ using path = fs::path;
 
 namespace jh
 {
-	inline path operator+(path const& p, std::string const& s)
-	{
-		auto r = p; r += s; return r;
-	}
-
 	std::string todayStr()
 	{
 		auto t = std::time(nullptr);
@@ -31,8 +26,8 @@ namespace jh
 
 	path next_free(path p)
 	{
-		auto fn = p.filename();
-		auto i = 1;
+		auto fn = p.filename().string();
+		auto i = 1u;
 		while (fs::exists(p))
 		{
 			p.replace_filename(fn+ " " + std::to_string(i++));
@@ -111,7 +106,7 @@ QLayout* MainWin::makeBillingsView()
 		connect(addBtn, &QPushButton::pressed, this, [this]{ addBilling();});
 
 		auto delBtn = new QPushButton("Entfernen");
-		connect(delBtn, &QPushButton::pressed, this, [this] {delBilling(); });
+		connect(delBtn, &QPushButton::pressed, this, [this] {delBilling();});
 
 		auto btnBox = new QHBoxLayout();
 	   btnBox->addWidget(addBtn);
@@ -132,10 +127,48 @@ QLayout* MainWin::makeBillsView()
 		m_billTable = new QTableWidget(this);
 		m_billTable->setColumnCount(2);
 		m_billTable->setHorizontalHeaderLabels({ "Summe","Fahrer" });
-		auto l = new QHBoxLayout();
-		l->addWidget(m_billTable);
+
+		auto btnBox = new QHBoxLayout();
+		auto addBtn = new QPushButton("Neuer Eintrag");
+		connect(addBtn, &QPushButton::pressed, this, [this] 
+		{
+			auto& b = m_work.bills;
+			if (b.empty())
+				b.emplace_back(jh::bill_t{ 100,{"Josef"} });
+			else
+			{
+				auto& bb = b.back();
+				b.emplace_back(jh::bill_t{ bb.amount+1,bb.driver});
+			}
+			auto n = std::max(0, m_billingsView->currentRow());
+			auto path = m_billings.at(n);
+			m_work.store(path.string());
+			updateAll();
+
+		});
+		auto delBtn = new QPushButton("Letzten Eintrag entfernen");
+		connect(delBtn, &QPushButton::pressed, this, [this]
+		{
+			auto& b = m_work.bills;
+			if (!b.empty())
+			{
+				auto d = std::next(b.begin(), b.size() - 1);
+				b.erase(d);
+			}
+			auto n = std::max(0, m_billingsView->currentRow());
+			auto path = m_billings.at(n);
+			m_work.store(path.string());
+			updateAll();
+
+		});
+		btnBox->addWidget(addBtn);
+		btnBox->addWidget(delBtn);
+
+		auto vBox = new QVBoxLayout();
+		vBox->addWidget(m_billTable);
+		vBox->addLayout(btnBox);
 		updateAll();
-		return l;
+		return vBox;
 	}
 	return nullptr;
 }
