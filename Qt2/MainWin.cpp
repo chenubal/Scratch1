@@ -4,6 +4,7 @@
 #include <qlistwidget.h>
 #include <qtablewidget.h>
 #include <qtextedit.h>
+#include <qpushbutton.h>
 
 template<class T>
 QLabel* makeLabel(T v, QString const& u) 
@@ -48,9 +49,25 @@ QLayout* MainWin::makeBillingsView()
 	{
 		m_billingsView = new QListWidget(this);
 		m_billingsView->setMaximumSize(300, 800);
-		auto l = new QHBoxLayout();
+		auto l = new QVBoxLayout();
 		l->addWidget(m_billingsView);
 		connect(m_billingsView, &QListWidget::currentRowChanged, this, [this](int) {updateAll(); });
+		auto button = new QPushButton("Add billing");
+		l->addWidget(button);
+		connect(button, &QPushButton::pressed, this, [this]() 
+		{
+			auto path = fs::current_path().append("billing_db");
+			fs::create_directory(path);
+			path.append("New billing");
+			fs::create_directory(path);
+
+			jh::billing b("New billing");
+			b.store(path.string());
+			load();
+			m_billingsView->setCurrentRow(m_billingsView->count() - 1);
+			updateAll();
+		});
+
 		m_billingsView->setCurrentRow(0);
 		updateBillsTable();
 		return l;
@@ -158,6 +175,7 @@ void MainWin::load()
 	if (fs::exists(db_path))
 	{
 		m_billingsView->clear();
+		m_billings.clear();
 		for (auto const& file : fs::directory_iterator{ db_path })
 		{
 			m_billingsView->setCurrentRow(0);

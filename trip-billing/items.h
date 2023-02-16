@@ -14,6 +14,7 @@ namespace jh
 	{
 		std::string name;
 
+		bool valid() const { return !name.empty(); }
 		auto operator==(const driver_t& o) const { return name == o.name; }
 		auto operator<(const driver_t& o) const { return name < o.name; }
 	};
@@ -28,10 +29,16 @@ namespace jh
 		int end;
 		driver_t driver;
 
+		bool valid() const { return end > start && driver.valid(); }
+
 		int dist() const { return end - start; }
 	};
 
-	inline std::istream& operator>>(std::istream& is, trip_t& trip) { is >> trip.start >> trip.end >> trip.driver; return is; }
+	inline std::istream& operator>>(std::istream& is, trip_t& trip) 
+	{ 
+		is >> trip.start >> trip.end >> trip.driver; 
+		return is; 
+	}
 	inline std::ostream& operator<<(std::ostream& os, trip_t const& trip) { os << trip.start << '\t' << trip.end << '\t' << trip.driver;	return os; }
 
 	using trips_t = std::vector<trip_t>;
@@ -52,6 +59,7 @@ namespace jh
 	{
 		double amount;
 		driver_t driver;
+		bool valid() const { return amount > 0.0 && driver.valid(); }
 	};
 
 	inline std::ostream& operator<<(std::ostream& os, bill_t const& bill)	{ os << bill.amount << '\t' << bill.driver; return os;}
@@ -71,6 +79,21 @@ namespace jh
 		return sum_f<bills_t, double>(bills, accu);
 	}
 
+	template<class T>
+	void transfer(std::ifstream&& in, T& out)
+	{
+		out.clear();
+		if (in)
+		{
+			while (!in.eof())
+			{
+				out.emplace_back(); in >> out.back();
+				if (!out.back().valid())
+					out.pop_back();
+			}
+		}
+	};
+
 	//----------------------------------------------------------------
 	struct billing
 	{
@@ -88,7 +111,7 @@ namespace jh
 		}
 		void load(std::string folder = ".") 
 		{
-			auto transfer = [](auto&& in, auto& out) { out.clear(); if (in) { while (!in.eof()) { out.emplace_back(); in >> out.back(); } } };
+	
 			transfer(std::ifstream(folder + "/trips.txt"), trips);
 			transfer(std::ifstream(folder + "/bills.txt"), bills);
 		}
@@ -108,26 +131,28 @@ namespace jh
 				auto roundN = [](auto v, char n) { auto f = std::pow(10, -1.0 * n); return f * std::round(v / f); };
 				std::stringstream ss;
 				ss << "----------------- " << name << " -----------------------\n";
-				auto completeTrack = total(trips);
-				auto completeAmount = total(bills);
-				auto evaluate = [&](driver_t driver)
+				if (auto completeTrack = total(trips))
 				{
-					auto track = double(total(trips, driver)); 
-					auto ratio = (track / completeTrack);
-					auto credit = total(bills, driver);
-					auto debit = completeAmount * ratio;
-					ss << "\n----------------- " <<driver.name << " -----------------------\n";
-				   ss << "Strecke:   " << track << " km  Anteil: " << roundN(100*ratio,1) << "%\n";
-					ss << "Soll:      " << roundN(debit,2) << " Euro\n";
-					ss << "Haben:     " << roundN(credit,2) << " Euro\n";
-					ss << "Ausgleich: " << roundN(credit-debit,2) << " Euro\n";
-				};
+					auto completeAmount = total(bills);
+					auto evaluate = [&](driver_t driver)
+					{
+						auto track = double(total(trips, driver));
+						auto ratio = (track / completeTrack);
+						auto credit = total(bills, driver);
+						auto debit = completeAmount * ratio;
+						ss << "\n----------------- " << driver.name << " -----------------------\n";
+						ss << "Strecke:   " << track << " km  Anteil: " << roundN(100 * ratio, 1) << "%\n";
+						ss << "Soll:      " << roundN(debit, 2) << " Euro\n";
+						ss << "Haben:     " << roundN(credit, 2) << " Euro\n";
+						ss << "Ausgleich: " << roundN(credit - debit, 2) << " Euro\n";
+					};
 
-				ss << "Gefahren gesamt:  " << completeTrack << " km\n";
-				ss << "Bezahlt  gesamt:  " << completeAmount << " Euro\n";
-				ss << "Quote:  " << roundN(100*completeAmount/ completeTrack,1) << " ct/km\n";
-				for( auto&& driver : drivers)
-					evaluate(driver);
+					ss << "Gefahren gesamt:  " << completeTrack << " km\n";
+					ss << "Bezahlt  gesamt:  " << completeAmount << " Euro\n";
+					ss << "Quote:  " << roundN(100 * completeAmount / completeTrack, 1) << " ct/km\n";
+					for (auto&& driver : drivers)
+						evaluate(driver);
+				}
 				return ss.str();
 			}
 			return "No trips found!";

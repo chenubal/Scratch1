@@ -235,14 +235,14 @@ namespace jh
 			Function m_function; // R=f(I)
 		};
 
-		Loop(Function f, Index endIndex) : m_begin(iterator(f, 0)), m_end(iterator(f, endIndex)) {}
+		Loop(Function f, Index endIndex) : begin_(iterator(f, 0)), end_(iterator(f, endIndex)) {}
 		Loop(Index endIndex) : Loop([](auto i) { return i; }, endIndex) {}
-		auto begin() { return m_begin; }
-		auto end() { return m_end; }
-		auto const begin() const { return m_begin; }
-		auto const end() const { return m_end; }
+		auto begin() { return begin_; }
+		auto end() { return end_; }
+		auto const begin() const { return begin_; }
+		auto const end() const { return end_; }
 		bool empty() const { return begin() == end(); }
-		iterator m_begin, m_end;
+		iterator begin_, end_;
 	};
 
 	// CTAD
@@ -254,11 +254,11 @@ namespace jh
 	template<typename T>
 	std::ostream& operator<<(std::ostream& os, const std::vector<T>& v)
 	{
-		auto e = std::end(v);
-		if (auto s = std::begin(v); s != e)
+		auto end_ = std::end(v);
+		if (auto s = std::begin(v); s != end_)
 		{
 			os << *s;
-			for (auto&& v : span(std::next(s), e)) os << '\n' << v;
+			for (auto&& v : drop(s, end_)) os << '\n' << v;
 		}
 		return os;
 	}
