@@ -54,20 +54,7 @@ QLayout* MainWin::makeBillingsView()
 		connect(m_billingsView, &QListWidget::currentRowChanged, this, [this](int) {updateAll(); });
 		auto button = new QPushButton("Add billing");
 		l->addWidget(button);
-		connect(button, &QPushButton::pressed, this, [this]() 
-		{
-			auto path = fs::current_path().append("billing_db");
-			fs::create_directory(path);
-			path.append("New billing");
-			fs::create_directory(path);
-
-			jh::billing b("New billing");
-			b.store(path.string());
-			load();
-			m_billingsView->setCurrentRow(m_billingsView->count() - 1);
-			updateAll();
-		});
-
+		connect(button, &QPushButton::pressed, this, [this]{addBilling();});
 		m_billingsView->setCurrentRow(0);
 		updateBillsTable();
 		return l;
@@ -186,5 +173,33 @@ void MainWin::load()
 			}
 		}
 	}
+}
+
+fs::path unused(fs::path p)
+{
+	auto n = p.filename();
+	auto i = 1;
+	while (fs::exists(p))
+	{  
+		auto n0 = n;
+		n0 += " " + std::to_string(i++);
+		p.replace_filename(n0);
+	}
+	return p;
+}
+
+void MainWin::addBilling()
+{
+	auto p = fs::current_path().append("billing_db");
+	fs::create_directory(p);
+	p /= "New billing";
+	p = unused(p);
+	fs::create_directory(p);
+
+	jh::billing b("New billing");
+	b.store(p.string());
+	load();
+	m_billingsView->setCurrentRow(m_billingsView->count() - 1);
+	updateAll();
 }
 
