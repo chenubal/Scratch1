@@ -5,14 +5,68 @@
 #include <qtablewidget.h>
 #include <qtextedit.h>
 #include <qpushbutton.h>
+#include <iostream>
+#include <ctime>
 
-template<class T>
-QLabel* makeLabel(T v, QString const& u) 
+
+namespace fs = std::filesystem;
+using path = fs::path;
+
+namespace jh
 {
-	auto lbl = new QLabel(QString("%1%2").arg(v).arg(u)); 
-	lbl->setAlignment(Qt::AlignCenter); 
-	return lbl; 
-};
+	inline path operator+(path const& p, std::string const& s)
+	{
+		auto r = p; r += s; return r;
+	}
+
+	std::string todayStr()
+	{
+		auto t = std::time(nullptr);
+		auto tm = *std::localtime(&t);
+
+		std::ostringstream oss;
+		oss << std::put_time(&tm, "%d-%m-%Y");
+		return oss.str();
+	}
+
+	path next_free(path p)
+	{
+		auto fn = p.filename();
+		auto i = 1;
+		while (fs::exists(p))
+		{
+			p.replace_filename(fn+ " " + std::to_string(i++));
+		}
+		return p;
+	}
+
+	path db_path()
+	{
+		auto dir = fs::current_path().append("billing_db");
+		fs::create_directory(dir);
+		return dir;
+	}
+
+	path backup_path()
+	{
+		auto dir = fs::current_path().append("backup");
+		fs::create_directory(dir);
+		return dir;
+	}
+
+	void toBackup(path const& p)
+	{
+		fs::rename(p, next_free(backup_path() / p.filename()));
+	}
+
+	template<class T>
+	QLabel* makeLabel(T v, QString const& u)
+	{
+		auto lbl = new QLabel(QString("%1%2").arg(v).arg(u));
+		lbl->setAlignment(Qt::AlignCenter);
+		return lbl;
+	};
+}
 
 MainWin::MainWin(QWidget* parent) : QMainWindow(parent)
 {
@@ -54,7 +108,7 @@ QLayout* MainWin::makeBillingsView()
 		connect(m_billingsView, &QListWidget::currentRowChanged, this, [this](int) {updateAll(); });
 		auto button = new QPushButton("Add billing");
 		l->addWidget(button);
-		connect(button, &QPushButton::pressed, this, [this]{addBilling();});
+		connect(button, &QPushButton::pressed, this, [this]{ addBilling();});
 		m_billingsView->setCurrentRow(0);
 		updateBillsTable();
 		return l;
@@ -109,8 +163,8 @@ void MainWin::updateBillsTable()
 		m_billTable->setRowCount(bills.size());
 		for (auto&& [bill, i] : jh::zip(bills, jh::Loop(bills.size())))
 		{
-			m_billTable->setCellWidget(i, 0, makeLabel(bill.amount, " Euro"));
-			m_billTable->setCellWidget(i, 1, makeLabel(bill.driver.name.c_str(), ""));
+			m_billTable->setCellWidget(i, 0, jh::makeLabel(bill.amount, " Euro"));
+			m_billTable->setCellWidget(i, 1, jh::makeLabel(bill.driver.name.c_str(), ""));
 		}
 	}
 }
@@ -124,9 +178,9 @@ void MainWin::updateTripsTable()
 		m_tripTable->setRowCount(trips.size());
 		for (auto&& [trip, i] : jh::zip(trips, jh::Loop(trips.size())))
 		{
-			m_tripTable->setCellWidget(i, 0, makeLabel(trip.start, " km"));
-			m_tripTable->setCellWidget(i, 1, makeLabel(trip.end, " km"));
-			m_tripTable->setCellWidget(i, 2, makeLabel(trip.driver.name.c_str(), ""));
+			m_tripTable->setCellWidget(i, 0, jh::makeLabel(trip.start, " km"));
+			m_tripTable->setCellWidget(i, 1, jh::makeLabel(trip.end, " km"));
+			m_tripTable->setCellWidget(i, 2, jh::makeLabel(trip.driver.name.c_str(), ""));
 		}
 	}
 }
@@ -157,49 +211,34 @@ void MainWin::updateReport()
 
 void MainWin::load()
 {
-	auto db_path = fs::current_path().append("billing_db");
-	fs::create_directory(db_path);
-	if (fs::exists(db_path))
+	if (auto const dbPath = jh::db_path(); fs::exists(dbPath))
 	{
 		m_billingsView->clear();
 		m_billings.clear();
-		for (auto const& file : fs::directory_iterator{ db_path })
+		for (auto const& file : fs::directory_iterator{ dbPath })
 		{
 			m_billingsView->setCurrentRow(0);
 			if (file.is_directory())
 			{
-				m_billings.emplace_back(file.path().string());
-				m_billingsView->addItem(file.path().filename().string().c_str());
+				auto const& fp = file.path();
+				m_billings.emplace_back(fp.string());
+				m_billingsView->addItem(fp.filename().string().c_str());
 			}
 		}
 	}
 }
 
-fs::path unused(fs::path p)
-{
-	auto n = p.filename();
-	auto i = 1;
-	while (fs::exists(p))
-	{  
-		auto n0 = n;
-		n0 += " " + std::to_string(i++);
-		p.replace_filename(n0);
-	}
-	return p;
-}
-
 void MainWin::addBilling()
 {
-	auto p = fs::current_path().append("billing_db");
-	fs::create_directory(p);
-	p /= "New billing";
-	p = unused(p);
-	fs::create_directory(p);
-
-	jh::billing b("New billing");
-	b.store(p.string());
-	load();
-	m_billingsView->setCurrentRow(m_billingsView->count() - 1);
-	updateAll();
+	if (auto dir = jh::db_path(); fs::exists(dir))
+	{
+		dir = jh::next_free(dir / path("Abrechnung am " + jh::todayStr()));
+		fs::create_directory(dir);
+		jh::billing b(dir.filename().string());
+		b.store(dir.string());
+		load();
+		m_billingsView->setCurrentRow(m_billingsView->count() - 1);
+		updateAll();
+	}
 }
 

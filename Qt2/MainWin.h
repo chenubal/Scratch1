@@ -4,8 +4,6 @@
 #include <filesystem>
 #include "../trip-billing/items.h"
 
-namespace fs = std::filesystem;
-using path = fs::path;
 
 class Qlayout;
 class QListWidget;
@@ -29,7 +27,7 @@ private:
    void updateReport();
    void load();
    void addBilling();
-   std::vector<path> m_billings;
+   std::vector<std::filesystem::path> m_billings;
    QListWidget* m_billingsView = nullptr;
    QTableWidget* m_billTable = nullptr;
    QTableWidget* m_tripTable = nullptr;
