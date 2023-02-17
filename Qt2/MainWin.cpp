@@ -93,6 +93,10 @@ MainWin::MainWin(QWidget* parent) : QMainWindow(parent)
 
 	setCentralWidget(makeMainWidget());
 	load();
+	// Select last billing
+	if (auto n = m_billingsView->count(); n > 0)
+		m_billingsView->setCurrentRow(n - 1);
+
 }
 
 QLayout* MainWin::makeBillingsView()
@@ -101,24 +105,24 @@ QLayout* MainWin::makeBillingsView()
 	{
 		m_billingsView = new QListWidget(this);
 		m_billingsView->setMaximumSize(300, 800);
-		auto vBox = new QVBoxLayout();
-		vBox->addWidget(m_billingsView);
-		connect(m_billingsView, &QListWidget::currentRowChanged, this, [this](int) {updateAll(); });
+		connect(m_billingsView, &QListWidget::currentRowChanged, this, [this](int){updateAll();});
 
 		auto addBtn = new QPushButton("Neu");
-		connect(addBtn, &QPushButton::pressed, this, [this]{ addBilling();});
+		connect(addBtn, &QPushButton::pressed, this, [this]{addBilling();});
 
 		auto delBtn = new QPushButton("Entfernen");
-		connect(delBtn, &QPushButton::pressed, this, [this] {delBilling();});
+		connect(delBtn, &QPushButton::pressed, this, [this]{delBilling();});
 
 		auto btnBox = new QHBoxLayout();
 	   btnBox->addWidget(addBtn);
 		btnBox->addWidget(delBtn);
-		vBox->addLayout(btnBox);
 
-		m_billingsView->setCurrentRow(0);
+		auto mainBox = new QVBoxLayout();
+		mainBox->addWidget(m_billingsView);
+		mainBox->addLayout(btnBox);
+
 		updateBillsTable();
-		return vBox;
+		return mainBox;
 	}
 	return nullptr;
 }
@@ -131,19 +135,20 @@ QLayout* MainWin::makeBillsView()
 		m_billTable->setColumnCount(2);
 		m_billTable->setHorizontalHeaderLabels({ "Summe","Fahrer" });
 
-		auto btnBox = new QHBoxLayout();
 		auto addBtn = new QPushButton("Neuer Eintrag");
 		connect(addBtn, &QPushButton::pressed, this, [this] { appendBill();} );
 		auto delBtn = new QPushButton("Letzten Eintrag entfernen");
 		connect(delBtn, &QPushButton::pressed, this, [this] {	delLastBill(); });
+
+		auto btnBox = new QHBoxLayout();
 		btnBox->addWidget(addBtn);
 		btnBox->addWidget(delBtn);
 
-		auto vBox = new QVBoxLayout();
-		vBox->addWidget(m_billTable);
-		vBox->addLayout(btnBox);
+		auto mainBox = new QVBoxLayout();
+		mainBox->addWidget(m_billTable);
+		mainBox->addLayout(btnBox);
 		updateAll();
-		return vBox;
+		return mainBox;
 	}
 	return nullptr;
 }
@@ -207,10 +212,9 @@ void MainWin::updateAll()
 	m_work.clear();
 	if (m_billingsView && !m_billings.empty())
 	{
-		auto n = std::max(0, m_billingsView->currentRow());
-		auto path = m_billings.at(n);
-		m_work.load(path.string());
-		m_work.name = path.filename().string();
+		auto p = currentPath();
+		m_work.load(p.string());
+		m_work.name = p.filename().string();
 	}
 	updateBillsTable();
 	updateTripsTable();
@@ -277,9 +281,7 @@ inline void MainWin::delLastBill()
 		auto d = std::next(b.begin(), b.size() - 1);
 		b.erase(d);
 	}
-	auto n = std::max(0, m_billingsView->currentRow());
-	auto path = m_billings.at(n);
-	m_work.store(path.string());
+	m_work.store(currentPath().string());
 	updateAll();
 }
 
@@ -323,11 +325,15 @@ void MainWin::runBillEditor(jh::bill_t& bill)
 	if (dialog->exec() == QDialog::Accepted)
 	{
 		m_work.bills.emplace_back(bill);
-		auto n = std::max(0, m_billingsView->currentRow());
-		auto path = m_billings.at(n);
-		m_work.store(path.string());
+		m_work.store(currentPath().string());
 		updateAll();
 	}
+}
+
+path MainWin::currentPath() const
+{
+	auto n = std::max(0, m_billingsView->currentRow());
+	return m_billings.at(n);
 }
 
 

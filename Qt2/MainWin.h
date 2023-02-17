@@ -30,7 +30,8 @@ private:
    void delBilling();
    void delLastBill();
    void appendBill();
-   void runBillEditor(jh::bill_t& bill);;
+   void runBillEditor(jh::bill_t& bill);
+   std::filesystem::path currentPath() const;
    std::vector<std::filesystem::path> m_billings;
    QListWidget* m_billingsView = nullptr;
    QTableWidget* m_billTable = nullptr;
