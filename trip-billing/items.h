@@ -128,28 +128,28 @@ namespace jh
 		{
 			if (!trips.empty())
 			{
-				auto roundN = [](auto v, char n) { auto f = std::pow(10, -1.0 * n); return f * std::round(v / f); };
+				auto round_d = [](auto v, char digits) { auto f = std::pow(10, -1.0 * digits); return f * std::round(v / f); };
 				std::stringstream ss;
 				ss << "----------------- " << name << " -----------------------\n";
-				if (auto completeTrack = total(trips))
+				if (auto totalTrack = total(trips))
 				{
-					auto completeAmount = total(bills);
+					auto totalAmount = total(bills);
 					auto evaluate = [&](driver_t driver)
 					{
 						auto track = double(total(trips, driver));
-						auto ratio = (track / completeTrack);
+						auto ratio = (track / totalTrack);
 						auto credit = total(bills, driver);
-						auto debit = completeAmount * ratio;
+						auto debit = totalAmount * ratio;
 						ss << "\n----------------- " << driver.name << " -----------------------\n";
-						ss << "Strecke:   " << track << " km  Anteil: " << roundN(100 * ratio, 1) << "%\n";
-						ss << "Soll:      " << roundN(debit, 2) << " Euro\n";
-						ss << "Haben:     " << roundN(credit, 2) << " Euro\n";
-						ss << "Ausgleich: " << roundN(credit - debit, 2) << " Euro\n";
+						ss << "Strecke:   " << track << " km  Anteil: " << round_d(100 * ratio, 1) << "%\n";
+						ss << "Soll:      " << round_d(debit, 2) << " Euro\n";
+						ss << "Haben:     " << round_d(credit, 2) << " Euro\n";
+						ss << "Ausgleich: " << round_d(credit - debit, 2) << " Euro\n";
 					};
 
-					ss << "Gefahren gesamt:  " << completeTrack << " km\n";
-					ss << "Bezahlt  gesamt:  " << completeAmount << " Euro\n";
-					ss << "Quote:  " << roundN(100 * completeAmount / completeTrack, 1) << " ct/km\n";
+					ss << "Gefahren gesamt:  " << totalTrack << " km\n";
+					ss << "Bezahlt  gesamt:  " << totalAmount << " Euro\n";
+					ss << "Quote:  " << round_d(100 * totalAmount / totalTrack, 1) << " ct/km\n";
 					for (auto&& driver : drivers)
 						evaluate(driver);
 				}
