@@ -68,25 +68,25 @@ namespace jh
 
 MainWin::MainWin(QWidget* parent) : QMainWindow(parent)
 {
-	auto makeBillViews = [this]
+	auto makeBillAndTripsViews = [this]
 	{
 		auto l = new QVBoxLayout();
 		l->addLayout(makeBillsView());
 		l->addLayout(makeTripsView());
-		l->addLayout(makeReportView());
 		return l;
 	};
 	auto mainLayout = [&, this]
 	{
 		auto l = new QHBoxLayout();
 		l->addLayout(makeBillingsView());
-		l->addLayout(makeBillViews());
+		l->addLayout(makeBillAndTripsViews());
+		l->addLayout(makeReportView());
 		return l;
 	};
 	auto makeMainWidget = [&, this]
 	{
 		auto w = new QWidget();
-		w->setMinimumSize(800, 600);
+		w->setMinimumSize(1000, 600);
 		w->setLayout(mainLayout());
 		return w;
 	};
@@ -253,7 +253,7 @@ void MainWin::load()
 				pBV->addItem(fp.filename().string().c_str());
 			}
 		}
-		if (auto n = pBV->count(); n<0) pBV->setCurrentRow(n-1);
+		if (auto n = pBV->count(); n>0) pBV->setCurrentRow(n-1);
 	}
 }
 
@@ -313,7 +313,7 @@ void MainWin::delLastTrip()
 
  void MainWin::appendTrip()
  {
-	 jh::trip_t trip{ 125000, 125201,{ "Josef" } };
+	 jh::trip_t trip{lastEnd , 125201,{ "Josef" } };
 	 auto& b = m_work.trips;
 	 if (!b.empty())
 	 {
@@ -321,7 +321,7 @@ void MainWin::delLastTrip()
 		 trip.end = trip.start + 15;
 		 trip.driver = b.back().driver;
 	 }
-	 runTripEditor(trip);
+	 runTripEditor(trip,b.empty());
  }
 
 void MainWin::runBillEditor(jh::bill_t& bill)
@@ -361,7 +361,7 @@ void MainWin::runBillEditor(jh::bill_t& bill)
 	}
 }
 
-void MainWin::runTripEditor(jh::trip_t& trip)
+void MainWin::runTripEditor(jh::trip_t& trip, bool enable)
 {
 	QStringList drvNames{ "Josef","Jannis","Luis" };
 	auto dialog = new QDialog();
@@ -369,8 +369,8 @@ void MainWin::runTripEditor(jh::trip_t& trip)
 	startBox->setFixedWidth(80);
 	startBox->setRange(0, 10'000'000);
 	startBox->setValue(trip.start);
-	startBox->setEnabled(false);
-	//connect(startBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int v) {trip.start = v; });
+	startBox->setEnabled(enable);
+	connect(startBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int v) {trip.start = v; });
 
    auto endBox = new QSpinBox();
 	endBox->setFixedWidth(80);
@@ -401,6 +401,7 @@ void MainWin::runTripEditor(jh::trip_t& trip)
 	dialog->setLayout(hBox);
 	if (dialog->exec() == QDialog::Accepted)
 	{
+		lastEnd = trip.end;
 		m_work.trips.emplace_back(trip);
 		m_work.store(currentPath().string());
 		updateAll();
