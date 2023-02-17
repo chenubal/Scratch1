@@ -6,6 +6,9 @@
 #include <qtextedit.h>
 #include <qpushbutton.h>
 #include <iostream>
+#include <qdialog.h>
+#include <qspinbox.h>
+#include <qcombobox.h>
 #include <ctime>
 
 
@@ -130,37 +133,9 @@ QLayout* MainWin::makeBillsView()
 
 		auto btnBox = new QHBoxLayout();
 		auto addBtn = new QPushButton("Neuer Eintrag");
-		connect(addBtn, &QPushButton::pressed, this, [this] 
-		{
-			auto& b = m_work.bills;
-			if (b.empty())
-				b.emplace_back(jh::bill_t{ 100,{"Josef"} });
-			else
-			{
-				auto& bb = b.back();
-				b.emplace_back(jh::bill_t{ bb.amount+1,bb.driver});
-			}
-			auto n = std::max(0, m_billingsView->currentRow());
-			auto path = m_billings.at(n);
-			m_work.store(path.string());
-			updateAll();
-
-		});
+		connect(addBtn, &QPushButton::pressed, this, [this] { appendBill();} );
 		auto delBtn = new QPushButton("Letzten Eintrag entfernen");
-		connect(delBtn, &QPushButton::pressed, this, [this]
-		{
-			auto& b = m_work.bills;
-			if (!b.empty())
-			{
-				auto d = std::next(b.begin(), b.size() - 1);
-				b.erase(d);
-			}
-			auto n = std::max(0, m_billingsView->currentRow());
-			auto path = m_billings.at(n);
-			m_work.store(path.string());
-			updateAll();
-
-		});
+		connect(delBtn, &QPushButton::pressed, this, [this] {	delLastBill(); });
 		btnBox->addWidget(addBtn);
 		btnBox->addWidget(delBtn);
 
@@ -290,6 +265,67 @@ void MainWin::delBilling()
 		jh::toBackup(m_billings.at(r));
 		load();
 		m_billingsView->setCurrentRow(m_billingsView->count() - 1);
+		updateAll();
+	}
+}
+
+inline void MainWin::delLastBill()
+{
+	auto& b = m_work.bills;
+	if (!b.empty())
+	{
+		auto d = std::next(b.begin(), b.size() - 1);
+		b.erase(d);
+	}
+	auto n = std::max(0, m_billingsView->currentRow());
+	auto path = m_billings.at(n);
+	m_work.store(path.string());
+	updateAll();
+}
+
+inline void MainWin::appendBill()
+{
+	jh::bill_t nBill{ 30,{ "Josef" } };
+	auto& b = m_work.bills;
+	if (!b.empty()) nBill.driver = b.back().driver;
+	runBillEditor(nBill);
+}
+
+void MainWin::runBillEditor(jh::bill_t& bill)
+{
+	QStringList drvNames{ "Josef","Jannis","Luis" };
+	auto dialog = new QDialog();
+	auto amountBox = new QDoubleSpinBox();
+	amountBox->setFixedWidth(80);
+	amountBox->setRange(0, 100000);
+	amountBox->setValue(bill.amount);
+	connect(amountBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [&](double v) {bill.amount = v; });
+
+	auto acceptBtn = new QPushButton("Okay");
+	connect(acceptBtn, &QPushButton::clicked, [dialog] {dialog->accept(); });
+	auto cancelBtn = new QPushButton("Abbrechen");
+	connect(cancelBtn, &QPushButton::clicked, [dialog] {dialog->reject(); });
+
+	auto drvSelection = new QComboBox();
+	drvSelection->addItems(drvNames);
+	drvSelection->setCurrentIndex(0);
+	connect(drvSelection, QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int i) {bill.driver.name = drvNames.at(i).toStdString(); });
+
+	auto hBox = new QHBoxLayout();
+	hBox->addWidget(new QLabel("Betrag: "));
+	hBox->addWidget(amountBox);
+	hBox->addWidget(new QLabel("  Fahrer: "));
+	hBox->addWidget(drvSelection);
+	hBox->addSpacing(60);
+	hBox->addWidget(acceptBtn);
+	hBox->addWidget(cancelBtn);
+	dialog->setLayout(hBox);
+	if (dialog->exec() == QDialog::Accepted)
+	{
+		m_work.bills.emplace_back(bill);
+		auto n = std::max(0, m_billingsView->currentRow());
+		auto path = m_billings.at(n);
+		m_work.store(path.string());
 		updateAll();
 	}
 }

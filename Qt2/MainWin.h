@@ -28,6 +28,9 @@ private:
    void load();
    void addBilling();
    void delBilling();
+   void delLastBill();
+   void appendBill();
+   void runBillEditor(jh::bill_t& bill);;
    std::vector<std::filesystem::path> m_billings;
    QListWidget* m_billingsView = nullptr;
    QTableWidget* m_billTable = nullptr;
