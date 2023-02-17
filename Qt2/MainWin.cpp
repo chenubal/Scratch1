@@ -9,6 +9,7 @@
 #include <qdialog.h>
 #include <qspinbox.h>
 #include <qcombobox.h>
+#include <qheaderview.h>
 #include <ctime>
 
 
@@ -86,7 +87,7 @@ MainWin::MainWin(QWidget* parent) : QMainWindow(parent)
 	auto makeMainWidget = [&, this]
 	{
 		auto w = new QWidget();
-		w->setMinimumSize(1000, 600);
+		w->setMinimumSize(970, 600);
 		w->setLayout(mainLayout());
 		return w;
 	};
@@ -131,9 +132,9 @@ QLayout* MainWin::makeBillsView()
 		m_billTable->setColumnCount(2);
 		m_billTable->setHorizontalHeaderLabels({ "Summe","Fahrer" });
 
-		auto addBtn = new QPushButton("Neuer Eintrag");
+		auto addBtn = new QPushButton("Neue Rechnung");
 		connect(addBtn, &QPushButton::pressed, this, [this] { appendBill();} );
-		auto delBtn = new QPushButton("Letzten Eintrag entfernen");
+		auto delBtn = new QPushButton("Letzten Rechnung entfernen");
 		connect(delBtn, &QPushButton::pressed, this, [this] {	delLastBill(); });
 
 		auto btnBox = new QHBoxLayout();
@@ -143,7 +144,6 @@ QLayout* MainWin::makeBillsView()
 		auto mainBox = new QVBoxLayout();
 		mainBox->addWidget(m_billTable);
 		mainBox->addLayout(btnBox);
-		updateAll();
 		return mainBox;
 	}
 	return nullptr;
@@ -157,9 +157,9 @@ QLayout* MainWin::makeTripsView()
 		m_tripTable->setColumnCount(3);
 		m_tripTable->setHorizontalHeaderLabels({ "Start","Ende","Fahrer" });
 
-		auto addBtn = new QPushButton("Neuer Eintrag");
+		auto addBtn = new QPushButton("Neuer Reise");
 		connect(addBtn, &QPushButton::pressed, this, [this] { appendTrip(); });
-		auto delBtn = new QPushButton("Letzten Eintrag entfernen");
+		auto delBtn = new QPushButton("Letzten Reise entfernen");
 		connect(delBtn, &QPushButton::pressed, this, [this] { delLastTrip(); });
 
 		auto btnBox = new QHBoxLayout();
@@ -195,6 +195,7 @@ void MainWin::updateBillsTable()
 			m_billTable->setCellWidget(i, 0, jh::makeLabel(bill.amount," Euro"));
 			m_billTable->setCellWidget(i, 1, jh::makeLabel(bill.driver.name.c_str(), ""));
 		}
+		m_billTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	}
 }
 
@@ -211,6 +212,7 @@ void MainWin::updateTripsTable()
 			m_tripTable->setCellWidget(i, 1, jh::makeLabel(trip.end, " km"));
 			m_tripTable->setCellWidget(i, 2, jh::makeLabel(trip.driver.name.c_str(), ""));
 		}
+		m_tripTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	}
 }
 
