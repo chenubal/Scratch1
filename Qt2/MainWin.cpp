@@ -160,9 +160,20 @@ QLayout* MainWin::makeTripsView()
 		m_tripTable = new QTableWidget(this);
 		m_tripTable->setColumnCount(3);
 		m_tripTable->setHorizontalHeaderLabels({ "Start","Ende","Fahrer" });
-		auto l = new QHBoxLayout();
-		l->addWidget(m_tripTable);
-		return l;
+
+		auto addBtn = new QPushButton("Neuer Eintrag");
+		connect(addBtn, &QPushButton::pressed, this, [this] { appendTrip(); });
+		auto delBtn = new QPushButton("Letzten Eintrag entfernen");
+		connect(delBtn, &QPushButton::pressed, this, [this] { delLastTrip(); });
+
+		auto btnBox = new QHBoxLayout();
+		btnBox->addWidget(addBtn);
+		btnBox->addWidget(delBtn);
+
+		auto mainBox = new QVBoxLayout();
+		mainBox->addWidget(m_tripTable);
+		mainBox->addLayout(btnBox);
+		return mainBox;
 	}
 	return nullptr;
 }
@@ -273,7 +284,7 @@ void MainWin::delBilling()
 	}
 }
 
-inline void MainWin::delLastBill()
+void MainWin::delLastBill()
 {
 	auto& b = m_work.bills;
 	if (!b.empty())
@@ -285,13 +296,38 @@ inline void MainWin::delLastBill()
 	updateAll();
 }
 
-inline void MainWin::appendBill()
+void MainWin::delLastTrip()
+{
+	auto& b = m_work.trips;
+	if (!b.empty())
+	{
+		auto d = std::next(b.begin(), b.size() - 1);
+		b.erase(d);
+	}
+	m_work.store(currentPath().string());
+	updateAll();
+}
+
+ void MainWin::appendBill()
 {
 	jh::bill_t nBill{ 30,{ "Josef" } };
 	auto& b = m_work.bills;
 	if (!b.empty()) nBill.driver = b.back().driver;
 	runBillEditor(nBill);
 }
+
+ void MainWin::appendTrip()
+ {
+	 jh::trip_t trip{ 125000, 125201,{ "Josef" } };
+	 auto& b = m_work.trips;
+	 if (!b.empty())
+	 {
+		 trip.start = b.back().end;
+		 trip.end = trip.start + 15;
+		 trip.driver = b.back().driver;
+	 }
+	 runTripEditor(trip);
+ }
 
 void MainWin::runBillEditor(jh::bill_t& bill)
 {
@@ -325,6 +361,52 @@ void MainWin::runBillEditor(jh::bill_t& bill)
 	if (dialog->exec() == QDialog::Accepted)
 	{
 		m_work.bills.emplace_back(bill);
+		m_work.store(currentPath().string());
+		updateAll();
+	}
+}
+
+void MainWin::runTripEditor(jh::trip_t& trip)
+{
+	QStringList drvNames{ "Josef","Jannis","Luis" };
+	auto dialog = new QDialog();
+	auto startBox = new QSpinBox();
+	startBox->setFixedWidth(80);
+	startBox->setRange(0, 10'000'000);
+	startBox->setValue(trip.start);
+	startBox->setEnabled(false);
+	//connect(startBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int v) {trip.start = v; });
+
+   auto endBox = new QSpinBox();
+	endBox->setFixedWidth(80);
+	endBox->setRange(trip.start+1, 10'000'000);
+	endBox->setValue(trip.end);
+	connect(endBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int v) {trip.end = v; });
+
+	auto acceptBtn = new QPushButton("Okay");
+	connect(acceptBtn, &QPushButton::clicked, [dialog] {dialog->accept(); });
+	auto cancelBtn = new QPushButton("Abbrechen");
+	connect(cancelBtn, &QPushButton::clicked, [dialog] {dialog->reject(); });
+
+	auto drvSelection = new QComboBox();
+	drvSelection->addItems(drvNames);
+	drvSelection->setCurrentIndex(0);
+	connect(drvSelection, QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int i) {trip.driver.name = drvNames.at(i).toStdString(); });
+
+	auto hBox = new QHBoxLayout();
+	hBox->addWidget(new QLabel("Start: "));
+	hBox->addWidget(startBox);
+	hBox->addWidget(new QLabel("Ende: "));
+	hBox->addWidget(endBox);
+	hBox->addWidget(new QLabel("  Fahrer: "));
+	hBox->addWidget(drvSelection);
+	hBox->addSpacing(60);
+	hBox->addWidget(acceptBtn);
+	hBox->addWidget(cancelBtn);
+	dialog->setLayout(hBox);
+	if (dialog->exec() == QDialog::Accepted)
+	{
+		m_work.trips.emplace_back(trip);
 		m_work.store(currentPath().string());
 		updateAll();
 	}
