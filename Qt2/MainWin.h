@@ -41,4 +41,5 @@ private:
    QTableWidget* m_tripTable = nullptr;
    QTextEdit* m_report;
    jh::billing m_work;
+   int lastEnd = 125'000;
 };

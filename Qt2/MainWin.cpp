@@ -93,10 +93,6 @@ MainWin::MainWin(QWidget* parent) : QMainWindow(parent)
 
 	setCentralWidget(makeMainWidget());
 	load();
-	// Select last billing
-	if (auto n = m_billingsView->count(); n > 0)
-		m_billingsView->setCurrentRow(n - 1);
-
 }
 
 QLayout* MainWin::makeBillingsView()
@@ -245,18 +241,19 @@ void MainWin::load()
 {
 	if (auto const dbPath = jh::db_path(); fs::exists(dbPath))
 	{
-		m_billingsView->clear();
+		auto pBV = m_billingsView;
+		pBV->clear();
 		m_billings.clear();
 		for (auto const& file : fs::directory_iterator{ dbPath })
 		{
-			m_billingsView->setCurrentRow(0);
 			if (file.is_directory())
 			{
 				auto const& fp = file.path();
 				m_billings.emplace_back(fp.string());
-				m_billingsView->addItem(fp.filename().string().c_str());
+				pBV->addItem(fp.filename().string().c_str());
 			}
 		}
+		if (auto n = pBV->count(); n<0) pBV->setCurrentRow(n-1);
 	}
 }
 
@@ -269,7 +266,6 @@ void MainWin::addBilling()
 		jh::billing b(dir.filename().string());
 		b.store(dir.string());
 		load();
-		m_billingsView->setCurrentRow(m_billingsView->count() - 1);
 		updateAll();
 	}
 }
@@ -279,7 +275,6 @@ void MainWin::delBilling()
 	{
 		jh::toBackup(m_billings.at(r));
 		load();
-		m_billingsView->setCurrentRow(m_billingsView->count() - 1);
 		updateAll();
 	}
 }
