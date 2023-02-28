@@ -142,13 +142,13 @@ namespace jh
 						auto debit = totalAmount * ratio;
 						ss << "\n----------------- " << driver.name << " -----------------------\n";
 						ss << "Strecke:   " << track << " km  Anteil: " << round_d(100 * ratio, 1) << "%\n";
-						ss << "Soll:      " << round_d(debit, 2) << " Euro\n";
-						ss << "Haben:     " << round_d(credit, 2) << " Euro\n";
-						ss << "Ausgleich: " << round_d(credit - debit, 2) << " Euro\n";
+						ss << "Soll:      " << round_d(debit, 2) << "€\n";
+						ss << "Haben:     " << round_d(credit, 2) << "€\n";
+						ss << "Ausgleich: " << round_d(credit - debit, 2) << "€\n";
 					};
 
 					ss << "Gefahren gesamt:  " << totalTrack << " km\n";
-					ss << "Bezahlt  gesamt:  " << totalAmount << " Euro\n";
+					ss << "Bezahlt  gesamt:  " << totalAmount << "€\n";
 					ss << "Quote:  " << round_d(100 * totalAmount / totalTrack, 1) << " ct/km\n";
 					for (auto&& driver : drivers)
 						evaluate(driver);
