@@ -192,7 +192,7 @@ void MainWin::updateBillsTable()
 		m_billTable->setRowCount(bills.size());
 		for (auto&& [bill, i] : jh::zip(bills, jh::Loop(bills.size())))
 		{
-			m_billTable->setCellWidget(i, 0, jh::makeLabel(bill.amount," Euro"));
+			m_billTable->setCellWidget(i, 0, jh::makeLabel(bill.amount, QChar(0x20AC)));
 			m_billTable->setCellWidget(i, 1, jh::makeLabel(bill.driver.name.c_str(), ""));
 		}
 		m_billTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -234,8 +234,9 @@ void MainWin::updateReport()
 {
 	if (m_report)
 	{
-		auto s = m_work.invoiceAll();
-		m_report->setText(s.c_str());
+		auto s = QString(m_work.invoiceAll().c_str());
+		s.replace("Euro", QChar(0x20AC));
+		m_report->setText(s);
 	}
 }
 
