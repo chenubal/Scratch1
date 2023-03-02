@@ -4,6 +4,8 @@
 #include <numeric>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
+
 #include "../Tools/zipper.h"
 
 namespace jh
@@ -128,7 +130,6 @@ namespace jh
 		{
 			if (!trips.empty())
 			{
-				auto round_d = [](auto v, char digits) { auto f = std::pow(10, -1.0 * digits); return f * std::round(v / f); };
 				std::stringstream ss;
 				ss << "----------------- " << name << " -----------------------\n";
 				if (auto totalTrack = total(trips))
@@ -140,16 +141,18 @@ namespace jh
 						auto ratio = (track / totalTrack);
 						auto credit = total(bills, driver);
 						auto debit = totalAmount * ratio;
+						ss << std::setprecision(1) << std::left;
 						ss << "\n----------------- " << driver.name << " -----------------------\n";
-						ss << "Strecke:   " << track << " km  Anteil: " << round_d(100 * ratio, 1) << "%\n";
-						ss << "Soll:      " << round_d(debit, 2) << "€\n";
-						ss << "Haben:     " << round_d(credit, 2) << "€\n";
-						ss << "Ausgleich: " << round_d(credit - debit, 2) << "€\n";
+						ss << "Strecke:   " << track << " km  Anteil: " << (100 * ratio) << "%\n";
+						ss << std::setprecision(2);
+						ss << "Haben:\t" << credit << "€\n";
+						ss << "Soll:\t" << debit << "€\n";
+						ss << "Ausgleich:\t" << (credit - debit) << "€\n";
 					};
-
+					ss << std::fixed << std::setprecision(2);
 					ss << "Gefahren gesamt:  " << totalTrack << " km\n";
 					ss << "Bezahlt  gesamt:  " << totalAmount << "€\n";
-					ss << "Quote:  " << round_d(100 * totalAmount / totalTrack, 1) << " ct/km\n";
+					ss << "Quote:  " << (100 * totalAmount / totalTrack) << " ct/km\n";
 					for (auto&& driver : drivers)
 						evaluate(driver);
 				}
