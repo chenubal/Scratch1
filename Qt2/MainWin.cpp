@@ -87,7 +87,7 @@ MainWin::MainWin(QWidget* parent) : QMainWindow(parent)
 	auto makeMainWidget = [&, this]
 	{
 		auto w = new QWidget();
-		w->setMinimumSize(970, 600);
+		w->setMinimumSize(1200, 600);
 		w->setLayout(mainLayout());
 		return w;
 	};
@@ -154,8 +154,8 @@ QLayout* MainWin::makeTripsView()
 	if (!m_tripTable)
 	{
 		m_tripTable = new QTableWidget(this);
-		m_tripTable->setColumnCount(3);
-		m_tripTable->setHorizontalHeaderLabels({ "Start","Ende","Fahrer" });
+		m_tripTable->setColumnCount(4);
+		m_tripTable->setHorizontalHeaderLabels({ "Start","Ende", "Fahrer","Gefahren" });
 
 		auto addBtn = new QPushButton("Neuer Reise");
 		connect(addBtn, &QPushButton::pressed, this, [this] { appendTrip(); });
@@ -211,6 +211,7 @@ void MainWin::updateTripsTable()
 			m_tripTable->setCellWidget(i, 0, jh::makeLabel(trip.start, " km"));
 			m_tripTable->setCellWidget(i, 1, jh::makeLabel(trip.end, " km"));
 			m_tripTable->setCellWidget(i, 2, jh::makeLabel(trip.driver.name.c_str(), ""));
+			m_tripTable->setCellWidget(i, 3, jh::makeLabel((trip.end - trip.start), " km"));
 		}
 		m_tripTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	}
