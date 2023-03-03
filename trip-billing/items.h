@@ -104,6 +104,7 @@ namespace jh
 		std::string name{};
 		trips_t trips{};
 		bills_t bills{};
+		const double insurance = 0.05; // €/km
 
 		void store(std::string folder = ".") const
 		{
@@ -134,7 +135,8 @@ namespace jh
 				ss << "----------------- " << name << " -----------------------\n";
 				if (auto totalTrack = total(trips))
 				{
-					auto totalAmount = total(bills);
+					auto totalI = (totalTrack * insurance);
+					auto totalAmount = total(bills) + totalI;
 					auto evaluate = [&](driver_t driver)
 					{
 						auto track = double(total(trips, driver));
@@ -153,6 +155,7 @@ namespace jh
 					ss << "Gefahren gesamt:  " << totalTrack << " km\n";
 					ss << "Bezahlt  gesamt:  " << totalAmount << "€\n";
 					ss << "Quote:  " << (100 * totalAmount / totalTrack) << " ct/km\n";
+					ss << "Vesicherung:  " << (insurance*100) << " ct/km gesamt: "<< totalI << "€\n";
 					for (auto&& driver : drivers)
 						evaluate(driver);
 				}
