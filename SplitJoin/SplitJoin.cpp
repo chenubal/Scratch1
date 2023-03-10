@@ -8,21 +8,21 @@ using SIt = S::const_iterator;
 using VS = std::vector<S>;
 using VSIt = VS::const_iterator;
 
-void split(SIt b, SIt e, VS& r, char sep = '|')
+void split_r(SIt b, SIt e, VS& r, char sep = '|')
 {
 	auto p = std::find(b, e, sep);
 	r.emplace_back(b, p);
-	if (p != e) split(++p, e, r, sep);
+	if (p != e) split_r(++p, e, r, sep);
 }
 
-VS split(S const& s, char sep = '|')
+VS split_r(S const& s, char sep = '|')
 {
 	VS r;
-	split(std::begin(s), std::end(s), r, sep);
+	split_r(std::begin(s), std::end(s), r, sep);
 	return r;
 }
 
-VS split2(const S& s, char sep ='|')
+VS split_l(const S& s, char sep ='|')
 {
 	VS result;
 	size_t colon = s.find(sep);
@@ -39,24 +39,24 @@ VS split2(const S& s, char sep ='|')
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void join(VSIt b, VSIt e, S& s, char sep = '|')
+void join_r(VSIt b, VSIt e, S& s, char sep = '|')
 {
 	if (b != e)
 	{
 		s += *b++;
 		if (b != e) s += sep;
-		join(b, e, s, sep);
+		join_r(b, e, s, sep);
 	}
 }
 
-S join(VS const& vs, char sep = '|')
+S join_r(VS const& vs, char sep = '|')
 {
 	S r;
-	join(vs.begin(), vs.end(), r, sep);
+	join_r(vs.begin(), vs.end(), r, sep);
 	return r;
 }
 
-S join2(VS const& vs, char sep = '|')
+S join_l(VS const& vs, char sep = '|')
 {
 	S r;
 	if (auto b = vs.begin(), e = vs.end(); b != e)
@@ -70,8 +70,8 @@ S join2(VS const& vs, char sep = '|')
 
 int main()
 {
-	auto test = [](S const& s) {std::cout << join(split(s)) << "\n"; };
-	auto test2 = [](S const& s) {std::cout << join2(split2(s)) << "\n"; };
+	auto test = [](S const& s) {std::cout << join_r(split_r(s)) << "\n"; };
+	auto test2 = [](S const& s) {std::cout << join_l(split_l(s)) << "\n"; };
 	test("||Hello|World|abc|||h|");
 	test("|");
 	test("");
