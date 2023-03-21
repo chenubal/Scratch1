@@ -160,6 +160,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SplitJoin", "SplitJoin\Spli
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "compose", "compose\compose.vcxproj", "{F589C2C5-9293-4415-8BCC-076EBD1B3D4B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sp_polymorphism", "sp_polymorphism\sp_polymorphism.vcxproj", "{446CEFB5-03D4-49CC-905B-B79E7C509DA6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -758,6 +760,14 @@ Global
 		{F589C2C5-9293-4415-8BCC-076EBD1B3D4B}.Release|x64.Build.0 = Release|x64
 		{F589C2C5-9293-4415-8BCC-076EBD1B3D4B}.Release|x86.ActiveCfg = Release|Win32
 		{F589C2C5-9293-4415-8BCC-076EBD1B3D4B}.Release|x86.Build.0 = Release|Win32
+		{446CEFB5-03D4-49CC-905B-B79E7C509DA6}.Debug|x64.ActiveCfg = Debug|x64
+		{446CEFB5-03D4-49CC-905B-B79E7C509DA6}.Debug|x64.Build.0 = Debug|x64
+		{446CEFB5-03D4-49CC-905B-B79E7C509DA6}.Debug|x86.ActiveCfg = Debug|Win32
+		{446CEFB5-03D4-49CC-905B-B79E7C509DA6}.Debug|x86.Build.0 = Debug|Win32
+		{446CEFB5-03D4-49CC-905B-B79E7C509DA6}.Release|x64.ActiveCfg = Release|x64
+		{446CEFB5-03D4-49CC-905B-B79E7C509DA6}.Release|x64.Build.0 = Release|x64
+		{446CEFB5-03D4-49CC-905B-B79E7C509DA6}.Release|x86.ActiveCfg = Release|Win32
+		{446CEFB5-03D4-49CC-905B-B79E7C509DA6}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
