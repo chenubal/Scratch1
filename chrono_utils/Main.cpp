@@ -32,7 +32,7 @@ namespace chrono_tools
 	inline std::string today() { return time_g("%F"); }
 
 	/// @brief Returns a date string of now
-	inline std::string time() { return time_g("%T"); }
+	inline std::string time() { return time_g("%value_type"); }
 
 	/// @brief Returns a standard date string of now
 	inline std::string localtime() { return time_g("%c"); }

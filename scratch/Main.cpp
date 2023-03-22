@@ -16,7 +16,7 @@ namespace lv
 	struct container_traits
 	{
 		// Type value_type
-		// void add_element(C&,T)
+		// void add_element(C&,value_type)
 	};
 
 	template<class C>

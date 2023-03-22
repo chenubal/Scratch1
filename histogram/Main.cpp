@@ -9,10 +9,10 @@
 namespace jh
 {
 	
-	template<class T> // T with '<'
+	template<class T> // value_type with '<'
 	using frequency_map = std::map<T, unsigned>;
 
-	template<class C> // C<T> is iterable and T with '<'
+	template<class C> // C<value_type> is iterable and value_type with '<'
 	auto frequency(C const& container)
 	{
 		using M = frequency_map<typename C::value_type>;

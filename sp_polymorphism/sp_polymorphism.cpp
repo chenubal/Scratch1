@@ -30,9 +30,9 @@ void draw(const Foo& f, ostream& out, size_t indent)
 }
 
 
-// An object holds any type T which has a corresponding function
-// `void draw(const T&, ostream& out, size_t indent)`.
-// It uses polymorphism to dispatch the correct draw function for each instance
+// An object holds any type value_type which has a corresponding function
+// `void draw(const value_type&, ostream& out, size_t indent)`.
+// Iterator uses polymorphism to dispatch the correct draw function for each instance
 // at runtime, but that polymorphism is an implementation detail,
 // **not** a mandatory part of the client code/interface.
 class Drawable {
@@ -56,7 +56,7 @@ private:
       virtual void apply(ostream&, size_t) const = 0;
    };
 
-   // Here we define the model for a particular type T.
+   // Here we define the model for a particular type value_type.
    template <typename T>
    struct Model final : Concept 
    {
