@@ -345,7 +345,13 @@ void MainWin::runBillEditor(jh::bill_t& bill)
 
 	auto drvSelection = new QComboBox();
 	drvSelection->addItems(drvNames);
-	drvSelection->setCurrentIndex(0);
+	auto drvIndex = drvNames.indexOf(bill.driver.name.c_str(), 0);
+	if (drvIndex < 0)
+	{
+		drvIndex = 0;
+		bill.driver.name = drvNames.at(drvIndex).toStdString();
+	}
+	drvSelection->setCurrentIndex(drvIndex);
 	connect(drvSelection, QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int i) {bill.driver.name = drvNames.at(i).toStdString(); });
 
 	auto hBox = new QHBoxLayout();
@@ -389,7 +395,13 @@ void MainWin::runTripEditor(jh::trip_t& trip, bool enable)
 
 	auto drvSelection = new QComboBox();
 	drvSelection->addItems(drvNames);
-	drvSelection->setCurrentIndex(0);
+	auto drvIndex = drvNames.indexOf(trip.driver.name.c_str(), 0);
+	if (drvIndex < 0)
+	{
+		drvIndex = 0;
+		trip.driver.name = drvNames.at(drvIndex).toStdString();
+	}
+	drvSelection->setCurrentIndex(drvIndex);
 	connect(drvSelection, QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int i) {trip.driver.name = drvNames.at(i).toStdString(); });
 
 	auto hBox = new QHBoxLayout();

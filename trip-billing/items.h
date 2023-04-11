@@ -136,7 +136,8 @@ namespace jh
 				if (auto totalTrack = total(trips))
 				{
 					auto totalI = (totalTrack * insurance);
-					auto totalAmount = total(bills) + totalI;
+					auto totalBills = total(bills);
+					auto totalAmount = totalBills + totalI;
 					auto evaluate = [&](driver_t driver)
 					{
 						auto track = double(total(trips, driver));
@@ -152,10 +153,13 @@ namespace jh
 						ss << "Ausgleich:\t" << (credit - debit) << "€\n";
 					};
 					ss << std::fixed << std::setprecision(2);
-					ss << "Gefahren gesamt:  " << totalTrack << " km\n";
-					ss << "Bezahlt  gesamt:  " << totalAmount << "€\n";
-					ss << "Quote:  " << (100 * totalAmount / totalTrack) << " ct/km\n";
-					ss << "Vesicherung:  " << (insurance*100) << " ct/km gesamt: "<< totalI << "€\n";
+					ss << "Reisen gesamt:  " << totalTrack << " km\n";
+					ss << "Tanken gesamt:  " << totalBills << "€\n";
+					ss << "Versich. gesamt:  " << totalI << "€\n";
+					ss << "Kosten gesamt:  " << totalAmount << "€\n";
+					ss << "Quote (R):  " << (100 * totalBills / totalTrack) << " ct/km\n";
+					ss << "Quote (T):  " << (100 * totalAmount / totalTrack) << " ct/km\n";
+					ss << "Vesicherung:  " << (insurance*100) << " ct/km\n";
 					for (auto&& driver : drivers)
 						evaluate(driver);
 				}
