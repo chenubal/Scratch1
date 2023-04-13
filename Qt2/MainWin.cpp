@@ -330,7 +330,6 @@ void MainWin::delLastTrip()
 
 void MainWin::runBillEditor(jh::bill_t& bill)
 {
-	QStringList drvNames{ "Josef","Jannis","Luis" };
 	auto dialog = new QDialog();
 	auto amountBox = new QDoubleSpinBox();
 	amountBox->setFixedWidth(80);
@@ -373,7 +372,6 @@ void MainWin::runBillEditor(jh::bill_t& bill)
 
 void MainWin::runTripEditor(jh::trip_t& trip, bool enable)
 {
-	QStringList drvNames{ "Josef","Jannis","Luis" };
 	auto dialog = new QDialog();
 	auto startBox = new QSpinBox();
 	startBox->setFixedWidth(80);

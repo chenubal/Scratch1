@@ -64,8 +64,8 @@ namespace jh
 		bool valid() const { return amount > 0.0 && driver.valid(); }
 	};
 
-	inline std::ostream& operator<<(std::ostream& os, bill_t const& bill)	{ os << bill.amount << '\t' << bill.driver; return os;}
-	inline std::istream& operator>>(std::istream& is, bill_t& bill)	{ is >> bill.amount >> bill.driver;	return is; }
+	inline std::ostream& operator<<(std::ostream& os, bill_t const& bill) { os << bill.amount << '\t' << bill.driver; return os;}
+	inline std::istream& operator>>(std::istream& is, bill_t& bill) { is >> bill.amount >> bill.driver;	return is; }
 
 	using bills_t = std::vector<bill_t>;
 
@@ -77,23 +77,25 @@ namespace jh
 
 	inline double total(bills_t const bills, driver_t const& driver)
 	{
-		auto accu = [&driver](double s, bill_t const& bill) {return bill.driver == driver ? s + bill.amount : s; };
+		auto accu = [&driver](double s, bill_t const& bill) {return s + (bill.driver == driver ? bill.amount : 0); };
 		return sum_f<bills_t, double>(bills, accu);
 	}
 
 	template<class T>
-	void transfer(std::ifstream&& in, T& out)
+	void read(std::ifstream&& in, T& out)
 	{
-		out.clear();
-		if (in)
+		while (in && !in.eof())
 		{
-			while (!in.eof())
-			{
-				out.emplace_back(); in >> out.back();
-				if (!out.back().valid())
-					out.pop_back();
-			}
+			auto& back = out.emplace_back(); in >> back;
+			if (!back.valid())
+				out.pop_back();
 		}
+	};
+
+	template<class T>
+	void write(T& in, std::ofstream&& out) 
+	{
+		if (out) out << in; 
 	};
 
 	//----------------------------------------------------------------
@@ -108,15 +110,13 @@ namespace jh
 
 		void store(std::string folder = ".") const
 		{
-			auto transfer = [&](auto& in, auto&& out) {if (out) out << in; } ;
-			transfer( trips, std::ofstream(folder + "/trips.txt"));
-			transfer( bills, std::ofstream(folder + "/bills.txt"));
+			write( trips, std::ofstream(folder + "/trips.txt"));
+			write( bills, std::ofstream(folder + "/bills.txt"));
 		}
 		void load(std::string folder = ".") 
 		{
-	
-			transfer(std::ifstream(folder + "/trips.txt"), trips);
-			transfer(std::ifstream(folder + "/bills.txt"), bills);
+			trips.clear(); read(std::ifstream(folder + "/trips.txt"), trips);
+			bills.clear(); read(std::ifstream(folder + "/bills.txt"), bills);
 		}
 
 		std::vector<driver_t> driver() const
@@ -131,39 +131,40 @@ namespace jh
 		{
 			if (!trips.empty())
 			{
-				std::stringstream ss;
-				ss << "----------------- " << name << " -----------------------\n";
+				std::stringstream out;
+				out << "----------------- " << name << " -----------------------\n";
 				if (auto totalTrack = total(trips))
 				{
 					auto totalI = (totalTrack * insurance);
 					auto totalBills = total(bills);
 					auto totalAmount = totalBills + totalI;
-					auto evaluate = [&](driver_t driver)
+					out << std::fixed << std::setprecision(2);
+					out << "Reisen gesamt:  " << totalTrack << " km\n";
+					out << "Tanken gesamt:  " << totalBills << "€\n";
+					out << "Versich. gesamt:  " << totalI << "€\n";
+					out << "Kosten gesamt:  " << totalAmount << "€\n";
+					out << "Quote (R):  " << (100 * totalBills / totalTrack) << " ct/km\n";
+					out << "Quote (T):  " << (100 * totalAmount / totalTrack) << " ct/km\n";
+					out << "Versicherung:  " << (insurance*100) << " ct/km\n";
+
+					auto evalDriver = [&](driver_t driver)
 					{
 						auto track = double(total(trips, driver));
 						auto ratio = (track / totalTrack);
 						auto credit = total(bills, driver);
 						auto debit = totalAmount * ratio;
-						ss << std::setprecision(1) << std::left;
-						ss << "\n----------------- " << driver.name << " -----------------------\n";
-						ss << "Strecke:   " << track << " km  Anteil: " << (100 * ratio) << "%\n";
-						ss << std::setprecision(2);
-						ss << "Haben:\t" << credit << "€\n";
-						ss << "Soll:\t" << debit << "€\n";
-						ss << "Ausgleich:\t" << (credit - debit) << "€\n";
+						out << std::setprecision(1) << std::left;
+						out << "\n----------------- " << driver.name << " -----------------------\n";
+						out << "Strecke:   " << track << " km  Anteil: " << (100 * ratio) << "%\n";
+						out << std::setprecision(2);
+						out << "Haben:\t" << credit << "€\n";
+						out << "Soll:\t" << debit << "€\n";
+						out << "Ausgleich:\t" << (credit - debit) << "€\n";
 					};
-					ss << std::fixed << std::setprecision(2);
-					ss << "Reisen gesamt:  " << totalTrack << " km\n";
-					ss << "Tanken gesamt:  " << totalBills << "€\n";
-					ss << "Versich. gesamt:  " << totalI << "€\n";
-					ss << "Kosten gesamt:  " << totalAmount << "€\n";
-					ss << "Quote (R):  " << (100 * totalBills / totalTrack) << " ct/km\n";
-					ss << "Quote (T):  " << (100 * totalAmount / totalTrack) << " ct/km\n";
-					ss << "Vesicherung:  " << (insurance*100) << " ct/km\n";
 					for (auto&& driver : drivers)
-						evaluate(driver);
+						evalDriver(driver);
 				}
-				return ss.str();
+				return out.str();
 			}
 			return "No trips found!";
 		}

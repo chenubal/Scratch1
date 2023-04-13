@@ -42,4 +42,5 @@ private:
    QTextEdit* m_report;
    jh::billing m_work;
    int lastEnd = 125'000;
+   QStringList drvNames{ "Josef","Jannis","Luis" };
 };
