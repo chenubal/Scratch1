@@ -3,6 +3,8 @@
 //#include "items.h"
 #include <sstream>
 
+using json = nlohmann::json;
+
 int main()
 {
     //jh::bill_t x;
@@ -36,7 +38,14 @@ int main()
        std::cout << b.bills << "\n";
        std::cout << b.invoice({ {std::string("Josef")},{std::string("Jannes")},{std::string("Luis")} }) << "\n";
        std::vector<jh::driver_t> ds{ std::string("a"), std::string("b"), std::string("c") };
-       std::cout << nlohmann::json(b).dump(1) << "\n";
+ 
+       
+       if (false)
+       {
+          b.trips = json{ jh::trip_t{0,200,std::string("Josef")}, jh::trip_t{200,500,std::string("Luis")} };
+          b.bills = json{ jh::bill_t{255.33,std::string("Josef")} };
+       }
+       std::cout << json(b).dump(1) << "\n";
 
    }
 }
