@@ -33,7 +33,10 @@ int main()
        b.load();
        std::cout << b.trips << "\n";
        std::cout << b.bills << "\n";
-       std::cout << b.invoice({ {"Josef"},{"Jannes"},{"Luis"} }) << "\n";
+       std::cout << b.invoice({ {std::string("Josef")},{std::string("Jannes")},{std::string("Luis")} }) << "\n";
+       std::vector<jh::driver_t> ds{ std::string("a"), std::string("b"), std::string("c") };
+       std::cout << json(b).dump(3) << "\n";
+
    }
 }
 

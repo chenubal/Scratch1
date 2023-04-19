@@ -4,6 +4,7 @@
 #include <vector>
 #include <numeric>
 #include <ostream>
+#include <functional>
 
 namespace jh
 {
