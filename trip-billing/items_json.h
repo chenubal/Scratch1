@@ -33,7 +33,6 @@ namespace jh
 		js.at("driver").get_to(trip.driver); 
 	}
 
-
 	inline void to_json(json& js, const bill_t& bill)
 	{ 
 		js = json
@@ -47,26 +46,6 @@ namespace jh
 	{ 
 		js.at("amount").get_to(bill.amount); 
 		js.at("driver").get_to(bill.driver); 
-	}
-
-	inline void to_json(json& js, const trips_t& trips)
-	{
-		js = json::array_t(trips.begin(), trips.end());;
-	}
-
-	inline void from_json(const json& js, trips_t& trips)
-	{
-		trips = trips_t(js.begin(), js.end());
-	}
-
-	inline  void to_json(json& js, const bills_t& bills)
-	{ 
-		js = json::array_t(bills.begin(), bills.end());
-	}
-
-	inline  void from_json(const json& js, bills_t& bills)
-	{ 
-		bills = bills_t(js.begin(), js.end());
 	}
 
 	inline  void to_json(json& js, const billing& bill)

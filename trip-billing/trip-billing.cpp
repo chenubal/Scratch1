@@ -34,18 +34,16 @@ int main()
     {
        jh::billing b("Abrechnung vom 06.02.2023");
        b.load();
-       std::cout << b.trips << "\n";
-       std::cout << b.bills << "\n";
+       std::cout << b.trips << "\n-----------------------------\n" << b.bills << "\n";
        std::cout << b.invoice({ {std::string("Josef")},{std::string("Jannes")},{std::string("Luis")} }) << "\n";
-       std::vector<jh::driver_t> ds{ std::string("a"), std::string("b"), std::string("c") };
- 
-       
-       if (false)
+          
+       if (true)
        {
-          b.trips = json{ jh::trip_t{0,200,std::string("Josef")}, jh::trip_t{200,500,std::string("Luis")} };
+          jh::trips_t trips{ jh::trip_t{0,200,std::string("Josef")}, jh::trip_t{200,500,std::string("Luis")} };
+          b.trips = json(trips); // trips_t -> json ->trips_t
           b.bills = json{ jh::bill_t{255.33,std::string("Josef")} };
+          std::cout << json(b).dump(1) << "\n";
        }
-       std::cout << json(b).dump(1) << "\n";
 
    }
 }
