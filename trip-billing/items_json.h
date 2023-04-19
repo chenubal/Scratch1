@@ -2,87 +2,88 @@
 #include "items.h"
 #include <nlohmann/json.hpp>
 
-using json = nlohmann::json;
-
-
 namespace jh
 {
-	inline void to_json(json& j, const driver_t& d) 
+	using json = nlohmann::json;
+
+	inline void to_json(json& js, const driver_t& d)
 	{
-		j = json{ {"name", d.name}};
+		js = json{ {"name", d.name}};
 	}
 
-	inline void from_json(const json& j, driver_t& d) 
+	inline void from_json(const json& js, driver_t& d) 
 	{	
-		j.at("name").get_to(d.name);
+		js.at("name").get_to(d.name);
 	}
 
-	inline void to_json(json& j, const trip_t& trip) 
+	inline void to_json(json& js, const trip_t& trip) 
 	{ 
-		j = json{ 
+		js = json
+		{ 
 			{"start", trip.start}, 
 			{"end", trip.end}, 
 			{"driver", trip.driver} 
 		}; 
 	}
 
-	inline void from_json(const json& j, trip_t& trip)
+	inline void from_json(const json& js, trip_t& trip)
 	{ 
-		j.at("start").get_to(trip.start); 
-		j.at("end").get_to(trip.end); 
-		j.at("driver").get_to(trip.driver); 
+		js.at("start").get_to(trip.start); 
+		js.at("end").get_to(trip.end); 
+		js.at("driver").get_to(trip.driver); 
 	}
 
-	inline void to_json(json& j, const trips_t& trips)
-	{ 
-		j.clear(); 
-		for (auto&& x : trips) j.emplace_back(x); 
-	}
 
-	inline void from_json(const json& j, trips_t& trips)
+	inline void to_json(json& js, const bill_t& bill)
 	{ 
-		trips.clear(); 
-		for (auto&& x : j) trips.emplace_back(x); }
-
-	inline void to_json(json& j, const bill_t& bill)
-	{ 
-		j = json{ 
+		js = json
+		{ 
 			{"amount", bill.amount},
-		{"driver", bill.driver} 
+		   {"driver", bill.driver} 
 		};
 	}
 
-	inline  void from_json(const json& j, bill_t& bill)
+	inline  void from_json(const json& js, bill_t& bill)
 	{ 
-		j.at("amount").get_to(bill.amount); 
-		j.at("driver").get_to(bill.driver); 
+		js.at("amount").get_to(bill.amount); 
+		js.at("driver").get_to(bill.driver); 
 	}
 
-	inline  void to_json(json& j, const bills_t& bills)
-	{ 
-		j.clear(); 
-		for (auto&& x : bills) j.emplace_back(x); 
+	inline void to_json(json& js, const trips_t& trips)
+	{
+		js = json::array_t(trips.begin(), trips.end());;
 	}
 
-	inline  void from_json(const json& j, bills_t& bills)
-	{ 
-		bills.clear(); 
-		for (auto&& x : j) bills.emplace_back(x); 
+	inline void from_json(const json& js, trips_t& trips)
+	{
+		trips = trips_t(js.begin(), js.end());
 	}
 
-	inline  void to_json(json& j, const billing& bill)
+	inline  void to_json(json& js, const bills_t& bills)
 	{ 
-		j = json{ 
+		js = json::array_t(bills.begin(), bills.end());
+	}
+
+	inline  void from_json(const json& js, bills_t& bills)
+	{ 
+		bills = bills_t(js.begin(), js.end());
+	}
+
+	inline  void to_json(json& js, const billing& bill)
+	{ 
+		js = json
+		{ 
 			{"name", bill.name},
 		   {"trips", bill.trips}, 
-		   {"bills", bill.bills} }; 
+		   {"bills", bill.bills} 
+		}; 
 	}
 
-	inline  void from_json(const json& j, billing& bill)
+	inline  void from_json(const json& js, billing& bill)
 	{ 
-		j.at("name").get_to(bill.name); 
-		j.at("trips").get_to(bill.trips); 
-		j.at("bills").get_to(bill.bills); 
+		js.at("name").get_to(bill.name); 
+		js.at("trips").get_to(bill.trips); 
+		js.at("bills").get_to(bill.bills); 
 	}
 
 }
