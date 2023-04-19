@@ -7,11 +7,6 @@
 #include <iomanip>
 
 #include "../Tools/zipper.h"
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
-
-
 
 namespace jh
 {
@@ -26,9 +21,6 @@ namespace jh
 		auto operator==(const driver_t& o) const { return name == o.name; }
 		auto operator<(const driver_t& o) const { return name < o.name; }
 	};
-
-	void to_json(json& j, const driver_t& d) {j = json{ {"name", d.name}};}
-	void from_json(const json& j, driver_t& d) {	j.at("name").get_to(d.name);}
 
 	inline std::ostream& operator<<(std::ostream& os, driver_t const& driver) {os << driver.name; return os; }
 	inline std::istream& operator>>(std::istream& is, driver_t& driver) { is >> driver.name;	return is; }
@@ -67,11 +59,6 @@ namespace jh
 		auto accu = [&driver](int s, trip_t const& trip) {return trip.driver == driver ? s + trip.dist() : s; };
 		return sum_f<trips_t, int>(trips, accu); 
 	}
-
-	void to_json(json& j, const trip_t& trip) { j = json{ {"start", trip.start}, {"end", trip.end}, {"driver", trip.driver} }; }
-	void from_json(const json& j, trip_t& trip) { j.at("start").get_to(trip.start); j.at("end").get_to(trip.end); j.at("driver").get_to(trip.driver); }
-	void to_json(json& j, const trips_t& trips) { j.clear(); for (auto&& x : trips) j.emplace_back(x); }
-	void from_json(const json& j, trips_t& trips) { trips.clear(); for (auto&& x : j) trips.emplace_back(x); }
 
 	//----------------------------------------------------------------
 	struct bill_t
@@ -114,11 +101,6 @@ namespace jh
 	{
 		if (out) out << in; 
 	};
-
-	void to_json(json& j, const bill_t& bill) { j = json{ {"amount", bill.amount},{"driver", bill.driver} }; }
-	void from_json(const json& j, bill_t& bill) { j.at("amount").get_to(bill.amount); j.at("driver").get_to(bill.driver); }
-	void to_json(json& j, const bills_t& bills) { j.clear(); for (auto&& x : bills) j.emplace_back(x); }
-	void from_json(const json& j, bills_t& bills) { bills.clear(); for (auto&& x : j) bills.emplace_back(x); }
 
 	//----------------------------------------------------------------
 	struct billing
@@ -201,9 +183,6 @@ namespace jh
 		}
 	};
 
-	void to_json(json& j, const billing& bill) { j = json{ {"name", bill.name},{"trips", bill.trips}, {"bills", bill.bills} }; }
-	void from_json(const json& j, billing& bill) { j.at("name").get_to(bill.name); j.at("trips").get_to(bill.trips); j.at("bills").get_to(bill.bills);
-	}
 
 }
 

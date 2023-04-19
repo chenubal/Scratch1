@@ -1,4 +1,5 @@
 #include <iostream>
+//#include "items_json.h"
 #include "items.h"
 #include <sstream>
 
@@ -35,7 +36,7 @@ int main()
        std::cout << b.bills << "\n";
        std::cout << b.invoice({ {std::string("Josef")},{std::string("Jannes")},{std::string("Luis")} }) << "\n";
        std::vector<jh::driver_t> ds{ std::string("a"), std::string("b"), std::string("c") };
-       std::cout << json(b).dump(3) << "\n";
+       //std::cout << json(b).dump(3) << "\n";
 
    }
 }
