@@ -164,6 +164,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sp_polymorphism", "sp_polym
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Numbers", "Numbers\Numbers.vcxproj", "{FA174D60-BD85-46D2-A218-9743F8D12ABC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AndThen", "AndThen\AndThen.vcxproj", "{5B4203E6-A5D8-4921-B437-CF1460C83C0E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -778,6 +780,14 @@ Global
 		{FA174D60-BD85-46D2-A218-9743F8D12ABC}.Release|x64.Build.0 = Release|x64
 		{FA174D60-BD85-46D2-A218-9743F8D12ABC}.Release|x86.ActiveCfg = Release|Win32
 		{FA174D60-BD85-46D2-A218-9743F8D12ABC}.Release|x86.Build.0 = Release|Win32
+		{5B4203E6-A5D8-4921-B437-CF1460C83C0E}.Debug|x64.ActiveCfg = Debug|x64
+		{5B4203E6-A5D8-4921-B437-CF1460C83C0E}.Debug|x64.Build.0 = Debug|x64
+		{5B4203E6-A5D8-4921-B437-CF1460C83C0E}.Debug|x86.ActiveCfg = Debug|Win32
+		{5B4203E6-A5D8-4921-B437-CF1460C83C0E}.Debug|x86.Build.0 = Debug|Win32
+		{5B4203E6-A5D8-4921-B437-CF1460C83C0E}.Release|x64.ActiveCfg = Release|x64
+		{5B4203E6-A5D8-4921-B437-CF1460C83C0E}.Release|x64.Build.0 = Release|x64
+		{5B4203E6-A5D8-4921-B437-CF1460C83C0E}.Release|x86.ActiveCfg = Release|Win32
+		{5B4203E6-A5D8-4921-B437-CF1460C83C0E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
