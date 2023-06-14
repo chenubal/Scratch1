@@ -1,7 +1,6 @@
 #pragma once
 #include <span>
-#include <iostream>
-#include <vector>
+#include <memory>
 
 using Element = int;
 using SpanE = std::span<Element>;

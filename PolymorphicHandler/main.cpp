@@ -1,4 +1,6 @@
 #include "factory.h"
+#include <vector>
+
 
 int main(int, char**)
 {

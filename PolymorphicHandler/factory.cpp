@@ -1,4 +1,5 @@
 #include "factory.h"
+#include <iostream>
 
 template<class Functor>
 struct HandlerLoop : public HandlerInterace
