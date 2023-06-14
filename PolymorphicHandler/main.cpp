@@ -34,10 +34,15 @@ enum class Method {A,B};
 
 std::unique_ptr<HandlerInterace> makeHandler(Method method)
 {
-	if (method == Method::A)
+	switch (method)
+	{
+	case Method::A : 
 		return std::make_unique<HandlerLoop<PrintA>>();
-	else
+	case Method::B : 
 		return std::make_unique<HandlerLoop<PrintB>>();
+	default: 
+		return {};
+	}
 }
 
 int main(int, char**)
