@@ -37,7 +37,7 @@ namespace jh
 	}
 
 	template<class T>
-	std::string asLabel(T v)
+	std::string labeledValue(T v)
 	{
 		return std::to_string(value(v)) + unit(v);
 	}
@@ -47,43 +47,43 @@ namespace units
 	using namespace jh;
 	///////////////////////////////////////////////////////////////////////////////////////
 
-	using AngleDeg = TaggedType<double, struct AngleTag>;
-	using AngleRad = TaggedType<double, struct RadiantTag>;
-	using Angle = std::variant<AngleDeg, AngleRad>;
+	using AngleInDeg = TaggedType<double, struct AngleTag>;
+	using AngleInRad = TaggedType<double, struct RadiantTag>;
+	using Angle = std::variant<AngleInDeg, AngleInRad>;
 
-	std::string unit(Angle a)
+	std::string unit(Angle angle)
 	{
 		auto v = overload
 		(
-			[](AngleDeg) { return std::string("\370"); }, 
-			[](AngleRad) { return std::string("rad"); }
+			[](AngleInDeg) { return std::string("\370"); },
+			[](AngleInRad) { return std::string("rad"); }
 		);
-		return std::visit(v, a);
+		return std::visit(v, angle);
 	}
 
-	double factor(Angle a)
+	double factor(Angle angle)
 	{
 		auto v = overload
 		(
-			[](AngleDeg) { return 1.0; }, 
-			[](AngleRad) { return 180.0 / PI; }
+			[](AngleInDeg) { return 1.0; },
+			[](AngleInRad) { return 180.0 / PI; }
 		);
-		return std::visit(v, a);
+		return std::visit(v, angle);
 	}
 
-	template<class T = AngleDeg>
-	Angle convert(Angle a)
+	template<class T = AngleInDeg>
+	Angle as(Angle angle)
 	{
-		if (!std::holds_alternative<T>(a))
+		if (!std::holds_alternative<T>(angle))
 		{
-			auto q = factor(a) / factor(Angle(T(0)));
-			a = T(std::visit([&](auto l) { return  *l * q; }, a));
+			auto q = factor(angle) / factor(Angle(T(0)));
+			angle = T(std::visit([&](auto x) { return  *x * q; }, angle));
 		}
-		return a;
+		return angle;
 	}
 
-	bool operator==(Angle a, Angle b) { return value(convert(a)) == value(convert(b)); }
-	bool operator!=(Angle a, Angle b) { return !(a == b); }
+	bool operator==(Angle left, Angle right) { return value(as(left)) == value(as(right)); }
+	bool operator!=(Angle left, Angle right) { return !(left == right); }
 
 	///////////////////////////////////////////////////////////////////////////////////////
 	using LengthPM = TaggedType<double, struct LengthPMTag>;
@@ -104,7 +104,7 @@ namespace units
 
 	using Length = std::variant<LengthPM, LengthNM, LengthUM, LengthMM, LengthM, LengthKM, LengthMiles>;
 
-	std::string unit(Length l)
+	std::string unit(Length length)
 	{
 		auto v = overload(
 			[](LengthPM) { return std::string("pm"); },
@@ -114,10 +114,10 @@ namespace units
 			[](LengthM) { return std::string("m"); },
 			[](LengthKM) { return std::string("km"); },
 			[](LengthMiles) { return std::string("mil"); });
-		return std::visit(v, l);
+		return std::visit(v, length);
 	}
 
-	double factor(Length l)
+	double factor(Length length)
 	{
 		auto v = overload(
 			[](LengthPM) { return 1e-12; },
@@ -127,33 +127,38 @@ namespace units
 			[](LengthM) { return 1.0; },
 			[](LengthKM) { return 1e3; },
 			[](LengthMiles) { return 1609.34; });
-		return std::visit(v, l);
+		return std::visit(v, length);
 	}
 
 	template<class T = LengthM>
-	Length convert(Length l)
+	Length convert(Length length)
 	{
-		if (!std::holds_alternative<T>(l))
+		if (!std::holds_alternative<T>(length))
 		{
-			auto q = factor(l) / factor(Length(T(0)));
-			l = T(std::visit([&](auto x) { return  *x * q; }, l));
+			auto q = factor(length) / factor(Length(T(0)));
+			length = T(std::visit([&](auto x) { return  *x * q; }, length));
 		}
-		return l;
+		return length;
 	}
 
-	bool operator<(Length a, Length b) { return value(convert(a)) < value(convert(b)); }
-	bool operator==(Length a, Length b) { return value(convert(a)) == value(convert(b)); }
-	bool operator!=(Length a, Length b) { return !(a == b); }
+	bool operator<(Length left, Length right) { return value(convert(left)) < value(convert(right)); }
+	bool operator==(Length left, Length right) { return value(convert(left)) == value(convert(right)); }
+	bool operator!=(Length left, Length right) { return !(left == right); }
 
 	///////////////////////////////////////////////////////////////////////////////////////
 
 	using Kelvin = TaggedType<double, struct KelvinTag>;
 	using Celsius = TaggedType<double, struct CelsiusTag>;
 	using Fahrenheit = TaggedType<double, struct FahrenheitTag>;
-
 	using Temperature = std::variant<Kelvin, Celsius, Fahrenheit>;
+
 	// NOTE: keys have to match the indexes of Temperature
-	static std::map<unsigned, std::function<Temperature(double)>> temperatureMaker = { {0u, [](double v) {return Kelvin(v); } },{1u, [](double v) {return Celsius(v); } },{2u, [](double v) {return Fahrenheit(v); } } };
+	static std::map<unsigned, std::function<Temperature(double)>> temperatureMaker = 
+	{ 
+		{0u, [](double v) {return Kelvin(v); } },
+		{1u, [](double v) {return Celsius(v); } },
+		{2u, [](double v) {return Fahrenheit(v); } } 
+	};
 
 	std::optional<Temperature> createTemperature(unsigned i, double v = 0)
 	{
@@ -162,93 +167,93 @@ namespace units
 		return {};
 	}
 
-	std::string unit(Temperature t)
+	std::string unit(Temperature temperature)
 	{
-		auto v = overload
+		auto getUnit = overload
 		(
 			[](Kelvin) { return std::string("K"); },
 			[](Celsius) { return std::string("\370C"); },
 			[](Fahrenheit) { return std::string("\370F"); }
 		);
-		return std::visit(v, t);
+		return std::visit(getUnit, temperature);
 	}
 
 	///Temperature conversion: K = C + 273.15; F = C*1.8 + 32
 
-	/// Scaling factor w.r.t Celsius
-	double factor(Temperature t)
+	/// Scaling factor w.r.t. temperature Celsius
+	double factor(Temperature temperature)
 	{
-		auto v = overload
+		auto getFactor = overload
 		(
 			[](auto) { return 1.0; },
 			[](Fahrenheit) { return 1.8; }
 		);
-		return std::visit(v, t);
+		return std::visit(getFactor, temperature);
 	}
 
-	/// Scaling offset w.r.t Celsius
-	double offset(Temperature t)
+	/// Scaling offset w.r.t. temperature Celsius
+	double offset(Temperature temperature)
 	{
-		auto v = overload
+		auto getOffset = overload
 		(
 			[](Kelvin) { return 273.15; },
 			[](Celsius) { return 0.0; },
 			[](Fahrenheit) { return 32.0; }
 		);
-		return std::visit(v, t);
+		return std::visit(getOffset, temperature);
 	}
 
-	Temperature toCelsius(Temperature t)
+	Temperature toCelsius(Temperature temperature)
 	{
-		if (!std::holds_alternative<Celsius>(t))
+		if (!std::holds_alternative<Celsius>(temperature))
 		{
-			auto q = factor(t);
-			auto o = offset(t);
-			t = Celsius(std::visit([&](auto l) { return  ((*l) - o) / q; }, t));
+			auto q = factor(temperature);
+			auto o = offset(temperature);
+			temperature = Celsius(std::visit([&](auto x) { return  ((*x) - o) / q; }, temperature));
 		}
-		return t;
+		return temperature;
 	}
 
 	template<class T = Celsius>
-	Temperature convert(Temperature t)
+	Temperature as(Temperature temperature)
 	{
-		if (!std::holds_alternative<T>(t))
+		if (!std::holds_alternative<T>(temperature))
 		{
 			auto q = factor(T(0));
 			auto o = offset(T(0));
-			t = T(std::visit([&](auto l) { return  (*l) * q + o; }, toCelsius(t)));
+			temperature = T(std::visit([&](auto x) { return  (*x) * q + o; }, toCelsius(temperature)));
 		}
-		return t;
+		return temperature;
 	}
 
-	bool operator<(Temperature a, Temperature b) { return value(convert(a)) < value(convert(b)); }
-	bool operator==(Temperature a, Temperature b) { return value(convert(a)) == value(convert(b)); }
-	bool operator!=(Temperature a, Temperature b) { return !(a == b); }
+	bool operator<(Temperature left, Temperature right) { return value(toCelsius(left)) < value(toCelsius(right)); }
+	bool operator==(Temperature left, Temperature right) { return value(toCelsius(left)) == value(toCelsius(right)); }
+	bool operator!=(Temperature left, Temperature right) { return !(left == right); }
 
 }
 
 using namespace units;
 
 template<class T = LengthM>
-void print(Length l)
+void print(Length length)
 {
-	std::cout << "Length: " << asLabel(convert<T>(l)) << "\n";
+	std::cout << "Length: " << labeledValue(convert<T>(length)) << "\n";
 }
 
 #define NL std::cout <<"\n"
 
 int main(int, char**)
 {
-	auto test = [](std::string const l, auto v) {	std::cout << l << " " << v << "\n";	};
-	Angle angle = AngleDeg(45);
-	test("angle:", asLabel(angle));
+	auto test = [](std::string const label, auto value) {	std::cout << label << " " << value << "\n";	};
+	Angle angle = AngleInDeg(45);
+	test("angle:", labeledValue(angle));
 	test("angle:", value(angle));
 	NL;
-	test("angle:", asLabel(convert<AngleDeg>(angle)));
-	test("angle:", asLabel(convert<AngleRad>(angle)));
-	angle = AngleRad(jh::PI / 4.0);
-	test("angle:", asLabel(convert<AngleDeg>(angle)));
-	test("angle:", asLabel(convert<AngleRad>(angle)));
+	test("angle:", labeledValue(as<AngleInDeg>(angle)));
+	test("angle:", labeledValue(as<AngleInRad>(angle)));
+	angle = AngleInRad(jh::PI / 4.0);
+	test("angle:", labeledValue(as<AngleInDeg>(angle)));
+	test("angle:", labeledValue(as<AngleInRad>(angle)));
 	NL;
 	Length length = LengthM(11);
 	print(length);
@@ -259,37 +264,37 @@ int main(int, char**)
 	print<LengthKM>(4.0_mil);
 	NL;
 	Temperature temperature = Celsius(30.0);
-	test("temperature:", asLabel(convert<Celsius>(temperature)));
-	test("temperature:", asLabel(convert<Kelvin>(temperature)));
-	test("temperature:", asLabel(convert<Fahrenheit>(temperature)));
+	test("temperature:", labeledValue(as<Celsius>(temperature)));
+	test("temperature:", labeledValue(as<Kelvin>(temperature)));
+	test("temperature:", labeledValue(as<Fahrenheit>(temperature)));
 	NL;
 	temperature = Fahrenheit(86);
-	test("temperature:", asLabel(convert<Celsius>(temperature)));
-	test("temperature:", asLabel(convert<Kelvin>(temperature)));
-	test("temperature:", asLabel(convert<Fahrenheit>(temperature)));
+	test("temperature:", labeledValue(as<Celsius>(temperature)));
+	test("temperature:", labeledValue(as<Kelvin>(temperature)));
+	test("temperature:", labeledValue(as<Fahrenheit>(temperature)));
 	NL;
 	temperature = Kelvin(303.15);
-	test("temperature:", asLabel(convert<Celsius>(temperature)));
-	test("temperature:", asLabel(convert<Kelvin>(temperature)));
-	test("temperature:", asLabel(convert<Fahrenheit>(temperature)));
+	test("temperature:", labeledValue(as<Celsius>(temperature)));
+	test("temperature:", labeledValue(as<Kelvin>(temperature)));
+	test("temperature:", labeledValue(as<Fahrenheit>(temperature)));
 	NL;
-	test("temperature:", asLabel(convert<Kelvin>(Celsius(30.0))));
-	test("temperature:", asLabel(convert<Celsius>(Kelvin(303.15))));
-	test("temperature:", asLabel(convert<Celsius>(Fahrenheit(212))));
-	test("temperature:", asLabel(convert<Fahrenheit>(Celsius(100))));
+	test("temperature:", labeledValue(as<Kelvin>(Celsius(30.0))));
+	test("temperature:", labeledValue(as<Celsius>(Kelvin(303.15))));
+	test("temperature:", labeledValue(as<Celsius>(Fahrenheit(212))));
+	test("temperature:", labeledValue(as<Fahrenheit>(Celsius(100))));
 	test("equal temperature:", Celsius(100) == Fahrenheit(212) ? "true" : "false");
 	test("diff. temperature:", Celsius(100) != Kelvin(100) ? "true" : "false");
 
-	std::vector<Temperature> temps{ Fahrenheit(212), Kelvin(310), Celsius(5), Fahrenheit(88) };
-	for (auto&& x : temps)	std::cout << asLabel(convert<Kelvin>(x)) << " ";
+	std::vector<Temperature> temperatures{ Fahrenheit(212), Kelvin(310), Celsius(5), Fahrenheit(88) };
+	for (auto&& t : temperatures)	std::cout << labeledValue(as<Kelvin>(t)) << " ";
 	NL;
-	std::sort(temps.begin(), temps.end());
-	for (auto&& t : temps)
-		std::cout << asLabel(convert<Kelvin>(t)) << "=" << asLabel(t) << " ";
+	std::sort(temperatures.begin(), temperatures.end());
+	for (auto&& t : temperatures)
+		std::cout << labeledValue(as<Kelvin>(t)) << "=" << labeledValue(t) << " ";
 	NL;
-	auto acc = [](Kelvin const& s, Temperature const& t) {return Kelvin(*s + value(convert<Kelvin>(t))); };
-	Temperature avg = Kelvin(*std::accumulate(temps.begin(), temps.end(), Kelvin(0.0), acc) / temps.size());
-	test("avg(t) = ", asLabel(avg));
+	auto acc = [](Kelvin const& s, Temperature const& t) {return Kelvin(*s + value(as<Kelvin>(t))); };
+	Temperature avg = Kelvin(*std::accumulate(temperatures.begin(), temperatures.end(), Kelvin(0.0), acc) / temperatures.size());
+	test("avg(t) = ", labeledValue(avg));
 	return 0;
 
 }
