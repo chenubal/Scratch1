@@ -7,42 +7,44 @@ using SpanE = std::span<Element>;
 
 struct HandlerInterace
 {
-	virtual void handle(SpanE elements) = 0;
+	virtual void handle(SpanE const& elements) = 0;
 };
 
-template<class Derived>
+template<class Functor>
 struct HandlerLoop : public HandlerInterace
 {
-	void handle(SpanE elements) override
+	void handle(SpanE const& elements) override
 	{
-		for (auto x : elements) d.handle(std::move(x));
+		for (auto x : elements) f(x);
 	}
-	Derived d;
+	Functor f;
 };
 
-struct HandlerA
+struct PrintA
 {
-	void handle(Element e) { std::cout << "A: " << e << "\n"; }
+	void operator()(Element const& e) { std::cout << "A: " << e << "\n"; }
 };
 
-struct HandlerB
+struct PrintB
 {
-	void handle(Element e) { std::cout << "B: " << e << "\n"; }
+	void operator()(Element const& e) { std::cout << "B: " << e << "\n"; }
 };
 
-std::unique_ptr<HandlerInterace> makeHandler(unsigned n)
+enum class Method {A,B};
+
+std::unique_ptr<HandlerInterace> makeHandler(Method method)
 {
-	if (n == 0)
-		return std::make_unique<HandlerLoop<HandlerA>>();
+	if (method == Method::A)
+		return std::make_unique<HandlerLoop<PrintA>>();
 	else
-		return std::make_unique<HandlerLoop<HandlerB>>();
+		return std::make_unique<HandlerLoop<PrintB>>();
 }
 
 int main(int, char**)
 {
 	std::vector<Element> v = { 1,4,8 };
-	makeHandler(0)->handle(v);
+	makeHandler(Method::A)->handle(v);
 	v = { 11,14,18,16 };
-	makeHandler(1)->handle(v);
+	makeHandler(Method::B)->handle(v);
 	return 0;
 }
