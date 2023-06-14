@@ -7,35 +7,35 @@ using SpanE = std::span<Element>;
 
 struct HandlerInterace
 {
-	virtual void handle(SpanE elements) = 0;
+	virtual void handle(SpanE const& elements) = 0;
 };
 
-template<class Derived>
+template<class Functor>
 struct HandlerLoop : public HandlerInterace
 {
-	void handle(SpanE elements) override
+	void handle(SpanE const& elements) override
 	{
-		for (auto x : elements) d.handle(std::move(x));
+		for (auto x : elements) f(x);
 	}
-	Derived d;
+	Functor f;
 };
 
-struct HandlerA
+struct PrintA
 {
-	void handle(Element e) { std::cout << "A: " << e << "\n"; }
+	void operator()(Element const& e) { std::cout << "A: " << e << "\n"; }
 };
 
-struct HandlerB
+struct PrintB
 {
-	void handle(Element e) { std::cout << "B: " << e << "\n"; }
+	void operator()(Element const& e) { std::cout << "B: " << e << "\n"; }
 };
 
 std::unique_ptr<HandlerInterace> makeHandler(unsigned n)
 {
 	if (n == 0)
-		return std::make_unique<HandlerLoop<HandlerA>>();
+		return std::make_unique<HandlerLoop<PrintA>>();
 	else
-		return std::make_unique<HandlerLoop<HandlerB>>();
+		return std::make_unique<HandlerLoop<PrintB>>();
 }
 
 int main(int, char**)
