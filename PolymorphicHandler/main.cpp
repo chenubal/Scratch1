@@ -1,12 +1,14 @@
 #include "factory.h"
-#include <vector>
+#include <valarray>
 
 
 int main(int, char**)
 {
-	std::vector<Element> v = { 1,4,8 };
+	std::valarray<Element> v = { 1,4,8 };
 	makeHandler(Method::A)->handle(v);
-	v = { 11,14,18,16 };
+	v += 100;
 	makeHandler(Method::B)->handle(v);
+	v += 100;
+	makeHandler(Method::C)->handle(v);
 	return 0;
 }

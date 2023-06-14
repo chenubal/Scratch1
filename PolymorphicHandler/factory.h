@@ -10,6 +10,6 @@ struct HandlerInterace
 	virtual void handle(SpanE const& elements) = 0;
 };
 
-enum class Method { A, B };
+enum class Method { A, B , C};
 
 std::unique_ptr<HandlerInterace> makeHandler(Method method);
