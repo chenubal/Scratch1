@@ -49,7 +49,7 @@ void join_r(VSIt b, VSIt e, S& s, char sep = '|')
 	}
 }
 
-S join_r(VS const& vs, char sep = '|')
+S join(VS const& vs, char sep = '|')
 {
 	S r;
 	join_r(vs.begin(), vs.end(), r, sep);
@@ -70,7 +70,7 @@ S join_l(VS const& vs, char sep = '|')
 
 int main()
 {
-	auto test = [](S const& s) {std::cout << join_r(split_r(s)) << "\n"; };
+	auto test = [](S const& s) {std::cout << join(split_r(s)) << "\n"; };
 	auto test2 = [](S const& s) {std::cout << join_l(split_l(s)) << "\n"; };
 	test("||Hello|World|abc|||h|");
 	test("|");

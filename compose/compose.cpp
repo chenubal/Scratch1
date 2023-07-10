@@ -4,9 +4,9 @@
 #include <iostream>
 #include <ranges>
 template <class F, class... Fs>
-constexpr auto compose(F&& arg, Fs &&...args)
+constexpr auto compose(F&& head, Fs &&...tail)
 {
-   return[  fun = std::forward<F>(arg), ... functions = std::forward<Fs>(args)] <class... Xs> (Xs &&...xs) mutable requires std::invocable<F, Xs...>
+   return[  fun = std::forward<F>(head), ... functions = std::forward<Fs>(tail)] <class... Xs> (Xs &&...xs) mutable requires std::invocable<F, Xs...>
       {
          if constexpr (sizeof...(Fs))
          {
