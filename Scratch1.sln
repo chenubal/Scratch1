@@ -170,6 +170,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TransIter", "TransIter\Tran
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PolymorphicHandler", "PolymorphicHandler\PolymorphicHandler.vcxproj", "{BAB86CCE-4962-4525-A270-D5A70AF47A11}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Coro1", "Coro1\Coro1.vcxproj", "{FFB0E733-C5C0-4CFD-B8E3-0577B7F71E98}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -808,6 +810,14 @@ Global
 		{BAB86CCE-4962-4525-A270-D5A70AF47A11}.Release|x64.Build.0 = Release|x64
 		{BAB86CCE-4962-4525-A270-D5A70AF47A11}.Release|x86.ActiveCfg = Release|Win32
 		{BAB86CCE-4962-4525-A270-D5A70AF47A11}.Release|x86.Build.0 = Release|Win32
+		{FFB0E733-C5C0-4CFD-B8E3-0577B7F71E98}.Debug|x64.ActiveCfg = Debug|x64
+		{FFB0E733-C5C0-4CFD-B8E3-0577B7F71E98}.Debug|x64.Build.0 = Debug|x64
+		{FFB0E733-C5C0-4CFD-B8E3-0577B7F71E98}.Debug|x86.ActiveCfg = Debug|Win32
+		{FFB0E733-C5C0-4CFD-B8E3-0577B7F71E98}.Debug|x86.Build.0 = Debug|Win32
+		{FFB0E733-C5C0-4CFD-B8E3-0577B7F71E98}.Release|x64.ActiveCfg = Release|x64
+		{FFB0E733-C5C0-4CFD-B8E3-0577B7F71E98}.Release|x64.Build.0 = Release|x64
+		{FFB0E733-C5C0-4CFD-B8E3-0577B7F71E98}.Release|x86.ActiveCfg = Release|Win32
+		{FFB0E733-C5C0-4CFD-B8E3-0577B7F71E98}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
