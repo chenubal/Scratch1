@@ -7,7 +7,7 @@
 #include <vector>
 
 template<class G,class T>
-struct pt
+struct PT
 {
 	T value{};
 	G  get_return_object() { return G{ this }; }
@@ -23,7 +23,7 @@ using test_t = float;
 
 struct Generator
 {
-	using promise_type = pt<Generator, test_t>;
+	using promise_type = PT<Generator, test_t>;
 	using handle_type = std::coroutine_handle<promise_type>;
 
 	handle_type m_Handle{};
@@ -53,9 +53,11 @@ struct Generator
 
 };
 
-Generator interleaved(std::vector<test_t> a, std::vector<test_t> b)
+using C = std::vector<test_t>;
+
+Generator interleaved(C a, C b)
 {
-	auto makeGen = [](std::vector<test_t>& v) -> Generator
+	auto makeGen = [](C& v) -> Generator
 	{
 		for (const auto& e : v) { co_yield e; }
 	};
@@ -63,13 +65,15 @@ Generator interleaved(std::vector<test_t> a, std::vector<test_t> b)
 	auto x = makeGen(a);
 	auto y = makeGen(b);
 
-	while (not x.finished() or not y.finished()) {
-		if (not x.finished()) {
+	while (not x.finished() or not y.finished()) 
+	{
+		if (not x.finished()) 
+		{
 			co_yield x.value();
 			x.resume();
 		}
-
-		if (not y.finished()) {
+		if (not y.finished()) 
+		{
 			co_yield y.value();
 			y.resume();
 		}
@@ -78,8 +82,8 @@ Generator interleaved(std::vector<test_t> a, std::vector<test_t> b)
 
 void BaseTest()
 {
-	std::vector< test_t> a{ 2, 4, 6, 8 };
-	std::vector< test_t> b{ 3, 5, 7, 9 };
+	C a{ 2, 4, 6, 8 };
+	C b{ 3, 5, 7, 9 };
 
 	Generator g{ interleaved(std::move(a), std::move(b)) };
 
